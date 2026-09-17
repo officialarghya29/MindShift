@@ -1,11 +1,11 @@
 """Sliding context window + long-range summary embedding (PS-01 §8)."""
 from __future__ import annotations
 
-import numpy as np
-
 
 class ContextWindow:
-    """Previous K turns (verbatim) + exponential-decay long-range summary."""
+    """Previous K turns (verbatim) + tension-ranked selection of older turns.
+    `decay` is kept for API compatibility with the documented long-range
+    weighting; the selection itself is salience-based."""
 
     def __init__(self, k: int = 4, decay: float = 0.85):
         self.k = k
@@ -16,7 +16,6 @@ class ContextWindow:
         recent = " || ".join(m["text"] for m in messages[lo:i])
         older = messages[:lo]
         if older:
-            w = self.decay ** len(older)
             top = sorted(older, key=lambda m: -abs(m.get("tension", 0)))[:3]
             recent = " :: ".join(m["text"] for m in top) + " || " + recent
         return recent or ""

@@ -7,8 +7,6 @@ from __future__ import annotations
 
 import numpy as np
 
-from cerebro.temporal.arc import INTENSITY
-
 
 def detect_turning_points(results: list[dict], z_threshold: float = 1.6,
                           min_delta_tension: float = 15.0) -> list[dict]:

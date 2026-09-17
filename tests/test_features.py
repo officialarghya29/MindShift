@@ -1,6 +1,4 @@
 """Feature-engine tests: behavioral vector, micro signals, segmentation."""
-import numpy as np
-
 from cerebro.features.preprocess import (behavioral_vector, process_text,
                                          micro_signals, BEHAVIORAL_DIMS)
 from cerebro.features.segmentation import segment_conversation

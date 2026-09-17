@@ -13,10 +13,9 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.calibration import CalibratedClassifierCV
 
-from cerebro.common.labels import SENTIMENT_LABELS, EMOTION_LABELS, TONE_LABELS
 from cerebro.features.featurizer import (
     build_vectorizer, vectorize, featurize_messages, CachedVectorizer)
-from cerebro.features.preprocess import process_text, micro_signals
+from cerebro.features.preprocess import micro_signals
 from cerebro.context.features_builder import build_conversation_matrix
 
 

@@ -137,7 +137,6 @@ def graph_main_result():
 def graph_ablation():
     abl = load("ablations.json")
     full = load("summary.json")["full_metrics"]
-    variants = ["A", "B", "C", "D", "E"]
     vlabels = ["A\ntext\nonly", "B\n+context\nwindow", "C\n+speaker\nmemory",
                "D\n+behavior\n(full heads)", "E\n+hidden fusion\n(FULL)"]
     sarc = [abl[v]["sarcasm"]["roc_auc"] for v in ("A", "B", "C", "D")] + \

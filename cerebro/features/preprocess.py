@@ -33,7 +33,6 @@ def behavioral_vector(text: str, prev_ts, ts, prev_speaker: str | None,
     documented — the fusion layer and explanations depend on this ordering."""
     base, emojis = emoji_split(text)
     words = base.split()
-    n_words = max(len(words), 1)
     excl = text.count("!")
     ques = text.count("?")
     rep_punct = len(REPEAT_PUNCT_RE.findall(text))

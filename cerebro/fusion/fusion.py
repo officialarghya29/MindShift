@@ -7,8 +7,6 @@ never hand-picked — the PS-01 explicitly prefers tuned fusion.
 """
 from __future__ import annotations
 
-import itertools
-
 import numpy as np
 
 STREAMS = ["text", "context", "memory", "behavior", "temporal", "hidden"]
@@ -54,7 +52,6 @@ def fuse_message(r: dict, weights: dict[str, float]) -> dict:
       hidden    → sarcasm/irony/PA probabilities
     """
     conf_text = max(r["sentiment"]["confidence"], r["emotion"]["confidence"])
-    ctx_bonus = 0.08 if r.get("context_text") else 0.0
     w = weights or _DEFAULT_W
     fused_conf = float(np.clip(
         conf_text * (w["text"] + w["context"] + w["memory"]) * 2.2

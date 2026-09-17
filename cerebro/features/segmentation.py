@@ -58,7 +58,6 @@ def segment_by_cohesion(messages: list[dict]) -> list[list[dict]]:
             continue
         inter = len(a & b)
         cos = inter / ((len(a) * len(b)) ** 0.5)
-        prev = bounds[-1][1] if bounds else None
         bounds.append((i, cos))
     cuts = []
     for j, (i, cos) in enumerate(bounds):
