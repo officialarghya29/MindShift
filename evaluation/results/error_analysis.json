@@ -7,6 +7,14 @@
     "passive_aggression:false_negative": 6,
     "sarcasm:false_negative": 1
   },
+  "noise_attribution": {
+    "passive_aggression:false_negative": 6,
+    "sarcasm:false_negative": 1
+  },
+  "real_errors_after_noise_removal": {
+    "passive_aggression:false_negative": 0,
+    "sarcasm:false_negative": 0
+  },
   "samples": [
     {
       "conversation": "conv_0583",
@@ -17,7 +25,9 @@
       "prediction": "0 (p=0.00)",
       "confidence": 0.0026,
       "error_type": "passive_aggression:false_negative",
-      "possible_cause": "literal reading dominated — no contextual trigger"
+      "attributed_to_noise": true,
+      "template_design_label": 0,
+      "possible_cause": "gold label contradicts the template design — attributable to the injected 1.5% annotator noise (irreducible error)"
     },
     {
       "conversation": "conv_0446",
@@ -28,7 +38,9 @@
       "prediction": "0 (p=0.02)",
       "confidence": 0.0159,
       "error_type": "sarcasm:false_negative",
-      "possible_cause": "literal reading dominated — no contextual trigger"
+      "attributed_to_noise": true,
+      "template_design_label": 0,
+      "possible_cause": "gold label contradicts the template design — attributable to the injected 1.5% annotator noise (irreducible error)"
     },
     {
       "conversation": "conv_0255",
@@ -39,7 +51,9 @@
       "prediction": "0 (p=0.00)",
       "confidence": 0.0022,
       "error_type": "passive_aggression:false_negative",
-      "possible_cause": "literal reading dominated — no contextual trigger"
+      "attributed_to_noise": true,
+      "template_design_label": 0,
+      "possible_cause": "gold label contradicts the template design — attributable to the injected 1.5% annotator noise (irreducible error)"
     },
     {
       "conversation": "conv_0363",
@@ -50,7 +64,9 @@
       "prediction": "0 (p=0.01)",
       "confidence": 0.013,
       "error_type": "passive_aggression:false_negative",
-      "possible_cause": "literal reading dominated — no contextual trigger"
+      "attributed_to_noise": true,
+      "template_design_label": 0,
+      "possible_cause": "gold label contradicts the template design — attributable to the injected 1.5% annotator noise (irreducible error)"
     },
     {
       "conversation": "conv_0162",
@@ -61,7 +77,9 @@
       "prediction": "0 (p=0.01)",
       "confidence": 0.0094,
       "error_type": "passive_aggression:false_negative",
-      "possible_cause": "literal reading dominated — no contextual trigger"
+      "attributed_to_noise": true,
+      "template_design_label": 0,
+      "possible_cause": "gold label contradicts the template design — attributable to the injected 1.5% annotator noise (irreducible error)"
     },
     {
       "conversation": "conv_0535",
@@ -72,7 +90,9 @@
       "prediction": "0 (p=0.25)",
       "confidence": 0.2542,
       "error_type": "passive_aggression:false_negative",
-      "possible_cause": "literal reading dominated — no contextual trigger"
+      "attributed_to_noise": true,
+      "template_design_label": 0,
+      "possible_cause": "gold label contradicts the template design — attributable to the injected 1.5% annotator noise (irreducible error)"
     },
     {
       "conversation": "conv_0268",
@@ -83,7 +103,9 @@
       "prediction": "0 (p=0.00)",
       "confidence": 0.0006,
       "error_type": "passive_aggression:false_negative",
-      "possible_cause": "literal reading dominated — no contextual trigger"
+      "attributed_to_noise": true,
+      "template_design_label": 0,
+      "possible_cause": "gold label contradicts the template design — attributable to the injected 1.5% annotator noise (irreducible error)"
     }
   ]
 }

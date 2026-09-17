@@ -85,7 +85,7 @@
       "f1_macro": 0.958,
       "f1_weighted": 0.9811
     },
-    "latency_ms": 3.44
+    "latency_ms": 3.51
   },
   "error_analysis": {
     "counts": {
@@ -96,7 +96,15 @@
       "passive_aggression:false_negative": 6,
       "sarcasm:false_negative": 1
     },
+    "noise_attribution": {
+      "passive_aggression:false_negative": 6,
+      "sarcasm:false_negative": 1
+    },
+    "real_errors_after_noise_removal": {
+      "passive_aggression:false_negative": 0,
+      "sarcasm:false_negative": 0
+    },
     "n_samples": 7
   },
-  "wall_time_seconds": 50.6
+  "wall_time_seconds": 51.6
 }

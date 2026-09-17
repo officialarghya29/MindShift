@@ -265,10 +265,33 @@ def eval_full_cerebro(engine: MultiTaskEngine, convs):
 # ----------------------------------------------------------------------------
 # error analysis (PS-01 §39)
 # ----------------------------------------------------------------------------
+def _design_label_lookup() -> dict[str, tuple[int, int, int]]:
+    """Reverse lookup: template text → design (sarcasm, irony, PA) labels.
+    Used to attribute gold-label disagreements to the injected annotator noise."""
+    from cerebro.data.domains import DOMAINS
+    import re as _re
+    lookup = {}
+    for dom in DOMAINS.values():
+        for band in dom["bands"]:
+            for tpl in band:
+                text, _, _, _, sarc, iron, pa, _ = tpl
+                key = _re.sub(r"\s+", " ", text.lower().strip())
+                lookup[key] = (int(sarc), int(iron), int(pa))
+    return lookup
+
+
+def _clean_text(t: str) -> str:
+    import re as _re
+    t = _re.sub(r"\s*\([^)]*\)\s*", " ", t)   # strip injected topic references
+    return _re.sub(r"\s+", " ", t.lower().strip())
+
+
 def error_analysis(engine: MultiTaskEngine, convs, max_rows: int = 400) -> dict:
     rows = []
     err_types = Counter()
     fn_fp = Counter()
+    noise_attributed = Counter()
+    design = _design_label_lookup()
     for c in convs:
         results = engine.predict_conversation(c)
         apply_hidden_signals(results)
@@ -307,38 +330,53 @@ def error_analysis(engine: MultiTaskEngine, convs, max_rows: int = 400) -> dict:
                         "confidence": conf,
                         "error_type": et,
                     })
-            for head in HEADS_BINARY:
+            for head_idx, head in enumerate(HEADS_BINARY):
                 gold = int(m[head])
                 pred = int(r[head]["probability"] >= .5)
-                if gold != pred:
-                    kind = "false_negative" if gold == 1 else "false_positive"
-                    fn_fp[f"{head}:{kind}"] += 1
-                    err_types[f"{head}:{kind}"] += 1
-                    sig = r["signals"]
-                    if gold == 1 and pred == 0:
-                        cause = ("symbolic evidence below threshold (subtle "
-                                 "contradiction)" if r[head]["learned_p"] > .4
-                                 else "literal reading dominated — no contextual trigger")
-                    else:
-                        cause = ("tension trajectory primed the prior" if
-                                 r[head]["probability"] - r[head].get("learned_p", 0) > .2
-                                 else "marker words present without ironic intent")
-                    if len(rows) < max_rows:
-                        rows.append({
-                            "conversation": m["conversation_id"],
-                            "message_id": m["message_id"],
-                            "head": head,
-                            "text": m["text"][:100],
-                            "ground_truth": str(gold),
-                            "prediction": f"{pred} (p={r[head]['probability']:.2f})",
-                            "confidence": r[head]["probability"],
-                            "error_type": f"{head}:{kind}",
-                            "possible_cause": cause,
-                        })
+                if gold == pred:
+                    continue
+                kind = "false_negative" if gold == 1 else "false_positive"
+                fn_fp[f"{head}:{kind}"] += 1
+                err_types[f"{head}:{kind}"] += 1
+                sig = r["signals"]
+                # noise attribution: does the gold label contradict the template design?
+                d_label = design.get(_clean_text(m["text"]), (None, None, None))[head_idx]
+                is_noise = d_label is not None and d_label != gold
+                if is_noise:
+                    noise_attributed[f"{head}:{kind}"] += 1
+                    cause = ("gold label contradicts the template design — attributable "
+                             "to the injected 1.5% annotator noise (irreducible error)")
+                elif gold == 1 and pred == 0:
+                    cause = ("symbolic evidence below threshold (subtle contradiction)"
+                             if r[head]["learned_p"] > .4
+                             else "literal reading dominated — no contextual trigger")
+                else:
+                    cause = ("tension trajectory primed the prior"
+                             if r[head]["probability"] - r[head].get("learned_p", 0) > .2
+                             else "marker words present without ironic intent")
+                if len(rows) < max_rows:
+                    rows.append({
+                        "conversation": m["conversation_id"],
+                        "message_id": m["message_id"],
+                        "head": head,
+                        "text": m["text"][:100],
+                        "ground_truth": str(gold),
+                        "prediction": f"{pred} (p={r[head]['probability']:.2f})",
+                        "confidence": r[head]["probability"],
+                        "error_type": f"{head}:{kind}",
+                        "attributed_to_noise": bool(is_noise),
+                        "template_design_label": d_label,
+                        "possible_cause": cause,
+                    })
+    real_errors = {k: v - noise_attributed.get(k, 0) for k, v in fn_fp.items()}
     save_json({"counts": dict(err_types), "binary_breakdown": dict(fn_fp),
+               "noise_attribution": dict(noise_attributed),
+               "real_errors_after_noise_removal": real_errors,
                "samples": rows},
               f"{RESULTS_DIR}/error_analysis.json")
     return {"counts": dict(err_types), "binary_breakdown": dict(fn_fp),
+            "noise_attribution": dict(noise_attributed),
+            "real_errors_after_noise_removal": real_errors,
             "n_samples": len(rows)}
 
 
