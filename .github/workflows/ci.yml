@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest joblib
+
+      - name: Lint (syntax + undefined names)
+        run: |
+          python -m compileall -q cerebro backend evaluation scripts tests
+          python - <<'EOF'
+          import ast, pathlib, sys
+          bad = []
+          for p in pathlib.Path(".").rglob("*.py"):
+              if ".git" in p.parts:
+                  continue
+              try:
+                  ast.parse(p.read_text(encoding="utf-8"))
+              except SyntaxError as e:
+                  bad.append(f"{p}: {e}")
+          sys.exit(1 if bad else 0)
+          EOF
+
+      - name: Unit tests
+        run: python -m pytest tests/ -q
+
+      - name: API tests (stubbed pipeline)
+        run: python -m pytest backend/tests -q
+
+      - name: Metric gates (committed published results)
+        run: |
+          python - <<'EOF'
+          import json
+          s = json.load(open("evaluation/results/summary.json"))
+          assert s["n_test_conversations"] > 0
+          fm = s["full_metrics"]
+          # sanity gates: saturated corpus — assert the easy things loudly
+          assert fm["sentiment"]["f1_macro"] >= 0.95
+          assert fm["tension"]["mae"] <= 5.0
+          assert fm["sarcasm"]["roc_auc"] >= 0.90
+          print("summary gates OK:",
+                "sarc-auc", fm["sarcasm"]["roc_auc"],
+                "| tension-mae", fm["tension"]["mae"])
+          sc = json.load(open("evaluation/results/scenarios.json"))
+          assert sc["n_passed"] == 20, sc["n_passed"]
+          print("scenario gate OK: 20/20 executed")
+          ea = s.get("error_analysis", {})
+          real = sum(ea.get("real_errors_after_noise_removal", {}).values())
+          assert real <= 5, f"real errors regressed: {real}"
+          print("error gate OK: real errors =", real)
+          EOF
+
+      - name: Training smoke (tiny corpus, ~90s, exit-code only)
+        run: |
+          python - <<'EOF'
+          import sys
+          from evaluation.run_full import fit_stage, eval_stage
+          fit_stage(convs_per_cell=3)
+          eval_stage()
+          print("training smoke OK")
+          EOF
+
+      - name: Graph smoke
+        run: |
+          python - <<'EOF'
+          from evaluation.make_graphs import graph_architecture
+          graph_architecture()   # includes the overlap validator
+          EOF
+          test -f docs/architecture/architecture.png && echo "architecture OK"
