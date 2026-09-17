@@ -16,6 +16,10 @@ def emotion_intensity(res: dict) -> float:
 
 def build_arc(results: list[dict]) -> dict:
     """Emotional arc + intensity/direction/stability metrics (PS-01 §18)."""
+    if not results:                       # degenerate-input guard (fuzz-tested)
+        return {"arc": [], "mean_intensity": 0.0, "peak_intensity": 0.0,
+                "stability": 1.0, "direction": "stable", "peaks": [],
+                "drops": [], "recovered": False, "tension_curve": []}
     ys = np.array([emotion_intensity(r) for r in results])
     ts = np.array([r["tension"] for r in results])
     peaks_idx = _peaks(ys, prominence=0.18)

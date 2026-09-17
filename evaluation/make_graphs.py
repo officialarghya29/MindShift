@@ -567,7 +567,7 @@ def graph_scenarios():
 
 # ================================================================ 10 · ARCHITECTURE
 def graph_architecture():
-    fig = plt.figure(figsize=(13.5, 15.5))
+    fig = plt.figure(figsize=(13.5, 16.5))
     header(fig, "CEREBRO system architecture",
            "raw chat → parsers → contextual/temporal intelligence → explainable report (PS-01 §46)")
     ax = fig.add_axes([0, 0, 1, 1])
@@ -575,87 +575,134 @@ def graph_architecture():
     ax.set_xlim(0, 100)
     ax.set_ylim(0, 100)
 
-    def box(x, y, w, h, lines, color, fs=11.5, sub_fs=9.5):
+    rects = []          # (name, x, y, w, h) for the overlap validator
+
+    def box(x, y, w, h, lines, color, fs=11.5, sub_fs=9.5, name=""):
         ax.add_patch(plt.Rectangle((x, y), w, h, facecolor=PANEL, edgecolor=color,
                                    lw=2, zorder=3))
         head = lines[0]
         rest = lines[1:]
-        ax.text(x + w / 2, y + h - (h * 0.30 if rest else h / 2), head,
+        ax.text(x + w / 2, y + h - (h * 0.28 if rest else h / 2), head,
                 ha="center", va="center", fontsize=fs, fontweight="bold",
                 color=color, zorder=4)
         if rest:
-            ax.text(x + w / 2, y + h * 0.30, "\n".join(rest), ha="center",
+            ax.text(x + w / 2, y + h * 0.28, "\n".join(rest), ha="center",
                     va="center", fontsize=sub_fs, color="#D1D5DB", zorder=4)
+        rects.append((name or lines[0][:22], x, y, w, h))
 
     def arrow(x1, y1, x2, y2, color="#4B5563", lw=2):
         ax.annotate("", xy=(x2, y2), xytext=(x1, y1),
                     arrowprops=dict(arrowstyle="-|>", color=color, lw=lw))
 
+    bands = []          # (name, x, y, w, h)
     def band(y, h, label, color):
         ax.add_patch(plt.Rectangle((1.5, y), 97, h, facecolor=color, alpha=0.045,
                                    edgecolor="none", zorder=1))
-        ax.text(2.6, y + h - 1.6, label, fontsize=10, color=color, alpha=0.9,
-                fontweight="bold", zorder=2, va="top")
+        # right-aligned label: the figure header is left-aligned, so the two
+        # can never collide even on the topmost band
+        ax.text(97.2, y + h - 1.3, label, fontsize=10, color=color, alpha=0.9,
+                fontweight="bold", zorder=2, va="top", ha="right")
+        bands.append((label.split("·")[0].strip(), 1.5, y, 97, h))
 
-    band(88.5, 10.5, "INPUT LAYER · PS-01 §2", CYAN)
-    for txt, x in [("WhatsApp\n.txt", 6), ("Discord\nJSON", 24), ("Slack\nJSON", 41),
-                   ("CSV", 57), ("JSON", 69), ("plain txt", 81)]:
-        box(x, 89.5, 12.5, 6.2, [txt], CYAN, fs=10.5)
-        arrow(x + 6.2, 89.5, 48.5, 86.4, lw=1.4)
+    # ---- INPUT LAYER (band 84.5–92; header sits fully above 92) ----
+    band(84.5, 7.5, "INPUT LAYER · PS-01 §2", CYAN)
+    for txt, x in [("WhatsApp\n.txt", 4.5), ("Discord\nJSON", 20), ("Slack\nJSON", 35.5),
+                   ("CSV", 51), ("JSON", 66.5), ("plain txt", 82)]:
+        box(x, 85.8, 13, 4.2, [txt], CYAN, fs=10.5, name=f"in:{txt[:9]}")
+        arrow(x + 6.5, 85.8, 47, 83.6, lw=1.4)
 
-    box(31, 79.5, 36, 6.6, ["CHAT PARSER + AUTO-DETECT",
-                            "one common message format · speakers · timestamps"], CYAN)
-    arrow(49, 79.5, 49, 76.8)
+    box(29, 78.4, 42, 5.0,
+        ["CHAT PARSER + AUTO-DETECT — one common format · speakers · timestamps"],
+        CYAN, fs=11, name="parser")
+    arrow(50, 78.4, 50, 75.6)
 
-    band(56.5, 20, "UNDERSTANDING LAYER · PS-01 §5, §8, §9, §17", PURPLE)
-    box(8, 66.5, 40, 9.5, ["PREPROCESSING + BEHAVIORAL FEATURES",
-                           "16-dim interpretable vector per message",
-                           "CAPS · exclamations · emoji · response gap"], PURPLE)
-    box(54, 66.5, 40, 9.5, ["CONTEXT ENGINE + SPEAKER MEMORY",
-                            "sliding 4-turn window + decayed summary",
-                            "per-speaker emotional state"], PURPLE)
-    arrow(28, 66.5, 42, 62.2)
-    arrow(74, 66.5, 58, 62.2)
-    box(20, 58.2, 62, 4.0, ["MESSAGE REPRESENTATION  =  text ⊕ context ⊕ behavior ⊕ memory"],
-        "#7CFFB2", fs=12)
+    # ---- UNDERSTANDING LAYER (band 53–84; contains the parser row) ----
+    band(53, 31, "UNDERSTANDING LAYER · PS-01 §2, §5, §8, §9, §17", PURPLE)
+    box(8, 64, 40, 8, ["PREPROCESSING + BEHAVIORAL FEATURES",
+                       "16-dim interpretable vector per message",
+                       "CAPS · exclamations · emoji · response gap"], PURPLE,
+        name="preproc")
+    box(54, 64, 40, 8, ["CONTEXT ENGINE + SPEAKER MEMORY",
+                        "sliding 4-turn window + decayed summary",
+                        "per-speaker emotional state"], PURPLE, name="context")
+    arrow(28, 64, 43, 59.8)
+    arrow(74, 64, 57, 59.8)
+    box(19, 54.6, 62, 4.2,
+        ["MESSAGE REPRESENTATION  =  text ⊕ context ⊕ behavior ⊕ memory"],
+        "#7CFFB2", fs=12, name="repr")
+    arrow(50, 54.6, 50, 51.4)
 
-    band(30.5, 24.5, "INTELLIGENCE LAYER · PS-01 §10–22", YELLOW)
-    box(5, 47.5, 28, 8.5, ["MULTI-TASK NLP ENGINE",
-                           "sentiment · emotion · tone",
-                           "tension (0–100)"], YELLOW)
-    box(36, 47.5, 28, 8.5, ["HIDDEN-SIGNAL DETECTION",
-                            "sarcasm · irony · passive-aggression",
-                            "learned ⊕ contradiction evidence"], YELLOW)
-    box(67, 47.5, 28, 8.5, ["TEMPORAL ENGINES",
-                            "arc · transitions · turning points",
-                            "escalation trajectory"], YELLOW)
-    arrow(49, 47.5, 49, 44.4)
-    box(26, 36.8, 48, 7.4, ["MODEL FUSION + CALIBRATION",
-                            "six evidence streams · validation-tuned weights · Platt scaling"],
-        ORANGE)
+    # ---- INTELLIGENCE LAYER (band 30–52) ----
+    band(30, 22, "INTELLIGENCE LAYER · PS-01 §10–22", YELLOW)
+    box(5, 43.2, 28, 7, ["MULTI-TASK NLP ENGINE",
+                         "sentiment · emotion · tone",
+                         "tension (0–100)"], YELLOW, name="mtln")
+    box(36, 43.2, 28, 7, ["HIDDEN-SIGNAL DETECTION",
+                          "sarcasm · irony · passive-aggression",
+                          "learned ⊕ contradiction evidence"], YELLOW, name="hidden")
+    box(67, 43.2, 28, 7, ["TEMPORAL ENGINES",
+                          "arc · transitions · turning points",
+                          "escalation trajectory"], YELLOW, name="temporal")
+    arrow(50, 43.2, 50, 40.9)
+    box(26, 33.6, 48, 7, ["MODEL FUSION + CALIBRATION",
+                          "six evidence streams · validation-tuned weights · Platt scaling"],
+        ORANGE, name="fusion")
 
-    band(20, 9.5, "OUTPUT LAYER · PS-01 §23–30", PINK)
-    box(8, 21.5, 26, 7.0, ["EXPLAINABILITY",
-                           "WHY? · WHAT CHANGED?",
-                           "evidence ≠ interpretation"], PINK)
-    box(37, 21.5, 26, 7.0, ["CONVERSATION REPORT",
-                            "18-section summary",
-                            "speaker + topic views"], PINK)
-    box(66, 21.5, 26, 7.0, ["FASTAPI + DASHBOARD",
+    # ---- OUTPUT LAYER (band 12.5–29) ----
+    band(12.5, 16.5, "OUTPUT LAYER · PS-01 §23–30", PINK)
+    box(7, 20, 26.5, 7, ["EXPLAINABILITY",
+                         "WHY? · WHAT CHANGED?",
+                         "evidence ≠ interpretation"], PINK, name="explain")
+    box(36.75, 20, 26.5, 7, ["CONVERSATION REPORT",
+                             "18-section summary",
+                             "speaker + topic views"], PINK, name="report")
+    box(66.5, 20, 26.5, 7, ["FASTAPI + DASHBOARD",
                             "12 endpoints · TTL store",
-                            "futuristic frontend"], PINK)
-    arrow(21, 21.5, 44, 17.6)
-    arrow(49, 21.5, 49, 17.6)
-    arrow(79, 21.5, 54, 17.6)
-    box(30, 11.2, 40, 6.0, ["EMOTIONAL ARC · TENSION CURVE",
-                            "the conversation's emotional journey, explained"], CYAN, fs=12)
+                            "futuristic frontend"], PINK, name="api")
+    arrow(50, 33.6, 20.2, 27.4)
+    arrow(50, 33.6, 50, 27.4)
+    arrow(50, 33.6, 79.8, 27.4)
+    box(27, 13.9, 46, 4.4, ["EMOTIONAL ARC · TENSION CURVE — the journey, explained"],
+        CYAN, fs=11.5, name="arc")
+    arrow(20.2, 20, 39, 18.5, lw=1.4)
+    arrow(50, 20, 50, 18.5, lw=1.4)
+    arrow(79.8, 20, 61, 18.5, lw=1.4)
 
-    ax.text(50, 6.2, "every arrow is a real function call — see docs/methodology/PS01_WORKFLOW.md",
+    ax.text(50, 9.6, "every arrow is a real function call — see docs/methodology/PS01_WORKFLOW.md",
             fontsize=10.5, color="#6B7280", ha="center", style="italic")
+
+    # ---- programmatic overlap validator ----
+    def overlap(a, b, pad=0.05):
+        _, ax_, ay, aw, ah = a
+        _, bx, by, bw, bh = b
+        return not (ax_ + aw + pad <= bx or bx + bw + pad <= ax_ or
+                    ay + ah + pad <= by or by + bh + pad <= ay)
+    for i in range(len(rects)):
+        for j in range(i + 1, len(rects)):
+            assert not overlap(rects[i], rects[j]), \
+                f"box collision: {rects[i][0]} × {rects[j][0]}"
+    for name, x, y, w, h in rects:
+        inside = any(bx <= x and x + w <= bx + bw and by <= y and y + h <= by + bh
+                     for _, bx, by, bw, bh in bands)
+        assert inside, f"box outside every band: {name}"
+    # arrows must not start or end inside a non-endpoint box
+    arrow_tips = [(6.5 + x, 85.8, 47, 83.6) for x in (4.5, 20, 35.5, 51, 66.5, 82)] + [
+        (50, 78.4, 50, 75.6), (28, 64, 43, 59.8), (74, 64, 57, 59.8),
+        (50, 54.6, 50, 51.4), (50, 43.2, 50, 40.9), (50, 33.6, 20.2, 27.4),
+        (50, 33.6, 50, 27.4), (50, 33.6, 79.8, 27.4), (20.2, 20, 39, 18.5),
+        (50, 20, 50, 18.5), (79.8, 20, 61, 18.5)]
+    for x1, y1, x2, y2 in arrow_tips:
+        for name, bx, by, bw, bh in rects:
+            for px, py in ((x1, y1), (x2, y2)):
+                inside_pt = bx < px < bx + bw and by < py < by + bh
+                is_src = any(abs(px - ex) < 1.5 and abs(py - ey) < 1.5 for ex, ey in
+                             ((x + 6.5, 85.8) for x in (4.5, 20, 35.5, 51, 66.5, 82)))
+                assert not (inside_pt and not is_src), \
+                    f"arrow endpoint buried in box {name} at ({px},{py})"
     watermark(fig, alpha=0.05, zoom=0.17, pos=(0.845, 0.015))
     fig.savefig("docs/architecture/architecture.png", bbox_inches="tight")
     plt.close(fig)
-    print("  ✓ architecture.png")
+    print("  ✓ architecture.png (overlap validator passed)")
 
 
 if __name__ == "__main__":

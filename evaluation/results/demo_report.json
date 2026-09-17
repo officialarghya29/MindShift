@@ -27,8 +27,8 @@
       "professional": 3,
       "supportive": 2
     },
-    "sarcasm_level": 0.064,
-    "irony_level": 0.053,
+    "sarcasm_level": 0.049,
+    "irony_level": 0.037,
     "passive_aggression_level": 0.017,
     "mean_tension": 9.9,
     "peak_tension": 13.8,
@@ -104,6 +104,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -176,9 +178,11 @@
       },
       "tension": 12.0,
       "sarcasm": {
-        "probability": 0.003,
-        "confidence": 0.994,
-        "supporting_signals": [],
+        "probability": 0.0,
+        "confidence": 1.0,
+        "supporting_signals": [
+          "cooperative intent markers present (argues against sarcasm)"
+        ],
         "learned_p": 0.003,
         "contradiction_evidence": 0.0
       },
@@ -203,6 +207,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": true,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 0,
@@ -275,9 +281,11 @@
       },
       "tension": 12.1,
       "sarcasm": {
-        "probability": 0.0056,
-        "confidence": 0.9888,
-        "supporting_signals": [],
+        "probability": 0.0,
+        "confidence": 1.0,
+        "supporting_signals": [
+          "cooperative intent markers present (argues against sarcasm)"
+        ],
         "learned_p": 0.0053,
         "contradiction_evidence": 0.0
       },
@@ -304,6 +312,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": true,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -409,6 +419,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -512,6 +524,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": false,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 0,
@@ -584,20 +598,21 @@
       },
       "tension": 7.6,
       "sarcasm": {
-        "probability": 0.0829,
-        "confidence": 0.8341,
+        "probability": 0.0,
+        "confidence": 1.0,
         "supporting_signals": [
-          "marker words: thanks"
+          "marker words: thanks",
+          "cooperative intent markers present (argues against sarcasm)"
         ],
         "learned_p": 0.002,
-        "contradiction_evidence": 0.075
+        "contradiction_evidence": 0.0187
       },
       "irony": {
-        "probability": 0.0754,
-        "confidence": 0.8493,
+        "probability": 0.0191,
+        "confidence": 0.9617,
         "supporting_signals": [],
         "learned_p": 0.0004,
-        "mismatch_evidence": 0.075
+        "mismatch_evidence": 0.0187
       },
       "passive_aggression": {
         "probability": 0.0077,
@@ -617,6 +632,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": true,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -689,9 +706,11 @@
       },
       "tension": 7.7,
       "sarcasm": {
-        "probability": 0.0018,
-        "confidence": 0.9964,
-        "supporting_signals": [],
+        "probability": 0.1266,
+        "confidence": 0.7469,
+        "supporting_signals": [
+          "repeated wording: cool"
+        ],
         "learned_p": 0.0015,
         "contradiction_evidence": 0.0
       },
@@ -719,6 +738,10 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [
+          "cool"
+        ],
+        "cooperative": false,
         "interjections": [],
         "praise_minus_neg": 2,
         "exclam": 0,
@@ -821,6 +844,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": false,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 1,
@@ -920,6 +945,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": false,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 0,
@@ -1019,6 +1046,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": false,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 0,
@@ -1091,21 +1120,22 @@
       },
       "tension": 9.1,
       "sarcasm": {
-        "probability": 0.2754,
-        "confidence": 0.4491,
+        "probability": 0.0,
+        "confidence": 1.0,
         "supporting_signals": [
           "marker words: thanks",
+          "cooperative intent markers present (argues against sarcasm)",
           "exclamation emphasis"
         ],
         "learned_p": 0.0006,
-        "contradiction_evidence": 0.275
+        "contradiction_evidence": 0.0688
       },
       "irony": {
-        "probability": 0.2775,
-        "confidence": 0.4451,
+        "probability": 0.0719,
+        "confidence": 0.8562,
         "supporting_signals": [],
         "learned_p": 0.0034,
-        "mismatch_evidence": 0.275
+        "mismatch_evidence": 0.0688
       },
       "passive_aggression": {
         "probability": 0.0054,
@@ -1125,6 +1155,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": true,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 1,
@@ -1230,6 +1262,8 @@
         "exaggeration": [
           "everything"
         ],
+        "repeated_words": [],
+        "cooperative": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -1302,9 +1336,11 @@
       },
       "tension": 5.6,
       "sarcasm": {
-        "probability": 0.0162,
-        "confidence": 0.9676,
-        "supporting_signals": [],
+        "probability": 0.0,
+        "confidence": 1.0,
+        "supporting_signals": [
+          "cooperative intent markers present (argues against sarcasm)"
+        ],
         "learned_p": 0.0162,
         "contradiction_evidence": 0.0
       },
@@ -1331,6 +1367,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": true,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -1430,6 +1468,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": false,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 0,
@@ -1542,6 +1582,8 @@
         ],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 1,
@@ -1644,6 +1686,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": false,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 1,
@@ -1716,9 +1760,11 @@
       },
       "tension": 6.2,
       "sarcasm": {
-        "probability": 0.0045,
-        "confidence": 0.991,
-        "supporting_signals": [],
+        "probability": 0.0,
+        "confidence": 1.0,
+        "supporting_signals": [
+          "cooperative intent markers present (argues against sarcasm)"
+        ],
         "learned_p": 0.0045,
         "contradiction_evidence": 0.0
       },
@@ -1745,6 +1791,8 @@
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
+        "repeated_words": [],
+        "cooperative": true,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -2256,13 +2304,14 @@
           "label": "Friendly",
           "confidence": 0.9928
         },
-        "sarcasm_probability": 0.003,
+        "sarcasm_probability": 0.0,
         "passive_aggression_probability": 0.0023,
         "tension": 12.0
       },
       "detected_evidence": [],
       "inferred_interpretation": [
         "sentiment shift neutral → positive",
+        "sarcasm evidence: cooperative intent markers present (argues against sarcasm)",
         "interpreted against the preceding conversation window"
       ],
       "model_confidence": 0.9925,
@@ -2283,7 +2332,7 @@
           "label": "Professional",
           "confidence": 0.9956
         },
-        "sarcasm_probability": 0.0056,
+        "sarcasm_probability": 0.0,
         "passive_aggression_probability": 0.0011,
         "tension": 12.1
       },
@@ -2292,6 +2341,7 @@
       ],
       "inferred_interpretation": [
         "sentiment shift positive → neutral",
+        "sarcasm evidence: cooperative intent markers present (argues against sarcasm)",
         "interpreted against the preceding conversation window"
       ],
       "model_confidence": 0.9924,
@@ -2374,7 +2424,7 @@
           "label": "Friendly",
           "confidence": 0.9953
         },
-        "sarcasm_probability": 0.0829,
+        "sarcasm_probability": 0.0,
         "passive_aggression_probability": 0.0077,
         "tension": 7.6
       },
@@ -2384,7 +2434,7 @@
       ],
       "inferred_interpretation": [
         "emotional shift joy → affection",
-        "sarcasm evidence: marker words: thanks",
+        "sarcasm evidence: marker words: thanks; cooperative intent markers present (argues against sarcasm)",
         "interpreted against the preceding conversation window"
       ],
       "model_confidence": 0.9968,
@@ -2405,7 +2455,7 @@
           "label": "Supportive",
           "confidence": 0.9975
         },
-        "sarcasm_probability": 0.0018,
+        "sarcasm_probability": 0.1266,
         "passive_aggression_probability": 0.0089,
         "tension": 7.7
       },
@@ -2414,6 +2464,7 @@
       ],
       "inferred_interpretation": [
         "emotional shift affection → neutral",
+        "sarcasm evidence: repeated wording: cool",
         "interpreted against the preceding conversation window"
       ],
       "model_confidence": 0.9937,
@@ -2519,7 +2570,7 @@
           "label": "Casual",
           "confidence": 0.9077
         },
-        "sarcasm_probability": 0.2754,
+        "sarcasm_probability": 0.0,
         "passive_aggression_probability": 0.0054,
         "tension": 9.1
       },
@@ -2530,7 +2581,7 @@
       ],
       "inferred_interpretation": [
         "emotional shift neutral → excitement",
-        "sarcasm evidence: marker words: thanks; exclamation emphasis",
+        "sarcasm evidence: marker words: thanks; cooperative intent markers present (argues against sarcasm)",
         "interpreted against the preceding conversation window"
       ],
       "model_confidence": 0.9841,
@@ -2581,7 +2632,7 @@
           "label": "Casual",
           "confidence": 0.9891
         },
-        "sarcasm_probability": 0.0162,
+        "sarcasm_probability": 0.0,
         "passive_aggression_probability": 0.0081,
         "tension": 5.6
       },
@@ -2590,6 +2641,7 @@
       ],
       "inferred_interpretation": [
         "emotional shift relief → joy",
+        "sarcasm evidence: cooperative intent markers present (argues against sarcasm)",
         "interpreted against the preceding conversation window"
       ],
       "model_confidence": 0.9946,
@@ -2702,7 +2754,7 @@
           "label": "Supportive",
           "confidence": 0.9975
         },
-        "sarcasm_probability": 0.0045,
+        "sarcasm_probability": 0.0,
         "passive_aggression_probability": 0.0141,
         "tension": 6.2
       },
@@ -2712,6 +2764,7 @@
       "inferred_interpretation": [
         "emotional shift neutral → affection",
         "sentiment shift neutral → positive",
+        "sarcasm evidence: cooperative intent markers present (argues against sarcasm)",
         "interpreted against the preceding conversation window"
       ],
       "model_confidence": 0.9967,

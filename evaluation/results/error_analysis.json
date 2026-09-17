@@ -1,11 +1,15 @@
 {
   "counts": {
     "passive_aggression:false_negative": 6,
-    "sarcasm:false_negative": 1
+    "sarcasm:false_negative": 1,
+    "sarcasm:false_positive": 1,
+    "irony:false_positive": 1
   },
   "binary_breakdown": {
     "passive_aggression:false_negative": 6,
-    "sarcasm:false_negative": 1
+    "sarcasm:false_negative": 1,
+    "sarcasm:false_positive": 1,
+    "irony:false_positive": 1
   },
   "noise_attribution": {
     "passive_aggression:false_negative": 6,
@@ -13,7 +17,9 @@
   },
   "real_errors_after_noise_removal": {
     "passive_aggression:false_negative": 0,
-    "sarcasm:false_negative": 0
+    "sarcasm:false_negative": 0,
+    "sarcasm:false_positive": 1,
+    "irony:false_positive": 1
   },
   "samples": [
     {
@@ -80,6 +86,32 @@
       "attributed_to_noise": true,
       "template_design_label": 0,
       "possible_cause": "gold label contradicts the template design — attributable to the injected 1.5% annotator noise (irreducible error)"
+    },
+    {
+      "conversation": "conv_0578",
+      "message_id": 12,
+      "head": "sarcasm",
+      "text": "That's great, congrats! (on the trip plan)",
+      "ground_truth": "0",
+      "prediction": "1 (p=0.53)",
+      "confidence": 0.5286,
+      "error_type": "sarcasm:false_positive",
+      "attributed_to_noise": false,
+      "template_design_label": 0,
+      "possible_cause": "tension trajectory primed the prior"
+    },
+    {
+      "conversation": "conv_0578",
+      "message_id": 12,
+      "head": "irony",
+      "text": "That's great, congrats! (on the trip plan)",
+      "ground_truth": "0",
+      "prediction": "1 (p=0.54)",
+      "confidence": 0.5394,
+      "error_type": "irony:false_positive",
+      "attributed_to_noise": false,
+      "template_design_label": 0,
+      "possible_cause": "tension trajectory primed the prior"
     },
     {
       "conversation": "conv_0535",

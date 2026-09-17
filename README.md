@@ -10,7 +10,8 @@ Sentiment · Emotion · Tone · Sarcasm · Irony · Passive-Aggression · Tensio
 [![Python](https://img.shields.io/badge/Python-3.12-00E5FF?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.9-B388FF?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-7CFFB2?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Tests](https://img.shields.io/badge/tests-25%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-quality-gates--reproducibility)
+[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/officialarghya29/MindShift/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-33%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-quality-gates--reproducibility)
 [![Lint](https://img.shields.io/badge/pyflakes-0%20issues-7CFFB2?style=flat-square)](#-quality-gates--reproducibility)
 [![PS-01](https://img.shields.io/badge/problem_statement-PS--01--Tone%20Intelligence-FF5C8A?style=flat-square)](#-documentation)
 
@@ -159,9 +160,9 @@ Protocol: seed 42 · 1,678 features (826 text n-grams + context block + 16 behav
 | B1 · TF-IDF + Logistic Regression | 1.000 | 1.000 | 1.000 | 0.9270 | 3.205 |
 | B2 · TF-IDF + Linear SVC | 1.000 | 1.000 | 1.000 | **0.9414** | 3.205 |
 | B3 · TF-IDF + context window | 1.000 | 1.000 | 1.000 | 0.9328 | 3.227 |
-| **CEREBRO (E) · full engine** | 1.000 | 1.000 | 1.000 | **0.9585** | **3.079** |
+| **CEREBRO (E) · full engine** | 1.000 | 1.000 | 1.000 | **0.9695** | **3.079** |
 
-**📊 Figure — the two headline races.** *Left:* hidden-signal ROC-AUC per model — CEREBRO's evidence fusion takes sarcasm from 0.927 (text-only) to **0.9585**. *Right:* tension regression error — behavioral features cut MAE to **3.079**. (The AUC panel's y-axis starts at 0.88 so the small-but-consistent gaps are visible; this is labeled on the chart.)
+**📊 Figure — the two headline races.** *Left:* hidden-signal ROC-AUC per model — CEREBRO's evidence fusion takes sarcasm from 0.927 (text-only) to **0.9695**. *Right:* tension regression error — behavioral features cut MAE to **3.079**. (The AUC panel's y-axis starts at 0.88 so the small-but-consistent gaps are visible; this is labeled on the chart.)
 
 <div align="center"><img src="assets/graphs/baselines_vs_cerebro.png" width="96%"/></div>
 
@@ -173,11 +174,11 @@ Protocol: seed 42 · 1,678 features (826 text n-grams + context block + 16 behav
 | B | + context window | 0.9328 | 3.227 | 0.9739 |
 | C | + speaker memory | 0.9344 | 3.226 | 0.9740 |
 | D | + behavioral features (full heads) | 0.9342 | **3.079** | 0.9774 |
-| **E** | **full CEREBRO (D + hidden-signal fusion + temporal)** | **0.9585** | **3.079** | **0.9774** |
+| **E** | **full CEREBRO (D + hidden-signal fusion + temporal)** | **0.9695** | **3.079** | **0.9774** |
 
-**Reading:** the hidden-signal fusion layer (D→E) delivers the largest single ranking gain (+2.4 points sarcasm AUC over the best head), and behavioral features deliver the largest regression gain (MAE −3.9%). Context+memory help ranking modestly but stabilize the sequence models; their full value shows in the turning-point and escalation analyses, not in per-message accuracy.
+**Reading:** the hidden-signal fusion layer (D→E) delivers the largest single ranking gain (+3.5 points sarcasm AUC over the best head), and behavioral features deliver the largest regression gain (MAE −3.9%). Context+memory help ranking modestly but stabilize the sequence models; their full value shows in the turning-point and escalation analyses, not in per-message accuracy.
 
-**📊 Figure — the same story, two panels.** *Left:* sarcasm AUC climbs with every added component; the arrow marks the **+3.2-point** total lift from A to E. *Right:* the MAE drop at D is where behavioral features pay off.
+**📊 Figure — the same story, two panels.** *Left:* sarcasm AUC climbs with every added component; the arrow marks the **+4.3-point** total lift from A to E. *Right:* the MAE drop at D is where behavioral features pay off.
 
 <div align="center"><img src="assets/graphs/ablation_study.png" width="96%"/></div>
 
@@ -188,13 +189,13 @@ Protocol: seed 42 · 1,678 features (826 text n-grams + context block + 16 behav
 | Sentiment (3-way) | 1.000 | 1.000 | 1.000 | 1.000 | — | — | — |
 | Emotion (13-way) | 1.000 | 1.000 | 1.000 | 1.000 | — | — | — |
 | Tone (14-way) | 1.000 | 1.000 | 1.000 | 1.000 | — | — | — |
-| Sarcasm | 0.9958 | 0.9865 | 0.9372 | 0.9604 | **0.9585** | 0.8996 | 0.0182 |
-| Irony | 0.9958 | 0.9883 | 0.9461 | 0.9662 | 0.9498 | 0.9020 | 0.0162 |
+| Sarcasm | 0.9945 | 0.9648 | 0.9366 | 0.9502 | **0.9695** | 0.9096 | 0.0119 |
+| Irony | 0.9945 | 0.9698 | 0.9455 | 0.9573 | 0.9507 | 0.9032 | 0.0101 |
 | Passive-aggression | 0.9945 | 0.9972 | 0.9262 | 0.9588 | 0.9203 | 0.8872 | 0.0195 |
 | Tension (0–100) | — | — | — | MAE **3.08** · RMSE 3.96 | — | — | — |
 | Escalation (t ≥ 60) | 0.9812 | 0.9626 | 0.9534 | 0.9580 | — | — | — |
 
-**Throughput:** 3.51 ms/message end-to-end (sequential, context+memory inference) · single CPU core.
+**Throughput:** 3.48 ms/message end-to-end (sequential, context+memory inference) · single CPU core.
 
 **📊 Figure — every reported metric on one honest axis.** All heads land between 0.92 and 1.0; the ranking metrics (AUCs) are where models genuinely separate.
 
@@ -218,16 +219,18 @@ Protocol: seed 42 · 1,678 features (826 text n-grams + context block + 16 behav
 
 ### Error analysis (PS-01 §39) — with noise attribution
 
-Across 40 test conversations the binary heads make **7 raw mistakes, all false negatives**. Each was reverse-looked-up against the template *design* labels: **all 7 are attributable to the injected 1.5% annotator noise** (gold label flips that contradict the template's design — e.g. the calm template *"How did your exam go btw?"* carrying a noise-flipped `pa=1`). Against the design ground truth, **real error rate = 0**. This is the correct P1 resolution: rather than tuning thresholds to chase irreducible label noise (which would damage precision), the evaluator now separates real errors from noise — the same technique used with human annotation disagreements.
+Across 40 test conversations the binary heads make **9 raw mistakes**. Reverse-lookup against the template *design* labels attributes **7 of them to the injected 1.5% annotator noise** (gold label flips that contradict the template's design — e.g. the calm template *"And I meant it. Today things just slipped."* carrying a noise-flipped `sarcasm=1`). Against the design ground truth, **2 real errors remain** (both borderline FPs at p ≈ 0.53 on the same sincere congratulation — a genuine ambiguity in heated windows, disclosed as the known residual). This is the correct P1 resolution: rather than tuning thresholds to chase irreducible label noise (which would damage precision), the evaluator now separates real errors from noise — the same technique used with human annotation disagreements.
 
 | Error | Raw | Attributed to injected noise | Real errors |
 |---|---|---|---|
 | Passive-aggression FN | 6 | 6 | **0** |
 | Sarcasm FN | 1 | 1 | **0** |
+| Sarcasm FP | 1 | 0 | **1** (p = 0.53, sincere praise in heated window) |
+| Irony FP | 1 | 0 | **1** (p = 0.54, same message) |
 
-The remaining genuinely-hard failure mode is documented in the worked example below: literal-positive sarcasm with **no** negative-context words in the window (out-of-distribution phrasing) — addressed on the roadmap via domain-adaptive context lexicons, not threshold hacks.
+The remaining hard failure mode for unseen phrasing is documented in the worked example below — addressed via tension-heat context modeling and sincerity-marked noisy-OR fusion, with the residual ambiguity disclosed rather than tuned away.
 
-> **Why the classification heads read 1.000 — stated plainly.** The corpus is template-composed, so its lexicons are perfectly learnable; on this data sentiment/emotion/tone saturate for *every* model, baselines included. That is exactly why the hidden-signal heads (sarcasm/irony/PA), tension regression and calibration metrics — where models genuinely separate (AUC 0.927→0.9585, MAE 3.2→3.08) — are the honest benchmarks here. The public-dataset extension path above is how the saturated heads get stressed.
+> **Why the classification heads read 1.000 — stated plainly.** The corpus is template-composed, so its lexicons are perfectly learnable; on this data sentiment/emotion/tone saturate for *every* model, baselines included. That is exactly why the hidden-signal heads (sarcasm/irony/PA), tension regression and calibration metrics — where models genuinely separate (AUC 0.927→0.9695, MAE 3.2→3.08) — are the honest benchmarks here. The public-dataset extension path above is how the saturated heads get stressed.
 
 ---
 
@@ -239,12 +242,12 @@ The remaining genuinely-hard failure mode is documented in the worked example be
 POST /analyze → 200
   #1 Aarav | neutral     | tension  12.7 | sarc 0.04 | PA 0.20 | 'Hey! Did you finish the project?'
   #2 Meera | frustration | tension  37.0 | sarc 0.07 | PA 0.32 | "Yeah I'll do it tonight."
-  #3 Aarav | joy         | tension  13.1 | sarc 0.35 | PA 0.02 | 'Perfect, thanks!'
+  #3 Aarav | joy         | tension  13.1 | sarc 0.00 | PA 0.02 | 'Perfect, thanks!'
   #4 Meera | frustration | tension  55.3 | sarc 0.13 | PA 0.23 | 'You said that yesterday too.'
   #5 Aarav | frustration | tension  71.6 | sarc 0.07 | PA 0.88 | 'Fine. Do what you want then.'   ← PS-01 §16's hero case
-  #6 Meera | joy         | tension  19.0 | sarc 0.22 | PA 0.01 | 'Wow. Great. Just great.'        ← honest miss (see below)
-  #7 Aarav | frustration | tension  57.9 | sarc 0.12 | PA 0.20 | "I'm sorry, I really mean it this time."
-  #8 Meera | relief      | tension  29.7 | sarc 0.01 | PA 0.01 | "...okay. Let's just fix it tomorrow."
+  #6 Meera | joy         | tension  19.0 | sarc 0.61 | PA 0.01 | 'Wow. Great. Just great.'        ← OOD sarcasm caught via tension-heat + echoic-repetition evidence
+  #7 Aarav | frustration | tension  57.9 | sarc 0.00 | PA 0.20 | "I'm sorry, I really mean it this time."
+  #8 Meera | relief      | tension  29.7 | sarc 0.00 | PA 0.01 | "...okay. Let's just fix it tomorrow."
 
 turning points: (2: neutral→frustration, +24.3) · (3: →joy, −23.9) · (5: +16.3 spike) · (6: −52.6 drop) · (8: →relief, −28.2)
 WHAT CHANGED @5: { "tension_delta": 16.3, "emotion_shift": "frustration → frustration" }
@@ -256,7 +259,7 @@ WHAT CHANGED @5: { "tension_delta": 16.3, "emotion_shift": "frustration → frus
 
 <div align="center"><img src="assets/graphs/demo_report.png" width="92%"/></div>
 
-**Honest OOD observation:** the sarcastic *"Wow. Great. Just great."* scores only 0.22 — its contradiction prior needs negative-context words in the window, and none of the recognized failure terms appeared. This is the known weak spot of lexicon-gated contradiction and is exactly what the roadmap item (broadened domain-adaptive context lexicon) addresses.
+**OOD fix note:** *"Wow. Great. Just great."* was the documented weak spot (0.22 in earlier runs) — literal-positive sarcasm with no recognized failure words in its window. The contradiction evidence now also reads **ambient tension heat** (a heated exchange is a negative situational context even when its words are neutral) and **echoic repetition** (use→mention shift on repeated positive words), while sincerity markers ("thanks", "I'll…") damp the same evidence for cooperative messages. It now scores **0.61** with supporting signals `positive wording in negative context · marker words: great, great · repeated wording: great`; the 2 borderline FPs this gate trades are disclosed in the error table above.
 
 **Turning point from the held-out test report** (`evaluation/results/demo_report.json`):
 
@@ -294,22 +297,22 @@ All 20 PS-01 §41 scenario types (emoji-heavy, slang-heavy, rapid/slow timing, m
 | 1–2 | normal · happy | ✅ executed; joy detected in happy; benign chat over-read as tension 44 → known OOD bias (below) |
 | 3 | angry | ✅ executed; peak tension 62, conflict detected |
 | 4 | sarcastic | ✅ executed; tension 57, markers flagged |
-| 5 | passive-aggressive | ✅ **PA = 0.34 mean — clear separation** (vs 0.14 corpus-wide benign mean) |
+| 5 | passive-aggressive | ✅ **PA = 0.35 mean — clear separation** (vs 0.14 corpus-wide benign mean) |
 | 6–9 | mixed · emoji · slang · very-short | ✅ executed; no crashes; emoji/slang handled |
 | 10 | long (24 turns) | ✅ 5 turning points tracked across the arc |
 | 11 | multi-speaker (3 people) | ✅ 3 speaker profiles built |
 | 12–13 | rapid (sec) · slow (hours) | ✅ response-gap features fire; slow chat correctly split into **3 segments** |
 | 14 | topic change | ✅ executed (segmenter needs stronger lexical shift to fire on OOD text) |
 | 15–16 | escalating · de-escalating | ✅ trajectory = **volatile** with peak tracking; cooling detected |
-| 17 | ambiguous ("Fine.", "Okay then.") | ✅ **no false PA alarm** (0.17 < 0.5) — context gating works |
-| 18 | irony | ✅ irony/sarcasm highest of all scenarios (0.30) though below threshold |
+| 17 | ambiguous ("Fine.", "Okay then.") | ✅ **no false PA alarm** (0.18 < 0.5) — context gating works |
+| 18 | irony | ✅ irony/sarcasm highest of all scenarios (sarc 0.35 / irony 0.41) though below threshold |
 | 19–20 | humor · malformed | ✅ executed; null bytes and empty messages survived |
 
 **📊 Figure — all 20 scenarios side by side.** Left: mean (bars) and peak (ticks) tension per scenario vs the training-corpus mean; green = scenarios where calm is expected. Right: hidden-signal probability traces — note the PA separation on scenario 5 and the near-zero false alarms on ambiguous scenario 17.
 
 <div align="center"><img src="assets/graphs/scenario_robustness.png" width="100%"/></div>
 
-> **OOD honesty note.** The engine never crashes and separates conflict from calm, but absolute emotion labels on unseen phrasing drift (benign chats read as tension ≈40, and "sarcastic" only reaches 0.30). This is the documented teacher-forcing gap: the model has only seen template phrasings. The public-dataset adapters (P2) are the structural fix.
+> **OOD honesty note.** The engine never crashes and separates conflict from calm, but absolute emotion labels on unseen phrasing drift (benign chats read as tension ≈40; the OOD sarcastic scenario reaches sarc 0.29 — the *worked example* below shows the pipeline catching fresh sarcastic phrasing at 0.61 once context evidence accumulates). This is the documented teacher-forcing gap: the model has only seen template phrasings. The public-dataset adapters (P2) are the structural fix.
 
 ---
 ## 🚀 Quickstart
@@ -381,16 +384,19 @@ Every gate below is executable against this repository right now — no gate is 
 
 | Gate | Command | Status |
 |---|---|---|
+| CI (GitHub Actions) | lint → tests → metric gates → training smoke → graph smoke on every push | ✅ [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 | Static analysis (0 warnings) | `python -m pyflakes cerebro/ backend/ evaluation/ tests/ scripts/` | ✅ 0 issues |
-| Unit + API test suite | `python -m pytest tests/ backend/tests/ -q` | ✅ 25 passed |
-| Module import audit | all 28 project modules import cleanly | ✅ |
+| Unit + API test suite | `python -m pytest tests/ backend/tests/ -q` | ✅ 33 passed |
+| Module import audit | all 29 project modules import cleanly | ✅ |
 | API end-to-end (real engine) | `python scripts/deepscan_api.py` | ✅ 17/17 checks |
+| Adversarial robustness | `python scripts/deepscan_advanced.py` — 500-payload parser fuzz, pipeline fuzz, state-leak, numeric bounds, schema | ✅ all scans |
+| Diagram integrity | architecture graph ships with a programmatic box/band/arrow overlap validator | ✅ |
 | Security pattern scan | no `eval`/`exec`/`shell=True`/secret patterns | ✅ clean |
 | Frontend validity | balanced HTML, unique ids, all DOM lookups resolve | ✅ |
 | Docs integrity | image links, cross-references, 10 tables column-aligned | ✅ |
 | Determinism | scenario outputs byte-identical across re-runs (seed 42) | ✅ |
 
-**25 functional tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases), the explainability panels, and the full API flow with a stubbed pipeline:
+**33 functional tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases), the public-dataset adapters (GoEmotions/SARC/DailyDialog conversion + schema validation), and the full API flow with a stubbed pipeline:
 
 ```bash
 python -m pytest tests/ backend/tests/ -q
@@ -405,6 +411,7 @@ python -m pytest tests/ backend/tests/ -q
 | Regenerate all graphs | `python -m evaluation.make_graphs` | `assets/graphs/*.png` |
 | Live API demo | `python scripts/demo_api.py` | per-message readout to stdout |
 | API deepscan (17 checks) | `python scripts/deepscan_api.py` | pass/fail per endpoint |
+| Adversarial deepscan | `python scripts/deepscan_advanced.py` | scan-by-scan pass/fail |
 
 ---
 
@@ -429,7 +436,7 @@ MindShift/
 ├── assets/graphs/              #   logo-branded charts (dark futuristic)
 ├── docs/                       #   dataset card · methodology · architecture
 ├── models/saved/               #   persisted engine (joblib)
-└── tests/                      #   25-test suite
+└── tests/                      #   33-test suite (+ public-dataset adapters)
 ```
 
 ---
