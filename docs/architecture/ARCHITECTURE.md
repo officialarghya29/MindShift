@@ -36,7 +36,7 @@ A = text, B = text+context, C = +memory, D = +behavior (all).
 - Hidden signals: engine probabilities are post-fused with symbolic
   contradiction/trajectory evidence (noisy-OR), then the temporal engines run
   conversation-level analysis.
-- Latency: 3.44 ms/message measured on the test split, single CPU core.
+- Latency: 3.5 ms/message measured on the test split, single CPU core.
 
 ## Serving layer
 

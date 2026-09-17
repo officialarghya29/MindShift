@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CEREBRO — Conversation Intelligence Dashboard</title>
+<link rel="icon" href="../docs/favicon.png"/>
+<style>
+  :root{
+    --bg:#0B0F1A; --panel:#111827; --panel2:#0F1524;
+    --cyan:#00E5FF; --purple:#B388FF; --pink:#FF5C8A; --green:#7CFFB2;
+    --orange:#FF9E64; --yellow:#FFD166; --text:#F3F4F6; --muted:#9CA3AF;
+    --line:#263244;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 500px at 80% -10%, rgba(0,229,255,.08), transparent),
+      radial-gradient(900px 400px at 10% 110%, rgba(179,136,255,.07), transparent),
+      var(--bg);
+    color:var(--text); font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    min-height:100vh;
+  }
+  header{display:flex;align-items:center;gap:14px;padding:18px 28px;
+    border-bottom:1px solid var(--line);background:rgba(17,24,39,.6);
+    backdrop-filter:blur(8px);position:sticky;top:0;z-index:50}
+  header img{height:42px;width:42px;border-radius:10px}
+  header h1{font-size:19px;letter-spacing:.5px}
+  header h1 span{color:var(--cyan)}
+  header .status{margin-left:auto;font-size:12px;color:var(--muted);
+    border:1px solid var(--line);padding:6px 12px;border-radius:20px}
+  header .status b{color:var(--green)}
+  main{max-width:1280px;margin:0 auto;padding:26px 28px 80px}
+  .grid{display:grid;gap:18px}
+  .grid.upload{grid-template-columns:1.2fr .8fr}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-radius:16px;padding:20px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:1.4px;
+    color:var(--muted);margin-bottom:14px}
+  .drop{border:1.6px dashed #33415c;border-radius:14px;padding:34px 20px;
+    text-align:center;transition:.2s;cursor:pointer}
+  .drop:hover,.drop.over{border-color:var(--cyan);background:rgba(0,229,255,.045)}
+  .drop .big{font-size:15px;margin-bottom:6px}
+  .drop .small{font-size:12px;color:var(--muted)}
+  select,button{font-family:inherit}
+  select{background:var(--panel2);color:var(--text);border:1px solid var(--line);
+    border-radius:10px;padding:10px 12px;font-size:13px;outline:none}
+  .btn{background:linear-gradient(135deg,var(--cyan),#4dd0e1);color:#04121a;
+    border:none;font-weight:700;padding:11px 22px;border-radius:10px;
+    cursor:pointer;font-size:14px;transition:.15s;letter-spacing:.3px}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,229,255,.25)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .btn.ghost{background:transparent;color:var(--cyan);border:1px solid var(--cyan)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:14px;text-align:center}
+  .stat .v{font-size:24px;font-weight:800;color:var(--cyan)}
+  .stat .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;
+    letter-spacing:1px;margin-top:3px}
+  .row{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  canvas{width:100%;border-radius:12px;background:var(--panel2);
+    border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:1px;
+    text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  td{padding:9px 10px;border-bottom:1px solid rgba(38,50,68,.55)}
+  tr.msg{cursor:pointer;transition:.12s}
+  tr.msg:hover{background:rgba(0,229,255,.05)}
+  .chip{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;
+    font-weight:600}
+  .tp{background:rgba(255,92,138,.15);color:var(--pink)}
+  .peak{background:rgba(255,209,102,.15);color:var(--yellow)}
+  .calm{background:rgba(124,255,178,.13);color:var(--green)}
+  .mid{background:rgba(0,229,255,.12);color:var(--cyan)}
+  .who{font-weight:700;color:var(--purple)}
+  .txt{color:var(--muted)}
+  .why{margin-top:14px;border-left:3px solid var(--cyan);padding:12px 16px;
+    background:rgba(0,229,255,.05);border-radius:0 12px 12px 0;display:none}
+  .why h3{font-size:12px;color:var(--cyan);margin-bottom:8px;letter-spacing:1px}
+  .why li{font-size:12.5px;color:#cbd5e1;margin:4px 0 4px 16px}
+  .why .ev li::marker{content:"✓ ";color:var(--green)}
+  .why .inf li::marker{content:"→ ";color:var(--yellow)}
+  .disclaimer{font-size:10.5px;color:#6B7280;margin-top:10px;font-style:italic}
+  .empty{color:var(--muted);font-size:13px;text-align:center;padding:36px 10px}
+  .err{color:var(--pink);font-size:13px;margin-top:12px;display:none}
+  footer{max-width:1280px;margin:0 auto;padding:0 28px 40px;color:#4B5563;
+    font-size:11.5px}
+  code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
+    padding:2px 7px;font-size:12px;color:var(--cyan)}
+</style>
+</head>
+<body>
+<header>
+  <img src="../assets/logo/cerebro_logo_128.png" alt="logo"/>
+  <h1>CEREBRO <span>// MindShift</span> — conversation intelligence</h1>
+  <div class="status">API: <b id="api-url">http://localhost:8000</b> · <span id="health">checking…</span></div>
+</header>
+
+<main>
+  <div class="grid upload">
+    <div class="card">
+      <h2>Upload chat export</h2>
+      <div class="drop" id="drop">
+        <div class="big">Drop a chat file here — or click to choose</div>
+        <div class="small">WhatsApp .txt · Discord JSON · Slack JSON · CSV · plain "Name: message" lines</div>
+      </div>
+      <input type="file" id="file" hidden/>
+      <div class="row" style="margin-top:14px">
+        <select id="platform">
+          <option value="">auto-detect platform</option>
+          <option value="whatsapp">WhatsApp</option>
+          <option value="discord">Discord</option>
+          <option value="slack">Slack</option>
+          <option value="csv">CSV</option>
+          <option value="json">JSON</option>
+          <option value="generic">Generic</option>
+        </select>
+        <button class="btn" id="analyze" disabled>Analyze conversation</button>
+        <button class="btn ghost" id="demo" type="button">load demo chat</button>
+      </div>
+      <div class="err" id="err"></div>
+    </div>
+    <div class="card">
+      <h2>Conversation summary</h2>
+      <div class="stats">
+        <div class="stat"><div class="v" id="s-msgs">—</div><div class="k">messages</div></div>
+        <div class="stat"><div class="v" id="s-traj">—</div><div class="k" style="color:var(--pink)">trajectory</div></div>
+        <div class="stat"><div class="v" id="s-tension">—</div><div class="k">mean tension</div></div>
+      </div>
+      <div class="stats" style="margin-top:12px">
+        <div class="stat"><div class="v" id="s-sarc">—</div><div class="k" style="color:var(--pink)">sarcasm</div></div>
+        <div class="stat"><div class="v" id="s-tp">—</div><div class="k">turning points</div></div>
+        <div class="stat"><div class="v" id="s-spk">—</div><div class="k">speakers</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:18px">
+    <div class="card"><h2>Emotional arc — tension per message</h2><canvas id="arc" height="300"></canvas></div>
+    <div class="card"><h2>Escalation — hidden-signal probabilities</h2><canvas id="hidden" height="300"></canvas></div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h2>Message inspector — click a row for the WHY? panel</h2>
+    <table id="tbl">
+      <thead><tr>
+        <th>#</th><th>speaker</th><th>message</th><th>emotion</th>
+        <th>tension</th><th>sarcasm</th><th>passive-aggr.</th><th>signal</th>
+      </tr></thead>
+      <tbody id="rows"><tr><td colspan="8" class="empty">analyze a conversation to populate the inspector</td></tr></tbody>
+    </table>
+    <div class="why" id="why">
+      <h3>WHY? — evidence behind this prediction</h3>
+      <ul class="ev" id="why-ev"></ul>
+      <ul class="inf" id="why-inf"></ul>
+      <div class="disclaimer" id="why-disc"></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Runs against the local CEREBRO API — start it with <code>uvicorn backend.app.main:app --port 8000</code>.
+  Static demo data loads if the API is unreachable.
+</footer>
+
+<script>
+const API = "http://localhost:8000";
+let REPORT = null, chosen = null;
+
+const DEMO_TEXT = `Aarav: Hey! Did you finish the project?
+Meera: Yeah I'll do it tonight.
+Aarav: Perfect, thanks!
+Meera: You said that yesterday too.
+Aarav: Fine. Do what you want then.
+Meera: Wow. Great. Just great.
+Aarav: I'm sorry, I really mean it this time.
+Meera: ...okay. Let's just fix it tomorrow.`;
+
+/* ---------- tiny canvas line chart (no deps) ---------- */
+function lineChart(canvas, series, yMax, yLabel, zones){
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.clientWidth, H = canvas.height;
+  canvas.width = W * dpr; canvas.style.height = H + "px";
+  const ctx = canvas.getContext("2d"); ctx.scale(dpr, dpr);
+  const padL = 44, padR = 14, padT = 18, padB = 30;
+  const iw = W - padL - padR, ih = H - padT - padB;
+  ctx.clearRect(0, 0, W, H);
+  ctx.font = "10px 'Segoe UI'"; 
+  const n = Math.max(...series.map(s => s.ys.length));
+  const X = i => padL + (n <= 1 ? iw/2 : i * iw / (n - 1));
+  const Y = v => padT + ih - (v / yMax) * ih;
+  (zones || []).forEach(z => {
+    ctx.fillStyle = z.color + "14";
+    ctx.fillRect(padL, Y(z.to), iw, Y(z.from) - Y(z.to));
+  });
+  ctx.strokeStyle = "#263244"; ctx.fillStyle = "#9CA3AF";
+  for(let g = 0; g <= 4; g++){
+    const v = yMax * g / 4, y = Y(v);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+    ctx.fillText(Math.round(v), 8, y + 3);
+  }
+  series.forEach(s => {
+    ctx.strokeStyle = s.color; ctx.lineWidth = 2.2; ctx.beginPath();
+    s.ys.forEach((v, i) => i ? ctx.lineTo(X(i), Y(v)) : ctx.moveTo(X(i), Y(v)));
+    ctx.stroke();
+    s.ys.forEach((v, i) => {
+      ctx.beginPath(); ctx.arc(X(i), Y(v), 3.4, 0, 7);
+      ctx.fillStyle = s.color; ctx.fill();
+      ctx.strokeStyle = "#0B0F1A"; ctx.lineWidth = 1; ctx.stroke();
+    });
+  });
+  ctx.fillStyle = "#6B7280"; ctx.textAlign = "center";
+  for(let i = 0; i < n; i += Math.ceil(n / 12))
+    ctx.fillText("#" + (i + 1), X(i), H - 10);
+  ctx.textAlign = "left";
+  ctx.fillText(yLabel, padL, 11);
+}
+
+/* ---------- rendering ---------- */
+function chipClass(p){ return p >= .5 ? "tp" : p >= .25 ? "peak" : p >= .12 ? "mid" : "calm"; }
+
+function render(rep){
+  REPORT = rep;
+  const s = rep.summary;
+  document.getElementById("s-msgs").textContent = s.n_messages;
+  document.getElementById("s-traj").textContent = s.trajectory;
+  document.getElementById("s-tension").textContent = s.mean_tension;
+  document.getElementById("s-sarc").textContent = s.sarcasm_level;
+  document.getElementById("s-tp").textContent = rep.turning_points.length;
+  document.getElementById("s-spk").textContent = s.n_speakers;
+
+  const tension = rep.messages.map(m => m.tension);
+  const tpIds = new Set(rep.turning_points.map(t => t.message_id));
+  lineChart(document.getElementById("arc"),
+    [{ ys: tension, color: "#00E5FF" }], 100, "tension (0-100)",
+    [{ from: 60, to: 100, color: "#FF5C8A" }]);
+
+  lineChart(document.getElementById("hidden"), [
+    { ys: rep.messages.map(m => m.sarcasm.probability), color: "#FF5C8A" },
+    { ys: rep.messages.map(m => m.irony.probability), color: "#B388FF" },
+    { ys: rep.messages.map(m => m.passive_aggression.probability), color: "#7CFFB2" },
+  ], 1, "p(sarcasm / irony / passive-aggression)", []);
+
+  const tb = document.getElementById("rows");
+  tb.innerHTML = "";
+  rep.messages.forEach(m => {
+    const isTP = tpIds.has(m.message_id);
+    const tr = document.createElement("tr");
+    tr.className = "msg";
+    tr.innerHTML = `
+      <td>${m.message_id}</td>
+      <td class="who">${m.speaker_id}</td>
+      <td class="txt">${m.text.replace(/</g, "&lt;").slice(0, 44)}</td>
+      <td>${m.emotion.label}</td>
+      <td><b style="color:${m.tension >= 60 ? "#FF5C8A" : m.tension >= 35 ? "#FFD166" : "#7CFFB2"}">${m.tension}</b></td>
+      <td><span class="chip ${chipClass(m.sarcasm.probability)}">${m.sarcasm.probability.toFixed(2)}</span></td>
+      <td><span class="chip ${chipClass(m.passive_aggression.probability)}">${m.passive_aggression.probability.toFixed(2)}</span></td>
+      <td>${isTP ? '<span class="chip tp">turning point</span>' :
+           m.tension >= 60 ? '<span class="chip peak">escalation</span>' :
+           '<span class="chip calm">stable</span>'}</td>`;
+    tr.onclick = () => showWhy(m.message_id);
+    tb.appendChild(tr);
+  });
+}
+
+async function showWhy(mid){
+  const conv = REPORT.summary.conversation_id;
+  try{
+    const r = await fetch(`${API}/why/${conv}/${mid}`);
+    if(!r.ok) throw 0;
+    showWhyPanel(await r.json());
+  }catch(e){
+    const ex = REPORT.explanations.find(x => x.message_id === mid);
+    if(ex) showWhyPanel(ex);
+  }
+}
+function showWhyPanel(ex){
+  const box = document.getElementById("why");
+  box.style.display = "block";
+  document.getElementById("why-ev").innerHTML =
+    ex.detected_evidence.map(e => `<li>${e}</li>`).join("") || "<li>none — minimal signal message</li>";
+  document.getElementById("why-inf").innerHTML =
+    ex.inferred_interpretation.map(e => `<li>${e}</li>`).join("") || "<li>no contextual shift inferred</li>";
+  document.getElementById("why-disc").textContent = ex.disclaimer;
+  box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+/* ---------- API ---------- */
+async function checkHealth(){
+  const el = document.getElementById("health");
+  try{
+    const r = await fetch(API + "/healthz");
+    el.innerHTML = r.ok ? "<b>online</b>" : "error";
+  }catch(e){ el.innerHTML = "<span style='color:#FF5C8A'>offline — using demo mode</span>"; }
+}
+
+async function analyzeFile(){
+  const err = document.getElementById("err");
+  err.style.display = "none";
+  if(!chosen){ err.textContent = "choose a file first"; err.style.display = "block"; return; }
+  const btn = document.getElementById("analyze");
+  btn.disabled = true; btn.textContent = "analyzing…";
+  try{
+    const fd = new FormData();
+    fd.append("file", chosen);
+    const p = document.getElementById("platform").value;
+    if(p) fd.append("platform", p);
+    const r = await fetch(API + "/analyze", { method: "POST", body: fd });
+    if(!r.ok) throw new Error((await r.json()).detail || r.statusText);
+    render(await r.json());
+  }catch(e){
+    err.textContent = "API error: " + e.message + " — falling back to offline demo render.";
+    err.style.display = "block";
+    offlineDemo();
+  }
+  btn.disabled = false; btn.textContent = "Analyze conversation";
+}
+
+/* offline fallback: canned report shaped like the API response */
+function offlineDemo(){
+  render({
+    summary: { conversation_id: "demo", n_messages: 8, n_speakers: 2,
+      trajectory: "volatile", mean_tension: 37.0, sarcasm_level: 0.11,
+      passive_aggression_level: 0.24 },
+    turning_points: [{ message_id: 5 }],
+    messages: [
+      { message_id:1, speaker_id:"Aarav", text:"Hey! Did you finish the project?", emotion:{label:"neutral"}, tension:12.7, sarcasm:{probability:.04}, passive_aggression:{probability:.20} },
+      { message_id:2, speaker_id:"Meera", text:"Yeah I'll do it tonight.", emotion:{label:"frustration"}, tension:37.0, sarcasm:{probability:.07}, passive_aggression:{probability:.32} },
+      { message_id:3, speaker_id:"Aarav", text:"Perfect, thanks!", emotion:{label:"joy"}, tension:13.1, sarcasm:{probability:.35}, passive_aggression:{probability:.02} },
+      { message_id:4, speaker_id:"Meera", text:"You said that yesterday too.", emotion:{label:"frustration"}, tension:55.3, sarcasm:{probability:.13}, passive_aggression:{probability:.23} },
+      { message_id:5, speaker_id:"Aarav", text:"Fine. Do what you want then.", emotion:{label:"frustration"}, tension:71.6, sarcasm:{probability:.07}, passive_aggression:{probability:.88} },
+      { message_id:6, speaker_id:"Meera", text:"Wow. Great. Just great.", emotion:{label:"joy"}, tension:19.0, sarcasm:{probability:.22}, passive_aggression:{probability:.01} },
+      { message_id:7, speaker_id:"Aarav", text:"I'm sorry, I really mean it this time.", emotion:{label:"frustration"}, tension:57.9, sarcasm:{probability:.12}, passive_aggression:{probability:.20} },
+      { message_id:8, speaker_id:"Meera", text:"...okay. Let's just fix it tomorrow.", emotion:{label:"relief"}, tension:29.7, sarcasm:{probability:.01}, passive_aggression:{probability:.01} },
+    ],
+    explanations: [{ message_id: 5,
+      detected_evidence: ["concessive phrase: \"fine.\"", "minimal-length response", "negative wording present"],
+      inferred_interpretation: ["tension rose +16 vs previous turn", "passive-aggression evidence: concessive phrase; short cold response pattern; rising tension trajectory"],
+      disclaimer: "Offline demo data — start the API for live analysis." }],
+  });
+}
+
+/* ---------- wiring ---------- */
+const drop = document.getElementById("drop"), file = document.getElementById("file");
+drop.onclick = () => file.click();
+drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+drop.ondragleave = () => drop.classList.remove("over");
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove("over");
+  chosen = e.dataTransfer.files[0]; drop.querySelector(".big").textContent = "📎 " + chosen.name;
+  document.getElementById("analyze").disabled = false; };
+file.onchange = () => { chosen = file.files[0];
+  drop.querySelector(".big").textContent = "📎 " + chosen.name;
+  document.getElementById("analyze").disabled = false; };
+document.getElementById("analyze").onclick = analyzeFile;
+document.getElementById("demo").onclick = () => {
+  chosen = new File([DEMO_TEXT], "demo_chat.txt", { type: "text/plain" });
+  drop.querySelector(".big").textContent = "📎 demo_chat.txt";
+  document.getElementById("analyze").disabled = false;
+  analyzeFile();
+};
+window.addEventListener("resize", () => { if(REPORT) render(REPORT); });
+checkHealth();
+offlineDemo();
+</script>
+</body>
+</html>
