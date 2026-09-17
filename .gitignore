@@ -1,0 +1,22 @@
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# experiment artifacts (keep results JSON + demo report)
+evaluation/run.log
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# large transient data (regenerable deterministically)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+notebooks/.ipynb_checkpoints/

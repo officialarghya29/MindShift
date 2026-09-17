@@ -1,0 +1,2723 @@
+{
+  "summary": {
+    "conversation_id": "conv_uploaded",
+    "n_messages": 17,
+    "n_speakers": 2,
+    "dominant_emotion": [
+      [
+        "neutral",
+        7
+      ],
+      [
+        "relief",
+        3
+      ],
+      [
+        "joy",
+        3
+      ]
+    ],
+    "sentiment_distribution": {
+      "neutral": 5,
+      "positive": 12
+    },
+    "tone_distribution": {
+      "casual": 6,
+      "friendly": 6,
+      "professional": 3,
+      "supportive": 2
+    },
+    "sarcasm_level": 0.064,
+    "irony_level": 0.053,
+    "passive_aggression_level": 0.017,
+    "mean_tension": 9.9,
+    "peak_tension": 13.8,
+    "trajectory": "stable"
+  },
+  "messages": [
+    {
+      "message_id": 1,
+      "speaker_id": "Dev",
+      "text": "Awesome. I think the deadline is Friday, right?",
+      "sentiment": {
+        "label": "neutral",
+        "confidence": 0.9992,
+        "probabilities": {
+          "neutral": 0.9992,
+          "positive": 0.0008,
+          "negative": 0.0
+        }
+      },
+      "emotion": {
+        "label": "neutral",
+        "confidence": 0.9935,
+        "probabilities": {
+          "neutral": 0.9935,
+          "joy": 0.0024,
+          "anger": 0.0013
+        }
+      },
+      "tone": {
+        "label": "casual",
+        "confidence": 0.9917,
+        "probabilities": {
+          "casual": 0.9917,
+          "friendly": 0.0037,
+          "professional": 0.0014
+        }
+      },
+      "tension": 13.8,
+      "sarcasm": {
+        "probability": 0.0727,
+        "confidence": 0.8545,
+        "supporting_signals": [
+          "marker words: right",
+          "tension spike (+14 after this message)"
+        ],
+        "learned_p": 0.0327,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0072,
+        "confidence": 0.9856,
+        "supporting_signals": [],
+        "learned_p": 0.0072,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.2042,
+        "confidence": 0.5917,
+        "supporting_signals": [
+          "rising tension trajectory"
+        ],
+        "learned_p": 0.0052
+      },
+      "signals": {
+        "n_words": 8,
+        "pos_hits": [
+          "awesome"
+        ],
+        "neg_hits": [],
+        "sarc_words": [
+          "right"
+        ],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 1,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "",
+      "speaker_state_before": {
+        "last_emotion": null,
+        "last_tone": null,
+        "last_sentiment": null,
+        "recent_tension_mean": null,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 1,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9943,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 2,
+      "speaker_id": "Riya",
+      "text": "Friday it is. I'll finish my part tonight.",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.9974,
+        "probabilities": {
+          "positive": 0.9974,
+          "negative": 0.0016,
+          "neutral": 0.001
+        }
+      },
+      "emotion": {
+        "label": "neutral",
+        "confidence": 0.9895,
+        "probabilities": {
+          "neutral": 0.9895,
+          "anxiety": 0.003,
+          "frustration": 0.0023
+        }
+      },
+      "tone": {
+        "label": "friendly",
+        "confidence": 0.9928,
+        "probabilities": {
+          "friendly": 0.9928,
+          "professional": 0.0014,
+          "apologetic": 0.001
+        }
+      },
+      "tension": 12.0,
+      "sarcasm": {
+        "probability": 0.003,
+        "confidence": 0.994,
+        "supporting_signals": [],
+        "learned_p": 0.003,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0052,
+        "confidence": 0.9896,
+        "supporting_signals": [],
+        "learned_p": 0.0052,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.0023,
+        "confidence": 0.9954,
+        "supporting_signals": [],
+        "learned_p": 0.0023
+      },
+      "signals": {
+        "n_words": 8,
+        "pos_hits": [],
+        "neg_hits": [],
+        "sarc_words": [],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 0,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Awesome. I think the deadline is Friday, right?",
+      "speaker_state_before": {
+        "last_emotion": null,
+        "last_tone": null,
+        "last_sentiment": null,
+        "recent_tension_mean": null,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 0,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9925,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 3,
+      "speaker_id": "Dev",
+      "text": "Good. I'll send the summary in a bit.",
+      "sentiment": {
+        "label": "neutral",
+        "confidence": 0.9988,
+        "probabilities": {
+          "neutral": 0.9988,
+          "positive": 0.0009,
+          "negative": 0.0002
+        }
+      },
+      "emotion": {
+        "label": "neutral",
+        "confidence": 0.9893,
+        "probabilities": {
+          "neutral": 0.9893,
+          "affection": 0.0023,
+          "relief": 0.0022
+        }
+      },
+      "tone": {
+        "label": "professional",
+        "confidence": 0.9956,
+        "probabilities": {
+          "professional": 0.9956,
+          "friendly": 0.0012,
+          "apologetic": 0.0008
+        }
+      },
+      "tension": 12.1,
+      "sarcasm": {
+        "probability": 0.0056,
+        "confidence": 0.9888,
+        "supporting_signals": [],
+        "learned_p": 0.0053,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0011,
+        "confidence": 0.9978,
+        "supporting_signals": [],
+        "learned_p": 0.0011,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.0011,
+        "confidence": 0.9978,
+        "supporting_signals": [],
+        "learned_p": 0.0011
+      },
+      "signals": {
+        "n_words": 8,
+        "pos_hits": [
+          "good"
+        ],
+        "neg_hits": [],
+        "sarc_words": [],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 1,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Awesome. I think the deadline is Friday, right? || Friday it is. I'll finish my part tonight.",
+      "speaker_state_before": {
+        "last_emotion": "neutral",
+        "last_tone": "casual",
+        "last_sentiment": "neutral",
+        "recent_tension_mean": 13.829996485253663,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 1,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9924,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 4,
+      "speaker_id": "Riya",
+      "text": "Yeah I saw it last night, looks solid overall.",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.9986,
+        "probabilities": {
+          "positive": 0.9986,
+          "neutral": 0.0011,
+          "negative": 0.0003
+        }
+      },
+      "emotion": {
+        "label": "relief",
+        "confidence": 0.9943,
+        "probabilities": {
+          "relief": 0.9943,
+          "neutral": 0.0015,
+          "affection": 0.0012
+        }
+      },
+      "tone": {
+        "label": "casual",
+        "confidence": 0.9879,
+        "probabilities": {
+          "casual": 0.9879,
+          "friendly": 0.0025,
+          "supportive": 0.0024
+        }
+      },
+      "tension": 9.8,
+      "sarcasm": {
+        "probability": 0.0764,
+        "confidence": 0.8472,
+        "supporting_signals": [
+          "marker words: yeah"
+        ],
+        "learned_p": 0.0015,
+        "contradiction_evidence": 0.075
+      },
+      "irony": {
+        "probability": 0.0767,
+        "confidence": 0.8467,
+        "supporting_signals": [],
+        "learned_p": 0.0018,
+        "mismatch_evidence": 0.075
+      },
+      "passive_aggression": {
+        "probability": 0.0126,
+        "confidence": 0.9748,
+        "supporting_signals": [],
+        "learned_p": 0.0126
+      },
+      "signals": {
+        "n_words": 9,
+        "pos_hits": [
+          "solid"
+        ],
+        "neg_hits": [],
+        "sarc_words": [
+          "yeah"
+        ],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 1,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Awesome. I think the deadline is Friday, right? || Friday it is. I'll finish my part tonight. || Good. I'll send the summary in a bit.",
+      "speaker_state_before": {
+        "last_emotion": "neutral",
+        "last_tone": "friendly",
+        "last_sentiment": "positive",
+        "recent_tension_mean": 12.04806130326833,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 1,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9947,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 5,
+      "speaker_id": "Dev",
+      "text": "Right? First decent day all week.",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.998,
+        "probabilities": {
+          "positive": 0.998,
+          "negative": 0.0012,
+          "neutral": 0.0008
+        }
+      },
+      "emotion": {
+        "label": "joy",
+        "confidence": 0.9954,
+        "probabilities": {
+          "joy": 0.9954,
+          "neutral": 0.0011,
+          "concerned": 0.0008
+        }
+      },
+      "tone": {
+        "label": "friendly",
+        "confidence": 0.9941,
+        "probabilities": {
+          "friendly": 0.9941,
+          "casual": 0.0013,
+          "defensive": 0.0009
+        }
+      },
+      "tension": 5.4,
+      "sarcasm": {
+        "probability": 0.076,
+        "confidence": 0.848,
+        "supporting_signals": [
+          "marker words: right"
+        ],
+        "learned_p": 0.0011,
+        "contradiction_evidence": 0.075
+      },
+      "irony": {
+        "probability": 0.0782,
+        "confidence": 0.8435,
+        "supporting_signals": [],
+        "learned_p": 0.0035,
+        "mismatch_evidence": 0.075
+      },
+      "passive_aggression": {
+        "probability": 0.0032,
+        "confidence": 0.9936,
+        "supporting_signals": [],
+        "learned_p": 0.0032
+      },
+      "signals": {
+        "n_words": 6,
+        "pos_hits": [],
+        "neg_hits": [],
+        "sarc_words": [
+          "right"
+        ],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 0,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Awesome. I think the deadline is Friday, right? || Friday it is. I'll finish my part tonight. || Good. I'll send the summary in a bit. || Yeah I saw it last night, looks solid overall.",
+      "speaker_state_before": {
+        "last_emotion": "neutral",
+        "last_tone": "professional",
+        "last_sentiment": "neutral",
+        "recent_tension_mean": 12.956271051841597,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 0,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9952,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 6,
+      "speaker_id": "Riya",
+      "text": "Thanks, that was fast.",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.9989,
+        "probabilities": {
+          "positive": 0.9989,
+          "neutral": 0.0008,
+          "negative": 0.0003
+        }
+      },
+      "emotion": {
+        "label": "affection",
+        "confidence": 0.999,
+        "probabilities": {
+          "affection": 0.999,
+          "joy": 0.0003,
+          "neutral": 0.0002
+        }
+      },
+      "tone": {
+        "label": "friendly",
+        "confidence": 0.9953,
+        "probabilities": {
+          "friendly": 0.9953,
+          "supportive": 0.0011,
+          "casual": 0.0011
+        }
+      },
+      "tension": 7.6,
+      "sarcasm": {
+        "probability": 0.0829,
+        "confidence": 0.8341,
+        "supporting_signals": [
+          "marker words: thanks"
+        ],
+        "learned_p": 0.002,
+        "contradiction_evidence": 0.075
+      },
+      "irony": {
+        "probability": 0.0754,
+        "confidence": 0.8493,
+        "supporting_signals": [],
+        "learned_p": 0.0004,
+        "mismatch_evidence": 0.075
+      },
+      "passive_aggression": {
+        "probability": 0.0077,
+        "confidence": 0.9846,
+        "supporting_signals": [],
+        "learned_p": 0.0077
+      },
+      "signals": {
+        "n_words": 4,
+        "pos_hits": [
+          "thanks"
+        ],
+        "neg_hits": [],
+        "sarc_words": [
+          "thanks"
+        ],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 1,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Awesome. I think the deadline is Friday, right? || Friday it is. I'll finish my part tonight. || Good. I'll send the summary in a bit. || Yeah I saw it last night, looks solid overall. || Right? First decent day all week.",
+      "speaker_state_before": {
+        "last_emotion": "relief",
+        "last_tone": "casual",
+        "last_sentiment": "positive",
+        "recent_tension_mean": 10.922302050643998,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 1,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9968,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 7,
+      "speaker_id": "Dev",
+      "text": "Cool cool. Ping me if anything is unclear.",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.9992,
+        "probabilities": {
+          "positive": 0.9992,
+          "neutral": 0.0008,
+          "negative": 0.0
+        }
+      },
+      "emotion": {
+        "label": "neutral",
+        "confidence": 0.9921,
+        "probabilities": {
+          "neutral": 0.9921,
+          "affection": 0.0031,
+          "joy": 0.0019
+        }
+      },
+      "tone": {
+        "label": "supportive",
+        "confidence": 0.9975,
+        "probabilities": {
+          "supportive": 0.9975,
+          "casual": 0.0007,
+          "friendly": 0.0007
+        }
+      },
+      "tension": 7.7,
+      "sarcasm": {
+        "probability": 0.0018,
+        "confidence": 0.9964,
+        "supporting_signals": [],
+        "learned_p": 0.0015,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0002,
+        "confidence": 0.9996,
+        "supporting_signals": [],
+        "learned_p": 0.0002,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.0089,
+        "confidence": 0.9822,
+        "supporting_signals": [],
+        "learned_p": 0.0089
+      },
+      "signals": {
+        "n_words": 8,
+        "pos_hits": [
+          "cool",
+          "cool"
+        ],
+        "neg_hits": [],
+        "sarc_words": [],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 2,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Friday it is. I'll finish my part tonight. :: Awesome. I think the deadline is Friday, right? || Good. I'll send the summary in a bit. || Yeah I saw it last night, looks solid overall. || Right? First decent day all week. || Thanks, that was fast.",
+      "speaker_state_before": {
+        "last_emotion": "joy",
+        "last_tone": "friendly",
+        "last_sentiment": "positive",
+        "recent_tension_mean": 10.448529326185007,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 2,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9937,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 8,
+      "speaker_id": "Riya",
+      "text": "Morning! Ready for the call at 10? (we should talk with the lab report)",
+      "sentiment": {
+        "label": "neutral",
+        "confidence": 0.9965,
+        "probabilities": {
+          "neutral": 0.9965,
+          "negative": 0.0026,
+          "positive": 0.0009
+        }
+      },
+      "emotion": {
+        "label": "neutral",
+        "confidence": 0.9811,
+        "probabilities": {
+          "neutral": 0.9811,
+          "joy": 0.0087,
+          "anger": 0.0034
+        }
+      },
+      "tone": {
+        "label": "professional",
+        "confidence": 0.9709,
+        "probabilities": {
+          "professional": 0.9709,
+          "friendly": 0.0224,
+          "aggressive": 0.0029
+        }
+      },
+      "tension": 12.9,
+      "sarcasm": {
+        "probability": 0.0161,
+        "confidence": 0.9678,
+        "supporting_signals": [
+          "exclamation emphasis",
+          "tension spike (+5 after this message)"
+        ],
+        "learned_p": 0.0005,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0001,
+        "confidence": 0.9998,
+        "supporting_signals": [],
+        "learned_p": 0.0001,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.0033,
+        "confidence": 0.9934,
+        "supporting_signals": [],
+        "learned_p": 0.0033
+      },
+      "signals": {
+        "n_words": 14,
+        "pos_hits": [],
+        "neg_hits": [],
+        "sarc_words": [],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 0,
+        "exclam": 1,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Friday it is. I'll finish my part tonight. :: Good. I'll send the summary in a bit. :: Awesome. I think the deadline is Friday, right? || Yeah I saw it last night, looks solid overall. || Right? First decent day all week. || Thanks, that was fast. || Cool cool. Ping me if anything is unclear.",
+      "speaker_state_before": {
+        "last_emotion": "affection",
+        "last_tone": "friendly",
+        "last_sentiment": "positive",
+        "recent_tension_mean": 9.817767857050015,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.18,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 0,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9887,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 9,
+      "speaker_id": "Dev",
+      "text": "Honestly better than I expected, I think I passed. (about the professor's feedback)",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.9954,
+        "probabilities": {
+          "positive": 0.9954,
+          "negative": 0.0036,
+          "neutral": 0.001
+        }
+      },
+      "emotion": {
+        "label": "relief",
+        "confidence": 0.9834,
+        "probabilities": {
+          "relief": 0.9834,
+          "disgust": 0.0034,
+          "excitement": 0.0025
+        }
+      },
+      "tone": {
+        "label": "casual",
+        "confidence": 0.9787,
+        "probabilities": {
+          "casual": 0.9787,
+          "frustrated": 0.0034,
+          "apologetic": 0.0032
+        }
+      },
+      "tension": 12.7,
+      "sarcasm": {
+        "probability": 0.0644,
+        "confidence": 0.8712,
+        "supporting_signals": [],
+        "learned_p": 0.0644,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0007,
+        "confidence": 0.9986,
+        "supporting_signals": [],
+        "learned_p": 0.0007,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.0015,
+        "confidence": 0.997,
+        "supporting_signals": [],
+        "learned_p": 0.0015
+      },
+      "signals": {
+        "n_words": 13,
+        "pos_hits": [],
+        "neg_hits": [],
+        "sarc_words": [],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 0,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Friday it is. I'll finish my part tonight. :: Good. I'll send the summary in a bit. :: Awesome. I think the deadline is Friday, right? || Right? First decent day all week. || Thanks, that was fast. || Cool cool. Ping me if anything is unclear. || Morning! Ready for the call at 10? (we should talk with the lab report)",
+      "speaker_state_before": {
+        "last_emotion": "neutral",
+        "last_tone": "supportive",
+        "last_sentiment": "positive",
+        "recent_tension_mean": 9.770874213558926,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 0,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9898,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 10,
+      "speaker_id": "Riya",
+      "text": "Yep, joined five minutes early.",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.9972,
+        "probabilities": {
+          "positive": 0.9972,
+          "negative": 0.0021,
+          "neutral": 0.0006
+        }
+      },
+      "emotion": {
+        "label": "neutral",
+        "confidence": 0.9927,
+        "probabilities": {
+          "neutral": 0.9927,
+          "frustration": 0.0019,
+          "anxiety": 0.0011
+        }
+      },
+      "tone": {
+        "label": "professional",
+        "confidence": 0.9963,
+        "probabilities": {
+          "professional": 0.9963,
+          "friendly": 0.0006,
+          "cold": 0.0005
+        }
+      },
+      "tension": 10.7,
+      "sarcasm": {
+        "probability": 0.0056,
+        "confidence": 0.9888,
+        "supporting_signals": [],
+        "learned_p": 0.0056,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0012,
+        "confidence": 0.9976,
+        "supporting_signals": [],
+        "learned_p": 0.0012,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.0004,
+        "confidence": 0.9992,
+        "supporting_signals": [],
+        "learned_p": 0.0004
+      },
+      "signals": {
+        "n_words": 5,
+        "pos_hits": [],
+        "neg_hits": [],
+        "sarc_words": [],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 0,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Friday it is. I'll finish my part tonight. :: Good. I'll send the summary in a bit. :: Awesome. I think the deadline is Friday, right? || Thanks, that was fast. || Cool cool. Ping me if anything is unclear. || Morning! Ready for the call at 10? (we should talk with the lab report) || Honestly better than I expected, I think I passed. (about the professor's feedback)",
+      "speaker_state_before": {
+        "last_emotion": "neutral",
+        "last_tone": "professional",
+        "last_sentiment": "neutral",
+        "recent_tension_mean": 10.578729355531205,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 0,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.994,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 11,
+      "speaker_id": "Dev",
+      "text": "Thanks! Celebrating this weekend. (we should talk with the lab report)",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.9989,
+        "probabilities": {
+          "positive": 0.9989,
+          "neutral": 0.0011,
+          "negative": 0.0
+        }
+      },
+      "emotion": {
+        "label": "excitement",
+        "confidence": 0.9708,
+        "probabilities": {
+          "excitement": 0.9708,
+          "joy": 0.02,
+          "neutral": 0.0046
+        }
+      },
+      "tone": {
+        "label": "casual",
+        "confidence": 0.9077,
+        "probabilities": {
+          "casual": 0.9077,
+          "friendly": 0.0658,
+          "professional": 0.0133
+        }
+      },
+      "tension": 9.1,
+      "sarcasm": {
+        "probability": 0.2754,
+        "confidence": 0.4491,
+        "supporting_signals": [
+          "marker words: thanks",
+          "exclamation emphasis"
+        ],
+        "learned_p": 0.0006,
+        "contradiction_evidence": 0.275
+      },
+      "irony": {
+        "probability": 0.2775,
+        "confidence": 0.4451,
+        "supporting_signals": [],
+        "learned_p": 0.0034,
+        "mismatch_evidence": 0.275
+      },
+      "passive_aggression": {
+        "probability": 0.0054,
+        "confidence": 0.9892,
+        "supporting_signals": [],
+        "learned_p": 0.0054
+      },
+      "signals": {
+        "n_words": 11,
+        "pos_hits": [
+          "thanks"
+        ],
+        "neg_hits": [],
+        "sarc_words": [
+          "thanks"
+        ],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 1,
+        "exclam": 1,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Friday it is. I'll finish my part tonight. :: Good. I'll send the summary in a bit. :: Awesome. I think the deadline is Friday, right? || Cool cool. Ping me if anything is unclear. || Morning! Ready for the call at 10? (we should talk with the lab report) || Honestly better than I expected, I think I passed. (about the professor's feedback) || Yep, joined five minutes early.",
+      "speaker_state_before": {
+        "last_emotion": "relief",
+        "last_tone": "casual",
+        "last_sentiment": "positive",
+        "recent_tension_mean": 10.364738298473366,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.18,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 1,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9841,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 12,
+      "speaker_id": "Riya",
+      "text": "Just finished the setup, everything works now.",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.9964,
+        "probabilities": {
+          "positive": 0.9964,
+          "negative": 0.003,
+          "neutral": 0.0005
+        }
+      },
+      "emotion": {
+        "label": "relief",
+        "confidence": 0.9945,
+        "probabilities": {
+          "relief": 0.9945,
+          "anger": 0.0026,
+          "affection": 0.0008
+        }
+      },
+      "tone": {
+        "label": "casual",
+        "confidence": 0.99,
+        "probabilities": {
+          "casual": 0.99,
+          "cold": 0.0027,
+          "defensive": 0.0021
+        }
+      },
+      "tension": 12.0,
+      "sarcasm": {
+        "probability": 0.01,
+        "confidence": 0.98,
+        "supporting_signals": [],
+        "learned_p": 0.0013,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0057,
+        "confidence": 0.9886,
+        "supporting_signals": [],
+        "learned_p": 0.0057,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.0008,
+        "confidence": 0.9984,
+        "supporting_signals": [],
+        "learned_p": 0.0008
+      },
+      "signals": {
+        "n_words": 7,
+        "pos_hits": [
+          "works"
+        ],
+        "neg_hits": [],
+        "sarc_words": [],
+        "irony_words": [
+          "just"
+        ],
+        "pa_phrase": null,
+        "exaggeration": [
+          "everything"
+        ],
+        "interjections": [],
+        "praise_minus_neg": 1,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Friday it is. I'll finish my part tonight. :: Good. I'll send the summary in a bit. :: Awesome. I think the deadline is Friday, right? || Morning! Ready for the call at 10? (we should talk with the lab report) || Honestly better than I expected, I think I passed. (about the professor's feedback) || Yep, joined five minutes early. || Thanks! Celebrating this weekend. (we should talk with the lab report)",
+      "speaker_state_before": {
+        "last_emotion": "neutral",
+        "last_tone": "professional",
+        "last_sentiment": "positive",
+        "recent_tension_mean": 10.61064709136065,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.1,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 1,
+        "exaggeration_words": 1,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9948,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 13,
+      "speaker_id": "Dev",
+      "text": "Will do. The weather is actually nice today.",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.9971,
+        "probabilities": {
+          "positive": 0.9971,
+          "neutral": 0.0023,
+          "negative": 0.0006
+        }
+      },
+      "emotion": {
+        "label": "joy",
+        "confidence": 0.9942,
+        "probabilities": {
+          "joy": 0.9942,
+          "neutral": 0.0016,
+          "affection": 0.0014
+        }
+      },
+      "tone": {
+        "label": "casual",
+        "confidence": 0.9891,
+        "probabilities": {
+          "casual": 0.9891,
+          "supportive": 0.0024,
+          "friendly": 0.0023
+        }
+      },
+      "tension": 5.6,
+      "sarcasm": {
+        "probability": 0.0162,
+        "confidence": 0.9676,
+        "supporting_signals": [],
+        "learned_p": 0.0162,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0049,
+        "confidence": 0.9902,
+        "supporting_signals": [],
+        "learned_p": 0.0049,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.0081,
+        "confidence": 0.9838,
+        "supporting_signals": [],
+        "learned_p": 0.0081
+      },
+      "signals": {
+        "n_words": 8,
+        "pos_hits": [
+          "nice"
+        ],
+        "neg_hits": [],
+        "sarc_words": [],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 1,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Morning! Ready for the call at 10? (we should talk with the lab report) :: Friday it is. I'll finish my part tonight. :: Good. I'll send the summary in a bit. || Honestly better than I expected, I think I passed. (about the professor's feedback) || Yep, joined five minutes early. || Thanks! Celebrating this weekend. (we should talk with the lab report) || Just finished the setup, everything works now.",
+      "speaker_state_before": {
+        "last_emotion": "excitement",
+        "last_tone": "casual",
+        "last_sentiment": "positive",
+        "recent_tension_mean": 9.427759266773359,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 1,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9946,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 14,
+      "speaker_id": "Riya",
+      "text": "How did your exam go btw?",
+      "sentiment": {
+        "label": "neutral",
+        "confidence": 0.9988,
+        "probabilities": {
+          "neutral": 0.9988,
+          "negative": 0.0011,
+          "positive": 0.0001
+        }
+      },
+      "emotion": {
+        "label": "concerned",
+        "confidence": 0.9992,
+        "probabilities": {
+          "concerned": 0.9992,
+          "neutral": 0.0003,
+          "confusion": 0.0002
+        }
+      },
+      "tone": {
+        "label": "friendly",
+        "confidence": 0.9944,
+        "probabilities": {
+          "friendly": 0.9944,
+          "defensive": 0.0014,
+          "professional": 0.0011
+        }
+      },
+      "tension": 9.3,
+      "sarcasm": {
+        "probability": 0.0126,
+        "confidence": 0.9748,
+        "supporting_signals": [],
+        "learned_p": 0.0015,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0006,
+        "confidence": 0.9988,
+        "supporting_signals": [],
+        "learned_p": 0.0006,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.0049,
+        "confidence": 0.9902,
+        "supporting_signals": [],
+        "learned_p": 0.0049
+      },
+      "signals": {
+        "n_words": 6,
+        "pos_hits": [],
+        "neg_hits": [],
+        "sarc_words": [],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 0,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Morning! Ready for the call at 10? (we should talk with the lab report) :: Honestly better than I expected, I think I passed. (about the professor's feedback) :: Friday it is. I'll finish my part tonight. || Yep, joined five minutes early. || Thanks! Celebrating this weekend. (we should talk with the lab report) || Just finished the setup, everything works now. || Will do. The weather is actually nice today.",
+      "speaker_state_before": {
+        "last_emotion": "relief",
+        "last_tone": "casual",
+        "last_sentiment": "positive",
+        "recent_tension_mean": 10.600798186490481,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 0,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9969,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 15,
+      "speaker_id": "Dev",
+      "text": "That's great, congrats!",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.9992,
+        "probabilities": {
+          "positive": 0.9992,
+          "neutral": 0.0007,
+          "negative": 0.0001
+        }
+      },
+      "emotion": {
+        "label": "joy",
+        "confidence": 0.9966,
+        "probabilities": {
+          "joy": 0.9966,
+          "neutral": 0.0009,
+          "excitement": 0.0008
+        }
+      },
+      "tone": {
+        "label": "friendly",
+        "confidence": 0.9957,
+        "probabilities": {
+          "friendly": 0.9957,
+          "casual": 0.0014,
+          "professional": 0.0011
+        }
+      },
+      "tension": 7.7,
+      "sarcasm": {
+        "probability": 0.351,
+        "confidence": 0.2979,
+        "supporting_signals": [
+          "positive wording in negative context",
+          "marker words: great, congrats",
+          "exclamation emphasis"
+        ],
+        "learned_p": 0.0016,
+        "contradiction_evidence": 0.35
+      },
+      "irony": {
+        "probability": 0.3583,
+        "confidence": 0.2835,
+        "supporting_signals": [
+          "literal meaning opposes situational context"
+        ],
+        "learned_p": 0.0127,
+        "mismatch_evidence": 0.35
+      },
+      "passive_aggression": {
+        "probability": 0.0061,
+        "confidence": 0.9878,
+        "supporting_signals": [],
+        "learned_p": 0.0061
+      },
+      "signals": {
+        "n_words": 3,
+        "pos_hits": [
+          "great"
+        ],
+        "neg_hits": [],
+        "sarc_words": [
+          "great",
+          "congrats"
+        ],
+        "irony_words": [
+          "great"
+        ],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 1,
+        "exclam": 1,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Morning! Ready for the call at 10? (we should talk with the lab report) :: Honestly better than I expected, I think I passed. (about the professor's feedback) :: Friday it is. I'll finish my part tonight. || Thanks! Celebrating this weekend. (we should talk with the lab report) || Just finished the setup, everything works now. || Will do. The weather is actually nice today. || How did your exam go btw?",
+      "speaker_state_before": {
+        "last_emotion": "joy",
+        "last_tone": "casual",
+        "last_sentiment": "positive",
+        "recent_tension_mean": 8.12394352735304,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.18,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 1,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9957,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 16,
+      "speaker_id": "Riya",
+      "text": "Hey! Did you get a chance to look at the plan? (quick one on the professor's feedback)",
+      "sentiment": {
+        "label": "neutral",
+        "confidence": 0.9971,
+        "probabilities": {
+          "neutral": 0.9971,
+          "negative": 0.0028,
+          "positive": 0.0001
+        }
+      },
+      "emotion": {
+        "label": "neutral",
+        "confidence": 0.9909,
+        "probabilities": {
+          "neutral": 0.9909,
+          "anger": 0.0044,
+          "joy": 0.0021
+        }
+      },
+      "tone": {
+        "label": "friendly",
+        "confidence": 0.9701,
+        "probabilities": {
+          "friendly": 0.9701,
+          "professional": 0.0167,
+          "aggressive": 0.007
+        }
+      },
+      "tension": 13.1,
+      "sarcasm": {
+        "probability": 0.0202,
+        "confidence": 0.9595,
+        "supporting_signals": [
+          "exclamation emphasis",
+          "tension spike (+5 after this message)"
+        ],
+        "learned_p": 0.0041,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0032,
+        "confidence": 0.9936,
+        "supporting_signals": [],
+        "learned_p": 0.0032,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.0082,
+        "confidence": 0.9836,
+        "supporting_signals": [],
+        "learned_p": 0.0082
+      },
+      "signals": {
+        "n_words": 17,
+        "pos_hits": [],
+        "neg_hits": [],
+        "sarc_words": [],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 0,
+        "exclam": 1,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Morning! Ready for the call at 10? (we should talk with the lab report) :: Honestly better than I expected, I think I passed. (about the professor's feedback) :: Friday it is. I'll finish my part tonight. || Just finished the setup, everything works now. || Will do. The weather is actually nice today. || How did your exam go btw? || That's great, congrats!",
+      "speaker_state_before": {
+        "last_emotion": "concerned",
+        "last_tone": "friendly",
+        "last_sentiment": "neutral",
+        "recent_tension_mean": 10.510344527896255,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.18,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 0,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9932,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    },
+    {
+      "message_id": 17,
+      "speaker_id": "Dev",
+      "text": "No worries, happy to help.",
+      "sentiment": {
+        "label": "positive",
+        "confidence": 0.9979,
+        "probabilities": {
+          "positive": 0.9979,
+          "neutral": 0.0016,
+          "negative": 0.0004
+        }
+      },
+      "emotion": {
+        "label": "affection",
+        "confidence": 0.9988,
+        "probabilities": {
+          "affection": 0.9988,
+          "neutral": 0.0003,
+          "relief": 0.0002
+        }
+      },
+      "tone": {
+        "label": "supportive",
+        "confidence": 0.9975,
+        "probabilities": {
+          "supportive": 0.9975,
+          "friendly": 0.0006,
+          "casual": 0.0005
+        }
+      },
+      "tension": 6.2,
+      "sarcasm": {
+        "probability": 0.0045,
+        "confidence": 0.991,
+        "supporting_signals": [],
+        "learned_p": 0.0045,
+        "contradiction_evidence": 0.0
+      },
+      "irony": {
+        "probability": 0.0005,
+        "confidence": 0.999,
+        "supporting_signals": [],
+        "learned_p": 0.0005,
+        "mismatch_evidence": 0.0
+      },
+      "passive_aggression": {
+        "probability": 0.0141,
+        "confidence": 0.9718,
+        "supporting_signals": [],
+        "learned_p": 0.0141
+      },
+      "signals": {
+        "n_words": 5,
+        "pos_hits": [
+          "happy"
+        ],
+        "neg_hits": [],
+        "sarc_words": [],
+        "irony_words": [],
+        "pa_phrase": null,
+        "exaggeration": [],
+        "interjections": [],
+        "praise_minus_neg": 1,
+        "exclam": 0,
+        "ellipsis": 0,
+        "emoji_sarc": [],
+        "emoji_polarity": 0,
+        "laugh": false,
+        "swear": 0,
+        "quoted_echo": false,
+        "is_short": false
+      },
+      "context_text": "Morning! Ready for the call at 10? (we should talk with the lab report) :: Honestly better than I expected, I think I passed. (about the professor's feedback) :: Friday it is. I'll finish my part tonight. || Will do. The weather is actually nice today. || How did your exam go btw? || That's great, congrats! || Hey! Did you get a chance to look at the plan? (quick one on the professor's feedback)",
+      "speaker_state_before": {
+        "last_emotion": "joy",
+        "last_tone": "friendly",
+        "last_sentiment": "positive",
+        "recent_tension_mean": 8.57232497000739,
+        "short_streak": 0
+      },
+      "behavior_flags": {
+        "intensity": 0.0,
+        "short_response": false,
+        "negative_lexicon": 0,
+        "positive_lexicon": 1,
+        "exaggeration_words": 0,
+        "emoji_polarity": 0.0,
+        "response_gap_hours": 0.0,
+        "caps_ratio": 0.0
+      },
+      "confidence": 0.9967,
+      "stream_weights": {
+        "text": 0.3,
+        "context": 0.22,
+        "memory": 0.14,
+        "behavior": 0.12,
+        "temporal": 0.1,
+        "hidden": 0.12
+      }
+    }
+  ],
+  "emotional_arc": {
+    "arc": [
+      {
+        "message_id": 1,
+        "emotion": "neutral",
+        "emotion_confidence": 0.9935,
+        "intensity": 0.1,
+        "tension": 13.8
+      },
+      {
+        "message_id": 2,
+        "emotion": "neutral",
+        "emotion_confidence": 0.9895,
+        "intensity": 0.1,
+        "tension": 12.0
+      },
+      {
+        "message_id": 3,
+        "emotion": "neutral",
+        "emotion_confidence": 0.9893,
+        "intensity": 0.1,
+        "tension": 12.1
+      },
+      {
+        "message_id": 4,
+        "emotion": "relief",
+        "emotion_confidence": 0.9943,
+        "intensity": 0.18,
+        "tension": 9.8
+      },
+      {
+        "message_id": 5,
+        "emotion": "joy",
+        "emotion_confidence": 0.9954,
+        "intensity": 0.35,
+        "tension": 5.4
+      },
+      {
+        "message_id": 6,
+        "emotion": "affection",
+        "emotion_confidence": 0.999,
+        "intensity": 0.25,
+        "tension": 7.6
+      },
+      {
+        "message_id": 7,
+        "emotion": "neutral",
+        "emotion_confidence": 0.9921,
+        "intensity": 0.1,
+        "tension": 7.7
+      },
+      {
+        "message_id": 8,
+        "emotion": "neutral",
+        "emotion_confidence": 0.9811,
+        "intensity": 0.1,
+        "tension": 12.9
+      },
+      {
+        "message_id": 9,
+        "emotion": "relief",
+        "emotion_confidence": 0.9834,
+        "intensity": 0.18,
+        "tension": 12.7
+      },
+      {
+        "message_id": 10,
+        "emotion": "neutral",
+        "emotion_confidence": 0.9927,
+        "intensity": 0.1,
+        "tension": 10.7
+      },
+      {
+        "message_id": 11,
+        "emotion": "excitement",
+        "emotion_confidence": 0.9708,
+        "intensity": 0.45,
+        "tension": 9.1
+      },
+      {
+        "message_id": 12,
+        "emotion": "relief",
+        "emotion_confidence": 0.9945,
+        "intensity": 0.18,
+        "tension": 12.0
+      },
+      {
+        "message_id": 13,
+        "emotion": "joy",
+        "emotion_confidence": 0.9942,
+        "intensity": 0.35,
+        "tension": 5.6
+      },
+      {
+        "message_id": 14,
+        "emotion": "concerned",
+        "emotion_confidence": 0.9992,
+        "intensity": 0.1,
+        "tension": 9.3
+      },
+      {
+        "message_id": 15,
+        "emotion": "joy",
+        "emotion_confidence": 0.9966,
+        "intensity": 0.35,
+        "tension": 7.7
+      },
+      {
+        "message_id": 16,
+        "emotion": "neutral",
+        "emotion_confidence": 0.9909,
+        "intensity": 0.1,
+        "tension": 13.1
+      },
+      {
+        "message_id": 17,
+        "emotion": "affection",
+        "emotion_confidence": 0.9988,
+        "intensity": 0.25,
+        "tension": 6.2
+      }
+    ],
+    "mean_intensity": 0.196,
+    "peak_intensity": 0.45,
+    "stability": 0.718,
+    "direction": "escalating",
+    "peaks": [
+      4,
+      10,
+      14
+    ],
+    "drops": [
+      1,
+      6,
+      9,
+      13
+    ],
+    "recovered": false,
+    "tension_curve": [
+      13.8,
+      12.0,
+      12.1,
+      9.8,
+      5.4,
+      7.6,
+      7.7,
+      12.9,
+      12.7,
+      10.7,
+      9.1,
+      12.0,
+      5.6,
+      9.3,
+      7.7,
+      13.1,
+      6.2
+    ]
+  },
+  "emotion_transitions": [
+    {
+      "at_message": 11,
+      "speaker": "Dev",
+      "from_emotion": "neutral",
+      "to_emotion": "excitement",
+      "tension_before": 10.7,
+      "tension_after": 9.1,
+      "tension_delta": -1.6,
+      "magnitude": 0.35,
+      "trigger_text": "Thanks! Celebrating this weekend. (we should talk with the lab report)",
+      "confidence": 0.9708
+    },
+    {
+      "at_message": 12,
+      "speaker": "Riya",
+      "from_emotion": "excitement",
+      "to_emotion": "relief",
+      "tension_before": 9.1,
+      "tension_after": 12.0,
+      "tension_delta": 2.9,
+      "magnitude": 0.27,
+      "trigger_text": "Just finished the setup, everything works now.",
+      "confidence": 0.9945
+    },
+    {
+      "at_message": 14,
+      "speaker": "Riya",
+      "from_emotion": "joy",
+      "to_emotion": "concerned",
+      "tension_before": 5.6,
+      "tension_after": 9.3,
+      "tension_delta": 3.7,
+      "magnitude": 0.25,
+      "trigger_text": "How did your exam go btw?",
+      "confidence": 0.9992
+    },
+    {
+      "at_message": 15,
+      "speaker": "Dev",
+      "from_emotion": "concerned",
+      "to_emotion": "joy",
+      "tension_before": 9.3,
+      "tension_after": 7.7,
+      "tension_delta": -1.6,
+      "magnitude": 0.25,
+      "trigger_text": "That's great, congrats!",
+      "confidence": 0.9966
+    },
+    {
+      "at_message": 16,
+      "speaker": "Riya",
+      "from_emotion": "joy",
+      "to_emotion": "neutral",
+      "tension_before": 7.7,
+      "tension_after": 13.1,
+      "tension_delta": 5.4,
+      "magnitude": 0.25,
+      "trigger_text": "Hey! Did you get a chance to look at the plan? (quick one on the professor's feedback)",
+      "confidence": 0.9909
+    }
+  ],
+  "transition_matrix": {
+    "neutral -> neutral": 3,
+    "neutral -> relief": 2,
+    "relief -> joy": 2,
+    "joy -> affection": 1,
+    "affection -> neutral": 1,
+    "relief -> neutral": 1,
+    "neutral -> excitement": 1,
+    "excitement -> relief": 1,
+    "joy -> concerned": 1,
+    "concerned -> joy": 1,
+    "joy -> neutral": 1,
+    "neutral -> affection": 1
+  },
+  "turning_points": [
+    {
+      "message_id": 8,
+      "before": {
+        "emotion": "neutral",
+        "tension": 7.7,
+        "tone": "supportive"
+      },
+      "after": {
+        "emotion": "neutral",
+        "tension": 12.9,
+        "tone": "professional"
+      },
+      "tension_change": 5.2,
+      "robust_z": 1.83,
+      "trigger_text": "Morning! Ready for the call at 10? (we should talk with the lab report)",
+      "speaker": "Riya",
+      "note": "model-estimated turning point, not a causal claim"
+    },
+    {
+      "message_id": 13,
+      "before": {
+        "emotion": "relief",
+        "tension": 12.0,
+        "tone": "casual"
+      },
+      "after": {
+        "emotion": "joy",
+        "tension": 5.6,
+        "tone": "casual"
+      },
+      "tension_change": -6.4,
+      "robust_z": -1.65,
+      "trigger_text": "Will do. The weather is actually nice today.",
+      "speaker": "Dev",
+      "note": "model-estimated turning point, not a causal claim"
+    },
+    {
+      "message_id": 16,
+      "before": {
+        "emotion": "joy",
+        "tension": 7.7,
+        "tone": "friendly"
+      },
+      "after": {
+        "emotion": "neutral",
+        "tension": 13.1,
+        "tone": "friendly"
+      },
+      "tension_change": 5.4,
+      "robust_z": 1.89,
+      "trigger_text": "Hey! Did you get a chance to look at the plan? (quick one on the professor's feedback)",
+      "speaker": "Riya",
+      "note": "model-estimated turning point, not a causal claim"
+    }
+  ],
+  "escalation": {
+    "trajectory": "stable",
+    "escalation_start_message": null,
+    "escalation_rate": -0.165,
+    "peak_tension": 13.8,
+    "peak_message": 1,
+    "deescalation_point": null,
+    "phase_means": {
+      "start": 10.6,
+      "middle": 10.1,
+      "end": 9.0
+    },
+    "confidence": 0.108
+  },
+  "escalation_phases": [
+    {
+      "message_id": 1,
+      "phase": "peak"
+    },
+    {
+      "message_id": 2,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 3,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 4,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 5,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 6,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 7,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 8,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 9,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 10,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 11,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 12,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 13,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 14,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 15,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 16,
+      "phase": "neutral"
+    },
+    {
+      "message_id": 17,
+      "phase": "neutral"
+    }
+  ],
+  "speaker_profiles": {
+    "Dev": {
+      "messages": 9,
+      "dominant_emotions": {
+        "neutral": 0.333,
+        "joy": 0.333,
+        "relief": 0.111,
+        "excitement": 0.111
+      },
+      "tone_distribution": {
+        "casual": 0.444,
+        "friendly": 0.222,
+        "supportive": 0.222,
+        "professional": 0.111
+      },
+      "sentiment_distribution": {
+        "positive": 0.778,
+        "neutral": 0.222
+      },
+      "avg_tension": 8.9,
+      "max_tension": 13.8,
+      "sarcastic_share": 0.0,
+      "passive_aggressive_share": 0.0,
+      "high_tension_share": 0.0,
+      "note": "communication-pattern summary, not a psychological profile"
+    },
+    "Riya": {
+      "messages": 8,
+      "dominant_emotions": {
+        "neutral": 0.5,
+        "relief": 0.25,
+        "affection": 0.125,
+        "concerned": 0.125
+      },
+      "tone_distribution": {
+        "friendly": 0.5,
+        "casual": 0.25,
+        "professional": 0.25
+      },
+      "sentiment_distribution": {
+        "positive": 0.625,
+        "neutral": 0.375
+      },
+      "avg_tension": 10.9,
+      "max_tension": 13.1,
+      "sarcastic_share": 0.0,
+      "passive_aggressive_share": 0.0,
+      "high_tension_share": 0.0,
+      "note": "communication-pattern summary, not a psychological profile"
+    }
+  },
+  "explanations": [
+    {
+      "message_id": 1,
+      "prediction": {
+        "sentiment": {
+          "label": "Neutral",
+          "confidence": 0.9992
+        },
+        "emotion": {
+          "label": "Neutral",
+          "confidence": 0.9935
+        },
+        "tone": {
+          "label": "Casual",
+          "confidence": 0.9917
+        },
+        "sarcasm_probability": 0.0727,
+        "passive_aggression_probability": 0.2042,
+        "tension": 13.8
+      },
+      "detected_evidence": [
+        "positive wording: awesome",
+        "irony-prone markers: right"
+      ],
+      "inferred_interpretation": [
+        "sarcasm evidence: marker words: right; tension spike (+14 after this message)",
+        "passive-aggression evidence: rising tension trajectory"
+      ],
+      "model_confidence": 0.9943,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 2,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.9974
+        },
+        "emotion": {
+          "label": "Neutral",
+          "confidence": 0.9895
+        },
+        "tone": {
+          "label": "Friendly",
+          "confidence": 0.9928
+        },
+        "sarcasm_probability": 0.003,
+        "passive_aggression_probability": 0.0023,
+        "tension": 12.0
+      },
+      "detected_evidence": [],
+      "inferred_interpretation": [
+        "sentiment shift neutral → positive",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9925,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 3,
+      "prediction": {
+        "sentiment": {
+          "label": "Neutral",
+          "confidence": 0.9988
+        },
+        "emotion": {
+          "label": "Neutral",
+          "confidence": 0.9893
+        },
+        "tone": {
+          "label": "Professional",
+          "confidence": 0.9956
+        },
+        "sarcasm_probability": 0.0056,
+        "passive_aggression_probability": 0.0011,
+        "tension": 12.1
+      },
+      "detected_evidence": [
+        "positive wording: good"
+      ],
+      "inferred_interpretation": [
+        "sentiment shift positive → neutral",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9924,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 4,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.9986
+        },
+        "emotion": {
+          "label": "Relief",
+          "confidence": 0.9943
+        },
+        "tone": {
+          "label": "Casual",
+          "confidence": 0.9879
+        },
+        "sarcasm_probability": 0.0764,
+        "passive_aggression_probability": 0.0126,
+        "tension": 9.8
+      },
+      "detected_evidence": [
+        "positive wording: solid",
+        "irony-prone markers: yeah"
+      ],
+      "inferred_interpretation": [
+        "emotional shift neutral → relief",
+        "sentiment shift neutral → positive",
+        "sarcasm evidence: marker words: yeah",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9947,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 5,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.998
+        },
+        "emotion": {
+          "label": "Joy",
+          "confidence": 0.9954
+        },
+        "tone": {
+          "label": "Friendly",
+          "confidence": 0.9941
+        },
+        "sarcasm_probability": 0.076,
+        "passive_aggression_probability": 0.0032,
+        "tension": 5.4
+      },
+      "detected_evidence": [
+        "irony-prone markers: right"
+      ],
+      "inferred_interpretation": [
+        "emotional shift relief → joy",
+        "sarcasm evidence: marker words: right",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9952,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 6,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.9989
+        },
+        "emotion": {
+          "label": "Affection",
+          "confidence": 0.999
+        },
+        "tone": {
+          "label": "Friendly",
+          "confidence": 0.9953
+        },
+        "sarcasm_probability": 0.0829,
+        "passive_aggression_probability": 0.0077,
+        "tension": 7.6
+      },
+      "detected_evidence": [
+        "positive wording: thanks",
+        "irony-prone markers: thanks"
+      ],
+      "inferred_interpretation": [
+        "emotional shift joy → affection",
+        "sarcasm evidence: marker words: thanks",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9968,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 7,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.9992
+        },
+        "emotion": {
+          "label": "Neutral",
+          "confidence": 0.9921
+        },
+        "tone": {
+          "label": "Supportive",
+          "confidence": 0.9975
+        },
+        "sarcasm_probability": 0.0018,
+        "passive_aggression_probability": 0.0089,
+        "tension": 7.7
+      },
+      "detected_evidence": [
+        "positive wording: cool, cool"
+      ],
+      "inferred_interpretation": [
+        "emotional shift affection → neutral",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9937,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 8,
+      "prediction": {
+        "sentiment": {
+          "label": "Neutral",
+          "confidence": 0.9965
+        },
+        "emotion": {
+          "label": "Neutral",
+          "confidence": 0.9811
+        },
+        "tone": {
+          "label": "Professional",
+          "confidence": 0.9709
+        },
+        "sarcasm_probability": 0.0161,
+        "passive_aggression_probability": 0.0033,
+        "tension": 12.9
+      },
+      "detected_evidence": [
+        "intensified punctuation (1× '!')"
+      ],
+      "inferred_interpretation": [
+        "sentiment shift positive → neutral",
+        "sarcasm evidence: exclamation emphasis; tension spike (+5 after this message)",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9887,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 9,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.9954
+        },
+        "emotion": {
+          "label": "Relief",
+          "confidence": 0.9834
+        },
+        "tone": {
+          "label": "Casual",
+          "confidence": 0.9787
+        },
+        "sarcasm_probability": 0.0644,
+        "passive_aggression_probability": 0.0015,
+        "tension": 12.7
+      },
+      "detected_evidence": [],
+      "inferred_interpretation": [
+        "emotional shift neutral → relief",
+        "sentiment shift neutral → positive",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9898,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 10,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.9972
+        },
+        "emotion": {
+          "label": "Neutral",
+          "confidence": 0.9927
+        },
+        "tone": {
+          "label": "Professional",
+          "confidence": 0.9963
+        },
+        "sarcasm_probability": 0.0056,
+        "passive_aggression_probability": 0.0004,
+        "tension": 10.7
+      },
+      "detected_evidence": [],
+      "inferred_interpretation": [
+        "emotional shift relief → neutral",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.994,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 11,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.9989
+        },
+        "emotion": {
+          "label": "Excitement",
+          "confidence": 0.9708
+        },
+        "tone": {
+          "label": "Casual",
+          "confidence": 0.9077
+        },
+        "sarcasm_probability": 0.2754,
+        "passive_aggression_probability": 0.0054,
+        "tension": 9.1
+      },
+      "detected_evidence": [
+        "positive wording: thanks",
+        "intensified punctuation (1× '!')",
+        "irony-prone markers: thanks"
+      ],
+      "inferred_interpretation": [
+        "emotional shift neutral → excitement",
+        "sarcasm evidence: marker words: thanks; exclamation emphasis",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9841,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 12,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.9964
+        },
+        "emotion": {
+          "label": "Relief",
+          "confidence": 0.9945
+        },
+        "tone": {
+          "label": "Casual",
+          "confidence": 0.99
+        },
+        "sarcasm_probability": 0.01,
+        "passive_aggression_probability": 0.0008,
+        "tension": 12.0
+      },
+      "detected_evidence": [
+        "positive wording: works",
+        "absolute/exaggerated words: everything"
+      ],
+      "inferred_interpretation": [
+        "emotional shift excitement → relief",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9948,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 13,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.9971
+        },
+        "emotion": {
+          "label": "Joy",
+          "confidence": 0.9942
+        },
+        "tone": {
+          "label": "Casual",
+          "confidence": 0.9891
+        },
+        "sarcasm_probability": 0.0162,
+        "passive_aggression_probability": 0.0081,
+        "tension": 5.6
+      },
+      "detected_evidence": [
+        "positive wording: nice"
+      ],
+      "inferred_interpretation": [
+        "emotional shift relief → joy",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9946,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 14,
+      "prediction": {
+        "sentiment": {
+          "label": "Neutral",
+          "confidence": 0.9988
+        },
+        "emotion": {
+          "label": "Concerned",
+          "confidence": 0.9992
+        },
+        "tone": {
+          "label": "Friendly",
+          "confidence": 0.9944
+        },
+        "sarcasm_probability": 0.0126,
+        "passive_aggression_probability": 0.0049,
+        "tension": 9.3
+      },
+      "detected_evidence": [],
+      "inferred_interpretation": [
+        "emotional shift joy → concerned",
+        "sentiment shift positive → neutral",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9969,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 15,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.9992
+        },
+        "emotion": {
+          "label": "Joy",
+          "confidence": 0.9966
+        },
+        "tone": {
+          "label": "Friendly",
+          "confidence": 0.9957
+        },
+        "sarcasm_probability": 0.351,
+        "passive_aggression_probability": 0.0061,
+        "tension": 7.7
+      },
+      "detected_evidence": [
+        "positive wording: great",
+        "intensified punctuation (1× '!')",
+        "irony-prone markers: great, congrats"
+      ],
+      "inferred_interpretation": [
+        "emotional shift concerned → joy",
+        "sentiment shift neutral → positive",
+        "sarcasm evidence: positive wording in negative context; marker words: great, congrats",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9957,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 16,
+      "prediction": {
+        "sentiment": {
+          "label": "Neutral",
+          "confidence": 0.9971
+        },
+        "emotion": {
+          "label": "Neutral",
+          "confidence": 0.9909
+        },
+        "tone": {
+          "label": "Friendly",
+          "confidence": 0.9701
+        },
+        "sarcasm_probability": 0.0202,
+        "passive_aggression_probability": 0.0082,
+        "tension": 13.1
+      },
+      "detected_evidence": [
+        "intensified punctuation (1× '!')"
+      ],
+      "inferred_interpretation": [
+        "emotional shift joy → neutral",
+        "sentiment shift positive → neutral",
+        "sarcasm evidence: exclamation emphasis; tension spike (+5 after this message)",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9932,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    },
+    {
+      "message_id": 17,
+      "prediction": {
+        "sentiment": {
+          "label": "Positive",
+          "confidence": 0.9979
+        },
+        "emotion": {
+          "label": "Affection",
+          "confidence": 0.9988
+        },
+        "tone": {
+          "label": "Supportive",
+          "confidence": 0.9975
+        },
+        "sarcasm_probability": 0.0045,
+        "passive_aggression_probability": 0.0141,
+        "tension": 6.2
+      },
+      "detected_evidence": [
+        "positive wording: happy"
+      ],
+      "inferred_interpretation": [
+        "emotional shift neutral → affection",
+        "sentiment shift neutral → positive",
+        "interpreted against the preceding conversation window"
+      ],
+      "model_confidence": 0.9967,
+      "disclaimer": "Model-estimated confidence, not human certainty. Evidence is detected; interpretation is inferred."
+    }
+  ],
+  "topics": null,
+  "disclaimer": "All outputs are model-estimated with calibrated confidence; turning points are associations, not causal claims."
+}

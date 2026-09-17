@@ -1,0 +1,89 @@
+{
+  "counts": {
+    "passive_aggression:false_negative": 6,
+    "sarcasm:false_negative": 1
+  },
+  "binary_breakdown": {
+    "passive_aggression:false_negative": 6,
+    "sarcasm:false_negative": 1
+  },
+  "samples": [
+    {
+      "conversation": "conv_0583",
+      "message_id": 5,
+      "head": "passive_aggression",
+      "text": "Hey! Did you get a chance to look at the plan? (we should talk about the reunion date)",
+      "ground_truth": "1",
+      "prediction": "0 (p=0.00)",
+      "confidence": 0.0026,
+      "error_type": "passive_aggression:false_negative",
+      "possible_cause": "literal reading dominated — no contextual trigger"
+    },
+    {
+      "conversation": "conv_0446",
+      "message_id": 7,
+      "head": "sarcasm",
+      "text": "And I meant it. Today things just slipped.",
+      "ground_truth": "1",
+      "prediction": "0 (p=0.02)",
+      "confidence": 0.0159,
+      "error_type": "sarcasm:false_negative",
+      "possible_cause": "literal reading dominated — no contextual trigger"
+    },
+    {
+      "conversation": "conv_0255",
+      "message_id": 5,
+      "head": "passive_aggression",
+      "text": "Awesome. I think the deadline is Friday, right?",
+      "ground_truth": "1",
+      "prediction": "0 (p=0.00)",
+      "confidence": 0.0022,
+      "error_type": "passive_aggression:false_negative",
+      "possible_cause": "literal reading dominated — no contextual trigger"
+    },
+    {
+      "conversation": "conv_0363",
+      "message_id": 2,
+      "head": "passive_aggression",
+      "text": "How did your exam go btw?",
+      "ground_truth": "1",
+      "prediction": "0 (p=0.01)",
+      "confidence": 0.013,
+      "error_type": "passive_aggression:false_negative",
+      "possible_cause": "literal reading dominated — no contextual trigger"
+    },
+    {
+      "conversation": "conv_0162",
+      "message_id": 15,
+      "head": "passive_aggression",
+      "text": "Thanks! Celebrating this weekend.",
+      "ground_truth": "1",
+      "prediction": "0 (p=0.01)",
+      "confidence": 0.0094,
+      "error_type": "passive_aggression:false_negative",
+      "possible_cause": "literal reading dominated — no contextual trigger"
+    },
+    {
+      "conversation": "conv_0535",
+      "message_id": 20,
+      "head": "passive_aggression",
+      "text": "...I didn't mean to blow up like that. I'm sorry.",
+      "ground_truth": "1",
+      "prediction": "0 (p=0.25)",
+      "confidence": 0.2542,
+      "error_type": "passive_aggression:false_negative",
+      "possible_cause": "literal reading dominated — no contextual trigger"
+    },
+    {
+      "conversation": "conv_0268",
+      "message_id": 9,
+      "head": "passive_aggression",
+      "text": "Honestly better than I expected, I think I passed.",
+      "ground_truth": "1",
+      "prediction": "0 (p=0.00)",
+      "confidence": 0.0006,
+      "error_type": "passive_aggression:false_negative",
+      "possible_cause": "literal reading dominated — no contextual trigger"
+    }
+  ]
+}
