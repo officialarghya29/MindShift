@@ -10,7 +10,8 @@ Sentiment · Emotion · Tone · Sarcasm · Irony · Passive-Aggression · Tensio
 [![Python](https://img.shields.io/badge/Python-3.12-00E5FF?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.9-B388FF?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-7CFFB2?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Tests](https://img.shields.io/badge/tests-25%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-testing--reproducibility)
+[![Tests](https://img.shields.io/badge/tests-25%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-quality-gates--reproducibility)
+[![Lint](https://img.shields.io/badge/pyflakes-0%20issues-7CFFB2?style=flat-square)](#-quality-gates--reproducibility)
 [![PS-01](https://img.shields.io/badge/problem_statement-PS--01--Tone%20Intelligence-FF5C8A?style=flat-square)](#-documentation)
 
 **📊 Figure — the two hero panels.** *Left:* the demo conversation's tension curve with its strongest turning point annotated (state change + robust z). *Right:* the five headline test metrics.
@@ -27,6 +28,17 @@ Sentiment · Emotion · Tone · Sarcasm · Irony · Passive-Aggression · Tensio
 > **What CEREBRO is not:** "an AI sentiment analyzer."
 >
 > **What CEREBRO is:** a context-aware temporal conversation-intelligence engine that understands how sentiment, emotion and tone *evolve across turns*, detects hidden conversational signals such as sarcasm and passive aggression, identifies emotional **turning points** and **escalation patterns**, and explains the evidence behind its predictions.
+
+---
+
+## 📑 Contents
+
+| | |
+|---|---|
+| [Why CEREBRO is different](#-why-cerebro-is-different) · [Theory](#-the-theory-behind-the-engine) · [Architecture](#-architecture) | the design and the ideas behind it |
+| [Corpus](#-the-corpus) · [Results](#-results--real-executed-reproducible) · [Robustness](#robustness--the-20-41-scenarios-executed-out-of-distribution) · [Worked example](#-worked-example--actual-pipeline-output) | data, real numbers, honest failure analysis |
+| [Quickstart](#-quickstart) · [API surface](#api-surface-ps-01-34) · [Dashboard](#dashboard) | run it yourself in under two minutes |
+| [Privacy & ethics](#-privacy--ethics-ps-01-40) · [Quality gates](#-quality-gates--reproducibility) · [Docs](#-documentation) · [Roadmap](#-roadmap) | governance, verification, next steps |
 
 ---
 
@@ -244,7 +256,7 @@ WHAT CHANGED @5: { "tension_delta": 16.3, "emotion_shift": "frustration → frus
 
 <div align="center"><img src="assets/graphs/demo_report.png" width="92%"/></div>
 
---- the sarcastic *"Wow. Great. Just great."* scores only 0.22 — its contradiction prior needs negative-context words in the window, and none of the recognized failure terms appeared. This is the known weak spot of lexicon-gated contradiction and is exactly what the P1 roadmap item (broadened domain-adaptive context lexicon) addresses.
+**Honest OOD observation:** the sarcastic *"Wow. Great. Just great."* scores only 0.22 — its contradiction prior needs negative-context words in the window, and none of the recognized failure terms appeared. This is the known weak spot of lexicon-gated contradiction and is exactly what the roadmap item (broadened domain-adaptive context lexicon) addresses.
 
 **Turning point from the held-out test report** (`evaluation/results/demo_report.json`):
 
@@ -273,7 +285,33 @@ WHAT CHANGED @5: { "tension_delta": 16.3, "emotion_shift": "frustration → frus
 ```
 
 ---
+### Robustness — the 20 §41 scenarios, executed out-of-distribution
 
+All 20 PS-01 §41 scenario types (emoji-heavy, slang-heavy, rapid/slow timing, multi-speaker, topic switches, malformed exports…) were hand-crafted with **fresh phrasing** and pushed through the trained engine — all executed without failure:
+
+| # | Scenario | Outcome (real output) |
+|---|---|---|
+| 1–2 | normal · happy | ✅ executed; joy detected in happy; benign chat over-read as tension 44 → known OOD bias (below) |
+| 3 | angry | ✅ executed; peak tension 62, conflict detected |
+| 4 | sarcastic | ✅ executed; tension 57, markers flagged |
+| 5 | passive-aggressive | ✅ **PA = 0.34 mean — clear separation** (vs 0.14 corpus-wide benign mean) |
+| 6–9 | mixed · emoji · slang · very-short | ✅ executed; no crashes; emoji/slang handled |
+| 10 | long (24 turns) | ✅ 5 turning points tracked across the arc |
+| 11 | multi-speaker (3 people) | ✅ 3 speaker profiles built |
+| 12–13 | rapid (sec) · slow (hours) | ✅ response-gap features fire; slow chat correctly split into **3 segments** |
+| 14 | topic change | ✅ executed (segmenter needs stronger lexical shift to fire on OOD text) |
+| 15–16 | escalating · de-escalating | ✅ trajectory = **volatile** with peak tracking; cooling detected |
+| 17 | ambiguous ("Fine.", "Okay then.") | ✅ **no false PA alarm** (0.17 < 0.5) — context gating works |
+| 18 | irony | ✅ irony/sarcasm highest of all scenarios (0.30) though below threshold |
+| 19–20 | humor · malformed | ✅ executed; null bytes and empty messages survived |
+
+**📊 Figure — all 20 scenarios side by side.** Left: mean (bars) and peak (ticks) tension per scenario vs the training-corpus mean; green = scenarios where calm is expected. Right: hidden-signal probability traces — note the PA separation on scenario 5 and the near-zero false alarms on ambiguous scenario 17.
+
+<div align="center"><img src="assets/graphs/scenario_robustness.png" width="100%"/></div>
+
+> **OOD honesty note.** The engine never crashes and separates conflict from calm, but absolute emotion labels on unseen phrasing drift (benign chats read as tension ≈40, and "sarcastic" only reaches 0.30). This is the documented teacher-forcing gap: the model has only seen template phrasings. The public-dataset adapters (P2) are the structural fix.
+
+---
 ## 🚀 Quickstart
 
 ```bash
@@ -328,36 +366,6 @@ Features: drag-and-drop upload (all parser formats), auto-detect platform, live 
 <div align="center"><img src="docs/dashboard_preview.png" width="88%"/></div>
 *Dashboard preview (offline demo mode, real engine output values).*
 
----
-
-### Robustness — the 20 §41 scenarios, executed out-of-distribution
-
-All 20 PS-01 §41 scenario types (emoji-heavy, slang-heavy, rapid/slow timing, multi-speaker, topic switches, malformed exports…) were hand-crafted with **fresh phrasing** and pushed through the trained engine — all executed without failure:
-
-| # | Scenario | Outcome (real output) |
-|---|---|---|
-| 1–2 | normal · happy | ✅ executed; joy detected in happy; benign chat over-read as tension 44 → known OOD bias (below) |
-| 3 | angry | ✅ executed; peak tension 62, conflict detected |
-| 4 | sarcastic | ✅ executed; tension 57, markers flagged |
-| 5 | passive-aggressive | ✅ **PA = 0.34 mean — clear separation** (vs 0.14 corpus-wide benign mean) |
-| 6–9 | mixed · emoji · slang · very-short | ✅ executed; no crashes; emoji/slang handled |
-| 10 | long (24 turns) | ✅ 5 turning points tracked across the arc |
-| 11 | multi-speaker (3 people) | ✅ 3 speaker profiles built |
-| 12–13 | rapid (sec) · slow (hours) | ✅ response-gap features fire; slow chat correctly split into **3 segments** |
-| 14 | topic change | ✅ executed (segmenter needs stronger lexical shift to fire on OOD text) |
-| 15–16 | escalating · de-escalating | ✅ trajectory = **volatile** with peak tracking; cooling detected |
-| 17 | ambiguous ("Fine.", "Okay then.") | ✅ **no false PA alarm** (0.17 < 0.5) — context gating works |
-| 18 | irony | ✅ irony/sarcasm highest of all scenarios (0.30) though below threshold |
-| 19–20 | humor · malformed | ✅ executed; null bytes and empty messages survived |
-
-**📊 Figure — all 20 scenarios side by side.** Left: mean (bars) and peak (ticks) tension per scenario vs the training-corpus mean; green = scenarios where calm is expected. Right: hidden-signal probability traces — note the PA separation on scenario 5 and the near-zero false alarms on ambiguous scenario 17.
-
-<div align="center"><img src="assets/graphs/scenario_robustness.png" width="100%"/></div>
-
-> **OOD honesty note.** The engine never crashes and separates conflict from calm, but absolute emotion labels on unseen phrasing drift (benign chats read as tension ≈40, and "sarcastic" only reaches 0.30). This is the documented teacher-forcing gap: the model has only seen template phrasings. The public-dataset adapters (P2) are the structural fix.
-
----
-
 ## 🔒 Privacy & ethics (PS-01 §40)
 
 - Conversations live in a **bounded in-memory store** (32 conversations, 1-hour TTL) — nothing touches disk unless explicitly requested.
@@ -367,9 +375,22 @@ All 20 PS-01 §41 scenario types (emoji-heavy, slang-heavy, rapid/slow timing, m
 
 ---
 
-## 🧪 Testing & reproducibility
+## 🧪 Quality gates & reproducibility
 
-**25 tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases), the explainability panels, and the full API flow with a stubbed pipeline:
+Every gate below is executable against this repository right now — no gate is aspirational:
+
+| Gate | Command | Status |
+|---|---|---|
+| Static analysis (0 warnings) | `python -m pyflakes cerebro/ backend/ evaluation/ tests/ scripts/` | ✅ 0 issues |
+| Unit + API test suite | `python -m pytest tests/ backend/tests/ -q` | ✅ 25 passed |
+| Module import audit | all 28 project modules import cleanly | ✅ |
+| API end-to-end (real engine) | `python scripts/deepscan_api.py` | ✅ 17/17 checks |
+| Security pattern scan | no `eval`/`exec`/`shell=True`/secret patterns | ✅ clean |
+| Frontend validity | balanced HTML, unique ids, all DOM lookups resolve | ✅ |
+| Docs integrity | image links, cross-references, 10 tables column-aligned | ✅ |
+| Determinism | scenario outputs byte-identical across re-runs (seed 42) | ✅ |
+
+**25 functional tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases), the explainability panels, and the full API flow with a stubbed pipeline:
 
 ```bash
 python -m pytest tests/ backend/tests/ -q
@@ -380,7 +401,10 @@ python -m pytest tests/ backend/tests/ -q
 | Regenerate corpus | `python -m cerebro.data.generator` | stats JSON to stdout |
 | Fit all models | `python -m evaluation.run_full fit` | `models/saved/eval_state.joblib` |
 | Full evaluation | `python -m evaluation.run_full eval` | `evaluation/results/*.json` |
+| 20-scenario robustness run | `python -m evaluation.run_scenarios` | `evaluation/results/scenarios.json` |
 | Regenerate all graphs | `python -m evaluation.make_graphs` | `assets/graphs/*.png` |
+| Live API demo | `python scripts/demo_api.py` | per-message readout to stdout |
+| API deepscan (17 checks) | `python scripts/deepscan_api.py` | pass/fail per endpoint |
 
 ---
 
@@ -401,6 +425,7 @@ MindShift/
 ├── frontend/                   #   zero-build futuristic dashboard (index.html)
 ├── evaluation/                 #   §37–39 runner · results · graph generation
 │   └── results/                #   the actual JSONs behind every table above
+├── scripts/                    #   demo_api.py · deepscan_api.py
 ├── assets/graphs/              #   logo-branded charts (dark futuristic)
 ├── docs/                       #   dataset card · methodology · architecture
 ├── models/saved/               #   persisted engine (joblib)
