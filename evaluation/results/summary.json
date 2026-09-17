@@ -1,0 +1,102 @@
+{
+  "seed": 42,
+  "n_train_conversations": 411,
+  "n_val_conversations": 88,
+  "n_test_conversations": 89,
+  "n_test_messages": 1648,
+  "n_features_total": 1678,
+  "n_features_text": 826,
+  "corpus_stats": {
+    "conversations": 588,
+    "messages": 10956,
+    "speakers_per_conversation": 2.0,
+    "avg_messages_per_conversation": 18.63,
+    "sarcasm_positive_rate": 0.0282,
+    "irony_positive_rate": 0.0339,
+    "passive_aggression_positive_rate": 0.0406,
+    "sentiment_distribution": {
+      "positive": 5670,
+      "neutral": 2615,
+      "negative": 2671
+    },
+    "tension_mean": 25.9
+  },
+  "full_metrics": {
+    "sentiment": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_macro": 1.0,
+      "f1_weighted": 1.0
+    },
+    "emotion": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_macro": 1.0,
+      "f1_weighted": 1.0
+    },
+    "tone": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_macro": 1.0,
+      "f1_weighted": 1.0
+    },
+    "sarcasm": {
+      "accuracy": 0.9958,
+      "precision": 0.9865,
+      "recall": 0.9372,
+      "f1_macro": 0.9604,
+      "f1_weighted": 0.9956,
+      "roc_auc": 0.9585,
+      "pr_auc": 0.8996,
+      "brier": 0.0182
+    },
+    "irony": {
+      "accuracy": 0.9958,
+      "precision": 0.9883,
+      "recall": 0.9461,
+      "f1_macro": 0.9662,
+      "f1_weighted": 0.9957,
+      "roc_auc": 0.9498,
+      "pr_auc": 0.902,
+      "brier": 0.0162
+    },
+    "passive_aggression": {
+      "accuracy": 0.9945,
+      "precision": 0.9972,
+      "recall": 0.9262,
+      "f1_macro": 0.9588,
+      "f1_weighted": 0.9943,
+      "roc_auc": 0.9203,
+      "pr_auc": 0.8872,
+      "brier": 0.0195
+    },
+    "tension": {
+      "mae": 3.079,
+      "rmse": 3.958,
+      "r2": 0.9774
+    },
+    "escalation": {
+      "accuracy": 0.9812,
+      "precision": 0.9626,
+      "recall": 0.9534,
+      "f1_macro": 0.958,
+      "f1_weighted": 0.9811
+    },
+    "latency_ms": 3.44
+  },
+  "error_analysis": {
+    "counts": {
+      "passive_aggression:false_negative": 6,
+      "sarcasm:false_negative": 1
+    },
+    "binary_breakdown": {
+      "passive_aggression:false_negative": 6,
+      "sarcasm:false_negative": 1
+    },
+    "n_samples": 7
+  },
+  "wall_time_seconds": 50.6
+}
