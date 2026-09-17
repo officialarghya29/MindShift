@@ -30,7 +30,6 @@ from cerebro.parsers import auto_parse
 from cerebro.features.segmentation import segment_conversation
 from cerebro.models.pipeline import CerebroPipeline
 from cerebro.models.engines import MultiTaskEngine
-from cerebro.common.io import load_json
 
 MAX_STORED = 32
 TTL_SECONDS = 3600

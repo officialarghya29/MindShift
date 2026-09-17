@@ -11,8 +11,6 @@ from __future__ import annotations
 
 import numpy as np
 
-from cerebro.features.preprocess import micro_signals
-
 TONE_DISPLAY = {
     "passive-aggressive": "Passive-aggressive", "passive_aggressive": "Passive-aggressive",
 }

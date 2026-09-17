@@ -13,27 +13,23 @@ Run:  python -m evaluation.run_full
 """
 from __future__ import annotations
 
-import json
 import time
 from collections import Counter
 
 import numpy as np
 from scipy.sparse import hstack, csr_matrix, vstack
 
-from cerebro.common.labels import SENTIMENT_LABELS, EMOTION_LABELS, TONE_LABELS
 from cerebro.common.metrics import (classification_metrics, regression_metrics,
                                     probability_metrics)
 from cerebro.data.generator import generate_corpus, split_conversations, corpus_stats
-from cerebro.features.featurizer import build_vectorizer, vectorize, featurize_messages
-from cerebro.features.preprocess import process_text, behavioral_vector, micro_signals
+from cerebro.features.featurizer import build_vectorizer
+from cerebro.features.preprocess import process_text, behavioral_vector
 from cerebro.context.context_engine import ContextWindow
-from cerebro.context.features_builder import _memory_vector, EMO_AROUSAL, EMO_VALENCE, TONE_WARMTH
+from cerebro.context.features_builder import _memory_vector
 from cerebro.context.speaker_memory import SpeakerMemory
 from cerebro.models.baselines import Baseline
 from cerebro.models.engines import MultiTaskEngine
 from cerebro.models.hidden_signals import apply_hidden_signals
-from cerebro.temporal.arc import build_arc
-from cerebro.temporal.escalation import classify_trajectory
 from cerebro.common.io import save_json
 
 RESULTS_DIR = "evaluation/results"
@@ -50,7 +46,6 @@ HEADS_BINARY = ["sarcasm", "irony", "passive_aggression"]
 def build_wide_matrices(convs, vec):
     """Per conversation: [text ⊕ context ⊕ behavior ⊕ memory] with teacher-forced
     history (labels known during TRAINING matrix construction only)."""
-    from sklearn.feature_extraction.text import TfidfVectorizer  # noqa: F401
     Xs, all_meta = [], []
     n_text = len(vec.get_feature_names_out())
     for c in convs:
@@ -83,7 +78,7 @@ def build_wide_matrices(convs, vec):
 #   [2*n_text, 2*n_text+16)   behavior
 #   [2*n_text+16, end)        memory (10 dims)
 def _slice_variant(X, n_text, variant: str):
-    behav_lo, behav_hi = 2 * n_text, 2 * n_text + 16
+    behav_hi = 2 * n_text + 16
     mem_lo, mem_hi = behav_hi, X.shape[1]
     ctx_hi = 2 * n_text
     if variant == "A":   # text only

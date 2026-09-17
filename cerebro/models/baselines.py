@@ -14,8 +14,6 @@ from sklearn.svm import LinearSVC
 from sklearn.calibration import CalibratedClassifierCV
 
 from cerebro.features.featurizer import build_vectorizer, vectorize, featurize_messages
-from cerebro.features.preprocess import process_text
-from cerebro.context.context_engine import ContextWindow
 from cerebro.context.features_builder import build_conversation_matrix
 
 

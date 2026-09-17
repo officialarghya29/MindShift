@@ -159,7 +159,6 @@ def corpus_stats(convs):
     if n == 0:
         return {"conversations": 0, "messages": 0}
     from collections import Counter
-    pos = sum(1 for m in msgs if m["sarcasm"] or m["irony"] or m["passive_aggression"])
     return {
         "conversations": len(convs),
         "messages": n,

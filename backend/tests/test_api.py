@@ -47,13 +47,12 @@ class _StubPipeline:
         from cerebro.temporal.turning_points import detect_turning_points
         from cerebro.temporal.escalation import classify_trajectory, escalation_flags
         from cerebro.explain.explanation_engine import speaker_profiles
+
         prev = None
         explanations = []
-        for i, r in enumerate(results):
+        for r in results:
             explanations.append(explain_message(r, prev))
             prev = r
-        import numpy as np
-        from collections import Counter
         return {
             "summary": {"conversation_id": conversation_id,
                         "n_messages": len(results),

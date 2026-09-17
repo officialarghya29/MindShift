@@ -8,7 +8,6 @@ Run:  python -m evaluation.run_scenarios
 """
 from __future__ import annotations
 
-import json
 import time
 import warnings
 from datetime import datetime, timedelta

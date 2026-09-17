@@ -7,8 +7,6 @@ from __future__ import annotations
 
 import numpy as np
 
-from cerebro.features.preprocess import micro_signals
-
 
 def _sentiment_polarity(sent: dict) -> float:
     probs = sent.get("probabilities", {})

@@ -1,8 +1,6 @@
 """Emotion transition engine (PS-01 §19): transitions, magnitudes, matrix."""
 from __future__ import annotations
 
-import numpy as np
-
 from cerebro.temporal.arc import INTENSITY
 
 
