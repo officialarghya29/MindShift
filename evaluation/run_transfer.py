@@ -144,11 +144,21 @@ def main() -> dict:
         {"gold": g, "pred": p, "n": c} for (g, p), c in confusion.most_common(8)
     ]
 
+    # committed artifact: per-message detail WITHOUT raw text (PS-01 §40
+    # data minimization — the source dataset is public, the repo need not
+    # mirror it). The full per-message file (with text) stays local only.
+    per_msg_notext = [{k: v for k, v in x.items() if k != "text"}
+                      for x in per_msg]
     with open(f"{RESULTS}/transfer_goemotions.json", "w") as f:
-        json.dump({"summary": summary, "per_message": per_msg}, f, indent=1)
-    # log-safe graph payload: distributions + metrics only, no raw text
+        json.dump({"summary": summary, "per_message": per_msg_notext}, f, indent=1)
+    # log-safe graph payload: distributions + metrics only
     with open(f"{RESULTS}/transfer_logsafe.json", "w") as f:
         json.dump(summary, f, indent=1)
+    import os
+    if os.environ.get("CEREBRO_KEEP_RAW_TEXT"):
+        with open(f"{RESULTS}/transfer_goemotions_full.json", "w") as f:
+            json.dump({"summary": summary, "per_message": per_msg}, f, indent=1)
+        print(f"local-only raw-text copy → {RESULTS}/transfer_goemotions_full.json (gitignored)")
 
     print(json.dumps(summary, indent=1)[:1400])
     print(f"done → {RESULTS}/transfer_goemotions.json")
