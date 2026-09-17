@@ -10,6 +10,8 @@ Endpoints:
   GET  /conversation/{id}/speakers        → speaker profiles
   GET  /conversation/{id}/report          → full report
   GET  /healthz               → liveness + model status
+  GET  /                      → the futuristic dashboard (frontend/index.html)
+  GET  /demo-report           → persisted report from the held-out demo run
 
 Privacy (§40): conversations live in a bounded in-memory store with
 TTL eviction; nothing touches disk unless explicitly requested.
@@ -23,8 +25,11 @@ import time
 import uuid
 from collections import OrderedDict
 
+from pathlib import Path
+
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from cerebro.parsers import auto_parse
 from cerebro.features.segmentation import segment_conversation
@@ -214,3 +219,24 @@ async def get_what_changed(conv_id: str, message_id: int):
 async def healthz():
     return {"status": "ok", "model_loaded": _STATE["pipeline"] is not None,
             "stored_conversations": len(_STORE), "time": time.time()}
+
+
+_FRONTEND = Path(__file__).resolve().parents[2] / "frontend" / "index.html"
+
+
+@app.get("/", include_in_schema=False)
+async def dashboard():
+    """Serve the futuristic dashboard (frontend/index.html)."""
+    if not _FRONTEND.exists():
+        raise HTTPException(404, "frontend/index.html not found")
+    return FileResponse(_FRONTEND, media_type="text/html")
+
+
+@app.get("/demo-report", include_in_schema=False)
+async def demo_report():
+    """Persisted report from the held-out demo run (no raw-text guarantee:
+    contents come from evaluation/results/demo_report.json)."""
+    p = Path(__file__).resolve().parents[2] / "evaluation" / "results" / "demo_report.json"
+    if not p.exists():
+        raise HTTPException(404, "demo_report.json not found — run evaluation")
+    return FileResponse(p, media_type="application/json")

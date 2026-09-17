@@ -565,6 +565,61 @@ def graph_scenarios():
     print("  ✓ scenario_robustness.png")
 
 
+# ================================================================ 9b · TRANSFER
+def graph_transfer():
+    try:
+        s = load("transfer_logsafe.json")
+    except FileNotFoundError:
+        print("  – transfer_logsafe.json missing, skip")
+        return
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13.2, 4.6))
+    header(fig, "Zero-shot transfer to real GoEmotions text",
+           "3,000 real Reddit comments · honest cross-corpus metrics (not comparable to in-corpus tables)")
+
+    # left: headline transfer metrics
+    keys = [("emotion top-3", s["zero_shot_emotion_top3"], 1/3),
+            ("emotion exact (13-way)", s["zero_shot_emotion_accuracy"], 1/13),
+            ("sentiment exact (3-way)", s["zero_shot_sentiment_accuracy"], 1/3)]
+    names = [k for k, _, _ in keys]
+    vals = [v for _, v, _ in keys]
+    chance = [c for _, _, c in keys]
+    y = np.arange(len(names))
+    ax1.barh(y, vals, color=[CYAN, PURPLE, PINK], height=.58, zorder=3)
+    ax1.barh(y, chance, color="none", edgecolor="#6B7280", height=.58,
+             lw=1.2, ls="--", zorder=4)
+    for yi, v in zip(y, vals):
+        ax1.text(v + .015, yi, f"{v:.1%}", va="center", fontsize=11,
+                 color="#E5E7EB", fontweight="bold")
+    ax1.set_yticks(y, names, fontsize=11)
+    ax1.set_xlim(0, .55)
+    ax1.set_xlabel("accuracy on real text (dashed = chance)", fontsize=11)
+    ax1.invert_yaxis()
+    ax1.set_title("Zero-shot accuracy vs chance", loc="left", pad=10, fontsize=13.5)
+    style_ax(ax1)
+
+    # right: gold vs predicted emotion distribution (top 8 classes)
+    gold = s["gold_emotion_distribution"]
+    pred = s["pred_emotion_distribution"]
+    classes = list(dict.fromkeys(list(gold) + list(pred)))[:8]
+    x = np.arange(len(classes))
+    gv = [gold.get(c, 0) / s["n_messages"] for c in classes]
+    pv = [pred.get(c, 0) / s["n_messages"] for c in classes]
+    ax2.bar(x - .19, gv, width=.38, color="#4B5563", label="gold (GoEmotions)", zorder=3)
+    ax2.bar(x + .19, pv, width=.38, color=CYAN, label="predicted", zorder=3)
+    ax2.set_xticks(x, classes, rotation=38, ha="right", fontsize=9.5)
+    ax2.set_ylabel("share of messages", fontsize=11)
+    ax2.legend(fontsize=10, framealpha=0)
+    ax2.set_title("Label-shift: frustration over-read on neutral text",
+                  loc="left", pad=10, fontsize=13.5)
+    style_ax(ax2)
+
+    fig.subplots_adjust(top=0.74, bottom=0.24, left=0.24, right=0.985, wspace=0.30)
+    watermark(fig, zoom=0.13, pos=(0.875, 0.015))
+    fig.savefig(f"{GRAPHS}/transfer_goemotions.png", bbox_inches="tight")
+    plt.close(fig)
+    print("  ✓ transfer_goemotions.png")
+
+
 # ================================================================ 10 · ARCHITECTURE
 def graph_architecture():
     fig = plt.figure(figsize=(13.5, 16.5))
@@ -657,7 +712,7 @@ def graph_architecture():
                              "18-section summary",
                              "speaker + topic views"], PINK, name="report")
     box(66.5, 20, 26.5, 7, ["FASTAPI + DASHBOARD",
-                            "12 endpoints · TTL store",
+                            "14 endpoints · TTL store",
                             "futuristic frontend"], PINK, name="api")
     arrow(50, 33.6, 20.2, 27.4)
     arrow(50, 33.6, 50, 27.4)
@@ -715,6 +770,7 @@ if __name__ == "__main__":
     graph_dataset()
     graph_demo_report()
     graph_scenarios()
+    graph_transfer()
     graph_architecture()
     graph_confusion("sent", SENTIMENT_LABELS, "sentiment (3-way)",
                     "confusion_sentiment.png", CYAN)

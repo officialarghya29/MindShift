@@ -31,7 +31,7 @@ that implements it.
 | 24 | "WHAT CHANGED?" panel | `cerebro/explain/explanation_engine.py::what_changed` | ✅ P1 |
 | 25 | Speaker-level analysis | `cerebro/explain/explanation_engine.py::speaker_profiles` | ✅ P1 |
 | 26 | Conversation report (18 sections) | `cerebro/models/pipeline.py::analyze` | ✅ P0 |
-| 27 | FastAPI backend (12 endpoints) | `backend/app/main.py` | ✅ |
+| 27 | FastAPI backend (14 endpoints incl. dashboard + demo-report) | `backend/app/main.py` | ✅ |
 | 28 | Evaluation pipeline (§37 metrics) | `evaluation/run_full.py` | ✅ |
 | 29 | Ablation study (§38 A–E) | `evaluation/run_full.py::train_variant_heads` | ✅ |
 | 30 | Error analysis (§39, typed errors + causes) | `evaluation/run_full.py::error_analysis` | ✅ |

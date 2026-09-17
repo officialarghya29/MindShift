@@ -5,7 +5,7 @@ sys.path.insert(0, ".")
 import pytest
 
 from cerebro.data.adapters import (
-    SCHEMA_FIELDS, SENTIMENTS, EMOTIONS,
+    SCHEMA_FIELDS,
     goemotions_records, sarc_records, dailydialog_conversations,
     validate_conversation, validate_cerebro_record,
 )

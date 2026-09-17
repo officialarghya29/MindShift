@@ -125,15 +125,24 @@ _CE_LEX_POS = ("good", "great", "thanks", "love", "nice", "awesome", "best")
 _CE_LEX_NEG = ("bad", "hate", "awful", "terrible", "worst", "stupid", "wrong")
 
 
-def goemotions_records(lines: Iterable[str], source_id: str = "goe") -> list[list[dict]]:
-    """JSONL lines → one 1-turn conversation per message."""
+def goemotions_records(lines: Iterable[str | dict], source_id: str = "goe",
+                       id2label: dict | None = None) -> list[list[dict]]:
+    """JSONL lines or parsed records → one 1-turn conversation per message.
+
+    `id2label` lets callers plug a different GoEmotions variant mapping
+    (e.g. the HuggingFace `simplified` config's 28-class integer layout).
+    """
+    id2label = id2label or GOEMOTIONS_ID2LABEL
     convs = []
     for i, line in enumerate(lines):
-        line = line.strip()
-        if not line:
-            continue
-        rec = json.loads(line)
-        labels = [GOEMOTIONS_ID2LABEL.get(int(l)) for l in rec.get("labels", [])]
+        if isinstance(line, str):
+            line = line.strip()
+            if not line:
+                continue
+            rec = json.loads(line)
+        else:
+            rec = line
+        labels = [id2label.get(int(l)) for l in rec.get("labels", [])]
         labels = [l for l in labels if l]
         emotion = next((ceb for native, ceb in _GO_NATIVE2CEB if native in labels),
                        "neutral")
@@ -198,7 +207,6 @@ def dailydialog_conversations(utterance_lines: Iterable[str],
     """DailyDialog → conversations. Speaker alternates A/B per turn;
     per-utterance emotion mapped natively; tone derived from emotion valence
     (documented heuristic, DailyDialog has no tone labels)."""
-    acts = list(act_lines)
     convs = []
     for d, (uline, eline) in enumerate(zip(utterance_lines, emotion_lines)):
         utterances = [u.strip() for u in uline.split("__eou__") if u.strip()]

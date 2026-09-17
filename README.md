@@ -197,6 +197,23 @@ Protocol: seed 42 · 1,678 features (826 text n-grams + context block + 16 behav
 
 **Throughput:** 3.48 ms/message end-to-end (sequential, context+memory inference) · single CPU core.
 
+### Zero-shot transfer to real text — GoEmotions, measured and disclosed
+
+The table above is in-corpus. The honest stress test is **real human text**: 3,000 real Reddit comments from [GoEmotions](https://huggingface.co/datasets/google-research-datasets/go_emotions) (Google Research, research license), pulled live through the public-dataset adapter and scored by the trained engine with zero retraining:
+
+| Transfer metric (real text, zero-shot) | Value | Chance |
+|---|---|---|
+| Emotion top-3 accuracy (13-way) | **38.1%** | 3/13 ≈ 23% |
+| Emotion exact accuracy (13-way) | 13.6% | 1/13 ≈ 7.7% |
+| Sentiment exact accuracy (3-way) | 39.8% | 1/3 ≈ 33% |
+| Tension separates negative vs positive valence (Mann–Whitney AUC) | **0.691** | 0.5 |
+
+**Reading — disclosed, not spun.** On real text the engine beats chance on every axis and its tension scale separates negative from positive valence well above coin-flip, but absolute emotion labels drift: the template-trained lexicons over-read *frustration* on neutral Reddit text (mean tension 51.4 vs ≈12 in-corpus). This is the documented teacher-forcing gap, now quantified — and the public-dataset adapters are the training-side fix. Full per-message results in [`evaluation/results/transfer_goemotions.json`](evaluation/results/transfer_goemotions.json).
+
+**📊 Figure — the transfer story in two panels.** *Left:* zero-shot accuracy vs the dashed chance lines. *Right:* label shift — gold vs predicted emotion shares; note the frustration bar where gold is neutral.
+
+<div align="center"><img src="assets/graphs/transfer_goemotions.png" width="96%"/></div>
+
 **📊 Figure — every reported metric on one honest axis.** All heads land between 0.92 and 1.0; the ranking metrics (AUCs) are where models genuinely separate.
 
 <div align="center"><img src="assets/graphs/capability_sheet.png" width="86%"/></div>
@@ -325,8 +342,13 @@ pip install -r requirements.txt
 python -m evaluation.run_full fit     # fits baselines + ablation variants (~4 min)
 python -m evaluation.run_full eval    # full test evaluation → evaluation/results/
 
-# 3 · serve the API
-uvicorn backend.app.main:app --reload   # http://localhost:8000/docs
+# 3 · serve the API + dashboard
+uvicorn backend.app.main:app --reload
+#   dashboard: http://localhost:8000/        (served by the backend, same-origin)
+#   OpenAPI:   http://localhost:8000/docs
+
+# 4 · zero-shot transfer eval on real GoEmotions text (needs network)
+python evaluation/run_transfer.py      # → evaluation/results/transfer_goemotions.json
 ```
 
 ```bash
@@ -349,6 +371,8 @@ curl -s -X POST http://localhost:8000/analyze -F "file=@chat.txt" \
 | GET | `/why/{id}/{message_id}` | the WHY? panel |
 | GET | `/what-changed/{id}/{message_id}` | the WHAT CHANGED? panel |
 | GET | `/healthz` | liveness + model status |
+| GET | `/` | the dashboard itself (same-origin, served by this app) |
+| GET | `/demo-report` | persisted report from the held-out demo run |
 
 ```bash
 # or docker
@@ -357,11 +381,11 @@ docker compose up --build
 
 ### Dashboard
 
-A zero-build, dependency-free futuristic frontend ships in [`frontend/index.html`](frontend/index.html) — open it directly, or serve it with the API:
+A zero-build, dependency-free futuristic frontend ships in [`frontend/index.html`](frontend/index.html) — **the backend serves it itself**, so the dashboard runs same-origin with zero CORS setup:
 
 ```bash
 uvicorn backend.app.main:app --port 8000
-# then open frontend/index.html in a browser (or any static server)
+# open http://localhost:8000/  → the dashboard, live against the trained engine
 ```
 
 Features: drag-and-drop upload (all parser formats), auto-detect platform, live emotional-arc and hidden-signal charts (no JS libraries), a clickable message inspector wired to the WHY? panel, turning-point badges, escalation zone, and speaker stats — with a graceful offline demo mode when the API isn't running.
@@ -410,6 +434,7 @@ python -m pytest tests/ backend/tests/ -q
 | 20-scenario robustness run | `python -m evaluation.run_scenarios` | `evaluation/results/scenarios.json` |
 | Regenerate all graphs | `python -m evaluation.make_graphs` | `assets/graphs/*.png` |
 | Live API demo | `python scripts/demo_api.py` | per-message readout to stdout |
+| Zero-shot transfer (real GoEmotions) | `python evaluation/run_transfer.py` | `transfer_goemotions.json` + graph |
 | API deepscan (17 checks) | `python scripts/deepscan_api.py` | pass/fail per endpoint |
 | Adversarial deepscan | `python scripts/deepscan_advanced.py` | scan-by-scan pass/fail |
 
