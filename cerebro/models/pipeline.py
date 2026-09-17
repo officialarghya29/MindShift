@@ -45,6 +45,21 @@ class CerebroPipeline:
 
     def analyze(self, messages: list[dict], conversation_id="conv_uploaded") -> dict:
         """Full analysis → dashboard-ready report dict (PS-01 §30)."""
+        if not messages:                      # degenerate-input guard (fuzz-tested)
+            return {
+                "summary": {"conversation_id": conversation_id, "n_messages": 0,
+                            "n_speakers": 0, "dominant_emotion": [],
+                            "sentiment_distribution": {}, "tone_distribution": {},
+                            "sarcasm_level": 0.0, "irony_level": 0.0,
+                            "passive_aggression_level": 0.0, "mean_tension": 0.0,
+                            "peak_tension": 0.0, "trajectory": "stable"},
+                "messages": [], "emotional_arc": None, "emotion_transitions": [],
+                "transition_matrix": None, "turning_points": [],
+                "escalation": {"trajectory": "stable"}, "escalation_phases": [],
+                "speaker_profiles": [], "explanations": [], "topics": None,
+                "disclaimer": ("All outputs are model-estimated with calibrated confidence; "
+                               "turning points are associations, not causal claims."),
+            }
         for i, m in enumerate(messages):
             m.setdefault("message_id", i + 1)
             m.setdefault("conversation_id", conversation_id)

@@ -129,7 +129,7 @@
       "f1_macro": 0.9589,
       "f1_weighted": 0.9816
     },
-    "latency_ms": 3.23
+    "latency_ms": 3.21
   },
   "C": {
     "sentiment": {
@@ -261,6 +261,6 @@
       "f1_macro": 0.958,
       "f1_weighted": 0.9811
     },
-    "latency_ms": 3.35
+    "latency_ms": 3.32
   }
 }

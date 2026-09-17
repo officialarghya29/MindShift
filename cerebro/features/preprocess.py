@@ -88,6 +88,15 @@ def micro_signals(text: str) -> dict:
     pa_phrase = next((p for p in PA_PHRASES if low.startswith(p)), None)
     exag = [w for w in words if w in EXAG_WORDS]
     praise_minus_context = len(pos_hits) - len(neg_hits)
+    # echoic-mention evidence: repeated content words ("Great. Just great.")
+    from collections import Counter
+    stop = {"to", "the", "a", "an", "i", "you", "it", "and", "that", "is", "my"}
+    counts = Counter(w for w in words if w and w not in stop)
+    repeated = sorted(w for w, c in counts.items() if c >= 2)
+    # cooperative-intent markers: sincere alignment, argues against echoic reading
+    coop = ("thanks", "thank you", "i'll", "let's", "happy to", "will do",
+            "sounds good", "no worries", "appreciate", "sorry")
+    cooperative = any(c in low for c in coop)
     return {
         "n_words": len(words),
         "pos_hits": pos_hits,
@@ -96,6 +105,8 @@ def micro_signals(text: str) -> dict:
         "irony_words": irony_words,
         "pa_phrase": pa_phrase,
         "exaggeration": exag,
+        "repeated_words": repeated,
+        "cooperative": cooperative,
         "interjections": [w for w in ("wow", "oh", "ah") if w in words],
         "praise_minus_neg": praise_minus_context,
         "exclam": text.count("!"),
