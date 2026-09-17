@@ -1,0 +1,86 @@
+{
+ "dataset": "google-research-datasets/go_emotions (simplified), research license",
+ "n_messages": 3000,
+ "source": "real Reddit comments via HF datasets-server (batches 0-29)",
+ "zero_shot_emotion_accuracy": 0.136,
+ "zero_shot_emotion_top3": 0.3813,
+ "zero_shot_sentiment_accuracy": 0.3983,
+ "tension_separates_valence_auc": 0.6909,
+ "pred_emotion_distribution": {
+  "neutral": 597,
+  "frustration": 522,
+  "anger": 479,
+  "anxiety": 330,
+  "relief": 285,
+  "sadness": 255,
+  "joy": 163,
+  "fear": 92,
+  "affection": 90,
+  "excitement": 88,
+  "concerned": 44,
+  "confusion": 32,
+  "disgust": 23
+ },
+ "gold_emotion_distribution": {
+  "neutral": 1109,
+  "affection": 620,
+  "frustration": 337,
+  "joy": 272,
+  "excitement": 163,
+  "anger": 113,
+  "surprise": 107,
+  "sadness": 97,
+  "confusion": 77,
+  "fear": 35,
+  "disgust": 35,
+  "anxiety": 28,
+  "relief": 7
+ },
+ "mean_sarcasm_p": 0.1771,
+ "mean_irony_p": 0.0504,
+ "mean_pa_p": 0.2109,
+ "mean_tension": 51.4,
+ "note": "Cross-corpus zero-shot numbers on real human text; not comparable to the in-corpus table. Publishing honest transfer metrics is the PS-01 \u00a739 spirit: measure, disclose, fix.",
+ "top_confusions": [
+  {
+   "gold": "neutral",
+   "pred": "frustration",
+   "n": 250
+  },
+  {
+   "gold": "neutral",
+   "pred": "neutral",
+   "n": 197
+  },
+  {
+   "gold": "affection",
+   "pred": "neutral",
+   "n": 178
+  },
+  {
+   "gold": "neutral",
+   "pred": "anger",
+   "n": 144
+  },
+  {
+   "gold": "neutral",
+   "pred": "anxiety",
+   "n": 143
+  },
+  {
+   "gold": "neutral",
+   "pred": "sadness",
+   "n": 116
+  },
+  {
+   "gold": "affection",
+   "pred": "anger",
+   "n": 89
+  },
+  {
+   "gold": "affection",
+   "pred": "relief",
+   "n": 88
+  }
+ ]
+}

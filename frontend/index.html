@@ -164,7 +164,9 @@
 </footer>
 
 <script>
-const API = "http://localhost:8000";
+/* Live backend: same-origin when served by FastAPI itself (uvicorn :8000),
+   otherwise default to a locally running backend; offline → demo mode. */
+const API = location.port === "8000" ? "" : "http://localhost:8000";
 let REPORT = null, chosen = null;
 
 const DEMO_TEXT = `Aarav: Hey! Did you finish the project?
@@ -325,12 +327,12 @@ function offlineDemo(){
     turning_points: [{ message_id: 5 }],
     messages: [
       { message_id:1, speaker_id:"Aarav", text:"Hey! Did you finish the project?", emotion:{label:"neutral"}, tension:12.7, sarcasm:{probability:.04}, passive_aggression:{probability:.20} },
-      { message_id:2, speaker_id:"Meera", text:"Yeah I'll do it tonight.", emotion:{label:"frustration"}, tension:37.0, sarcasm:{probability:.07}, passive_aggression:{probability:.32} },
-      { message_id:3, speaker_id:"Aarav", text:"Perfect, thanks!", emotion:{label:"joy"}, tension:13.1, sarcasm:{probability:.35}, passive_aggression:{probability:.02} },
+      { message_id:2, speaker_id:"Meera", text:"Yeah I'll do it tonight.", emotion:{label:"frustration"}, tension:37.0, sarcasm:{probability:.00}, passive_aggression:{probability:.32} },
+      { message_id:3, speaker_id:"Aarav", text:"Perfect, thanks!", emotion:{label:"joy"}, tension:13.1, sarcasm:{probability:.00}, passive_aggression:{probability:.02} },
       { message_id:4, speaker_id:"Meera", text:"You said that yesterday too.", emotion:{label:"frustration"}, tension:55.3, sarcasm:{probability:.13}, passive_aggression:{probability:.23} },
       { message_id:5, speaker_id:"Aarav", text:"Fine. Do what you want then.", emotion:{label:"frustration"}, tension:71.6, sarcasm:{probability:.07}, passive_aggression:{probability:.88} },
-      { message_id:6, speaker_id:"Meera", text:"Wow. Great. Just great.", emotion:{label:"joy"}, tension:19.0, sarcasm:{probability:.22}, passive_aggression:{probability:.01} },
-      { message_id:7, speaker_id:"Aarav", text:"I'm sorry, I really mean it this time.", emotion:{label:"frustration"}, tension:57.9, sarcasm:{probability:.12}, passive_aggression:{probability:.20} },
+      { message_id:6, speaker_id:"Meera", text:"Wow. Great. Just great.", emotion:{label:"joy"}, tension:19.0, sarcasm:{probability:.61}, passive_aggression:{probability:.01} },
+      { message_id:7, speaker_id:"Aarav", text:"I'm sorry, I really mean it this time.", emotion:{label:"frustration"}, tension:57.9, sarcasm:{probability:.00}, passive_aggression:{probability:.20} },
       { message_id:8, speaker_id:"Meera", text:"...okay. Let's just fix it tomorrow.", emotion:{label:"relief"}, tension:29.7, sarcasm:{probability:.01}, passive_aggression:{probability:.01} },
     ],
     explanations: [{ message_id: 5,
