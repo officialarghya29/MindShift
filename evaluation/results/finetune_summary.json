@@ -1,0 +1,48 @@
+{
+ "dataset": "google-research-datasets%2Fgo_emotions",
+ "n_batches": 30,
+ "n_messages": 2996,
+ "split": {
+  "level": "row (deduplicated, stratified by emotion band)",
+  "train": 2096,
+  "val": 447,
+  "test": 453,
+  "limitation": "HF simplified config exposes no Reddit thread ids; thread-level split impossible via this API. Exact-dup removal mitigates the dominant leakage mode."
+ },
+ "engine_variant": "text-only MultiTaskEngine (same heads as CEREBRO)",
+ "before_zero_shot": {
+  "n": 453,
+  "emotion_exact": 0.117,
+  "emotion_top3": 0.3709,
+  "sentiment_exact": 0.3797,
+  "tension_valence_auc": 0.6377
+ },
+ "after_finetune": {
+  "n": 453,
+  "emotion_exact": 0.4459,
+  "emotion_top3": 0.7528,
+  "sentiment_exact": 0.6071,
+  "tension_valence_auc": 0.8276
+ },
+ "delta": {
+  "emotion_exact": 0.3289,
+  "emotion_top3": 0.3819,
+  "sentiment_exact": 0.2274,
+  "tension_valence_auc": 0.1899
+ },
+ "retention_incorpus_reference": {
+  "n": 1500,
+  "emotion_exact": 1.0,
+  "emotion_top3": 1.0,
+  "sentiment_exact": 1.0,
+  "tension_valence_auc": 0.9566
+ },
+ "retention_incorpus_after_realdata_training": {
+  "n": 1500,
+  "emotion_exact": 0.2593,
+  "emotion_top3": 0.558,
+  "sentiment_exact": 0.5247,
+  "tension_valence_auc": 0.8813
+ },
+ "note": "Text-only fine-tune on real data closes part of the transfer gap; full CEREBRO context/temporal stack needs multi-turn real conversations (roadmap: DailyDialog transfer)."
+}

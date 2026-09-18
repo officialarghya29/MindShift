@@ -11,7 +11,7 @@ Sentiment · Emotion · Tone · Sarcasm · Irony · Passive-Aggression · Tensio
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.9-B388FF?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-7CFFB2?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/officialarghya29/MindShift/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-33%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-quality-gates--reproducibility)
+[![Tests](https://img.shields.io/badge/tests-34%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-quality-gates--reproducibility)
 [![Lint](https://img.shields.io/badge/pyflakes-0%20issues-7CFFB2?style=flat-square)](#-quality-gates--reproducibility)
 [![PS-01](https://img.shields.io/badge/problem_statement-PS--01--Tone%20Intelligence-FF5C8A?style=flat-square)](#-documentation)
 
@@ -393,6 +393,18 @@ Features: drag-and-drop upload (all parser formats), auto-detect platform, live 
 <div align="center"><img src="docs/dashboard_preview.png" width="88%"/></div>
 *Dashboard preview (offline demo mode, real engine output values).*
 
+## ☁️ Deployment
+
+The repo ships a **Render Blueprint** — deploy without changing any code:
+
+1. Push this repository to GitHub.
+2. On [render.com](https://render.com) → **New + → Blueprint** → pick the repo — Render reads [`render.yaml`](render.yaml), builds the Dockerfile, and wires the `/healthz` check automatically.
+3. Open the assigned URL → the dashboard is live at `/`, OpenAPI docs at `/docs`.
+
+Also runs anywhere containers run (`docker compose up --build`), and the free instance can be pointed at the local engine with zero config — the Dockerfile listens on `$PORT`.
+
+> **Free-tier notes (honest constraints):** Render's free instance sleeps after ~15 min idle (first request wakes it, ~30–60 s) and the conversation store is **in-memory with a 1-hour TTL** — restarts clear stored conversations by design (privacy, §40). A paid instance or an external store removes both limits.
+
 ## 🔒 Privacy & ethics (PS-01 §40)
 
 - Conversations live in a **bounded in-memory store** (32 conversations, 1-hour TTL) — nothing touches disk unless explicitly requested.
@@ -410,7 +422,7 @@ Every gate below is executable against this repository right now — no gate is 
 |---|---|---|
 | CI (GitHub Actions) | lint → tests → metric gates → training smoke → graph smoke on every push | ✅ [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 | Static analysis (0 warnings) | `python -m pyflakes cerebro/ backend/ evaluation/ tests/ scripts/` | ✅ 0 issues |
-| Unit + API test suite | `python -m pytest tests/ backend/tests/ -q` | ✅ 33 passed |
+| Unit + API test suite | `python -m pytest tests/ backend/tests/ -q` | ✅ 34 passed |
 | Module import audit | all 29 project modules import cleanly | ✅ |
 | API end-to-end (real engine) | `python scripts/deepscan_api.py` | ✅ 17/17 checks |
 | Adversarial robustness | `python scripts/deepscan_advanced.py` — 500-payload parser fuzz, pipeline fuzz, state-leak, numeric bounds, schema | ✅ all scans |
@@ -420,7 +432,7 @@ Every gate below is executable against this repository right now — no gate is 
 | Docs integrity | image links, cross-references, 10 tables column-aligned | ✅ |
 | Determinism | scenario outputs byte-identical across re-runs (seed 42) | ✅ |
 
-**33 functional tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases), the public-dataset adapters (GoEmotions/SARC/DailyDialog conversion + schema validation), and the full API flow with a stubbed pipeline:
+**34 functional tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases), the public-dataset adapters (GoEmotions/SARC/DailyDialog conversion + schema validation), PDF report export, and the full API flow with a stubbed pipeline:
 
 ```bash
 python -m pytest tests/ backend/tests/ -q
@@ -435,6 +447,7 @@ python -m pytest tests/ backend/tests/ -q
 | Regenerate all graphs | `python -m evaluation.make_graphs` | `assets/graphs/*.png` |
 | Live API demo | `python scripts/demo_api.py` | per-message readout to stdout |
 | Zero-shot transfer (real GoEmotions) | `python evaluation/run_transfer.py` | `transfer_goemotions.json` + graph |
+| Fine-tune on real data (protocol) | `python evaluation/run_finetune.py` | `finetune_summary.json` (before/after) |
 | API deepscan (17 checks) | `python scripts/deepscan_api.py` | pass/fail per endpoint |
 | Adversarial deepscan | `python scripts/deepscan_advanced.py` | scan-by-scan pass/fail |
 
@@ -457,7 +470,7 @@ MindShift/
 ├── frontend/                   #   zero-build futuristic dashboard (index.html)
 ├── evaluation/                 #   §37–39 runner · results · graph generation
 │   └── results/                #   the actual JSONs behind every table above
-├── scripts/                    #   demo_api.py · deepscan_api.py
+├── scripts/                    #   demo_api.py · deepscan_api.py · deepscan_advanced.py
 ├── assets/graphs/              #   logo-branded charts (dark futuristic)
 ├── docs/                       #   dataset card · methodology · architecture
 ├── models/saved/               #   persisted engine (joblib)

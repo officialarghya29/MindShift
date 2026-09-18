@@ -23,3 +23,7 @@ notebooks/.ipynb_checkpoints/
 
 # local-only raw-text transfer copy (PS-01 §40 data minimization)
 evaluation/results/transfer_goemotions_full.json
+
+# fine-tune engine artifact stays local-only
+evaluation/results/finetune_engine.joblib
+models/saved/finetune_engine.joblib

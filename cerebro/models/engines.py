@@ -43,6 +43,7 @@ class MultiTaskEngine:
         self.vec = None
         self.heads = {}
         self.trained = False
+        self.cfg: dict | None = None   # modality flags the engine was trained with
 
     # ---------------- training ----------------
     def fit(self, convs: list[list[dict]], use_context=True, use_memory=True,
@@ -58,7 +59,11 @@ class MultiTaskEngine:
 
         self._fit_heads(X, msgs)
         self.trained = True
+        self.cfg = {"use_context": use_context, "use_memory": use_memory,
+                    "use_behavior": use_behavior}
         return {"n_messages": len(msgs), "n_features": X.shape[1]}
+
+    _NEUTRAL_BINARY = {"probability": 0.0, "confidence": 0.0, "prediction": 0}
 
     def _fit_heads(self, X, msgs):
         y = {
@@ -71,15 +76,22 @@ class MultiTaskEngine:
             "passive_aggression": [int(m["passive_aggression"]) for m in msgs],
         }
         for head, labels in y.items():
-            self.heads[head] = self._make_head(head, labels)
             self._fit_one(head, X, labels)
+
+        # tension is a regression (no classes) — handle separately so the
+        # single-class skip above can't drop it when all labels are equal
+        if "tension" not in self.heads:
+            from sklearn.linear_model import Ridge
+            self.heads["tension"] = Ridge(alpha=1.0, random_state=self.seed)
+            self.heads["tension"].fit(X, y["tension"])
 
     # ---------------- persistence ----------------
     def save(self, path: str) -> str:
         import joblib
         import os
         os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-        joblib.dump({"vec": self.vec, "heads": self.heads, "seed": self.seed},
+        joblib.dump({"vec": self.vec, "heads": self.heads, "seed": self.seed,
+                     "cfg": self.cfg},
                     path + ".joblib")
         return path + ".joblib"
 
@@ -89,6 +101,7 @@ class MultiTaskEngine:
         self.vec = blob["vec"]
         self.heads = blob["heads"]
         self.seed = blob["seed"]
+        self.cfg = blob.get("cfg")
         self.trained = True
         return self
 
@@ -109,7 +122,13 @@ class MultiTaskEngine:
         raise KeyError(head)
 
     def _fit_one(self, head, X, labels):
-        model = self.heads[head]
+        # heads with a single class in the training data (e.g. real corpora
+        # without sarcasm/irony/PA/tone annotations) are skipped — the head
+        # stays absent and predict_conversation serves a neutral prior
+        if len(set(map(str, labels))) < 2:
+            self.heads.pop(head, None)
+            return None
+        model = self._make_head(head, labels)
         if head in ("sarcasm", "irony", "passive_aggression"):
             self.heads[head] = model(X, labels)      # CalibratedClassifierCV.fit
         else:
@@ -130,11 +149,20 @@ class MultiTaskEngine:
         return featurize_messages([m for c in convs for m in c])
 
     # ---------------- inference ----------------
-    def predict_conversation(self, messages: list[dict], use_context=True,
-                             use_memory=True, use_behavior=True) -> list[dict]:
+    def predict_conversation(self, messages: list[dict], use_context=None,
+                             use_memory=None, use_behavior=None) -> list[dict]:
         """Sequential analysis of one conversation. Speaker memory is updated
-        with the model's OWN predictions (no gold labels at inference)."""
+        with the model's OWN predictions (no gold labels at inference).
+
+        Modality flags default to whatever the engine was trained with
+        (self.cfg) so a text-only engine is never queried with feature
+        blocks it has never seen."""
         assert self.trained, "engine not trained"
+        cfg = self.cfg or {"use_context": True, "use_memory": True,
+                           "use_behavior": True}
+        use_context = cfg["use_context"] if use_context is None else use_context
+        use_memory = cfg["use_memory"] if use_memory is None else use_memory
+        use_behavior = cfg["use_behavior"] if use_behavior is None else use_behavior
         from cerebro.context.speaker_memory import SpeakerMemory
         from cerebro.context.context_engine import ContextWindow
         from cerebro.features.preprocess import behavioral_vector
@@ -193,6 +221,8 @@ class MultiTaskEngine:
         return results
 
     def _proba(self, head, X, *_):
+        if head not in self.heads:
+            return {"label": "neutral", "confidence": 0.0, "probabilities": {}}
         model = self.heads[head]
         if hasattr(model, "predict_proba"):
             p = model.predict_proba(X)[0]
@@ -207,6 +237,8 @@ class MultiTaskEngine:
                 "probabilities": {c: round(float(v), 4) for c, v in top}}
 
     def _binary(self, head, X):
+        if head not in self.heads:
+            return dict(self._NEUTRAL_BINARY)
         model = self.heads[head]
         p1 = float(model.predict_proba(X)[0][1])
         return {"probability": round(p1, 4),

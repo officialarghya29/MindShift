@@ -29,7 +29,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 
 from cerebro.parsers import auto_parse
 from cerebro.features.segmentation import segment_conversation
@@ -240,3 +240,23 @@ async def demo_report():
     if not p.exists():
         raise HTTPException(404, "demo_report.json not found — run evaluation")
     return FileResponse(p, media_type="application/json")
+
+
+@app.get("/conversation/{conv_id}/report.pdf")
+async def conversation_pdf(conv_id: str):
+    """PDF export of the stored conversation report (PS-01 §30).
+    Requires the optional fpdf2 dependency."""
+    rep = store_get(conv_id)
+    import tempfile
+    from cerebro.reports.pdf_report import build_pdf
+    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+        tmp_path = tmp.name
+    try:
+        build_pdf(rep, tmp_path)
+        with open(tmp_path, "rb") as f:
+            data = f.read()
+    finally:
+        Path(tmp_path).unlink(missing_ok=True)
+    return Response(content=data, media_type="application/pdf",
+                    headers={"Content-Disposition":
+                             f'inline; filename="{conv_id}_cerebro_report.pdf"'})
