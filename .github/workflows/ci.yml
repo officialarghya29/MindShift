@@ -56,6 +56,11 @@ jobs:
           print("summary gates OK:",
                 "sarc-auc", fm["sarcasm"]["roc_auc"],
                 "| tension-mae", fm["tension"]["mae"])
+          # fusion gate (PS-01 §24): published weights must be a valid simplex
+          w = s["fusion_weights"]
+          assert abs(sum(w.values()) - 1.0) < 1e-6, w
+          assert all(0 <= v <= 1 for v in w.values()), w
+          print("fusion gate OK: weights simplex |", s["fusion_tuning_status"])
           sc = json.load(open("evaluation/results/scenarios.json"))
           assert sc["n_passed"] == 20, sc["n_passed"]
           print("scenario gate OK: 20/20 executed")
@@ -63,6 +68,12 @@ jobs:
           real = sum(ea.get("real_errors_after_noise_removal", {}).values())
           assert real <= 5, f"real errors regressed: {real}"
           print("error gate OK: real errors =", real)
+          bm = json.load(open("evaluation/results/benchmarks.json"))
+          flat = bm["scaling"]
+          assert flat[-1]["messages_per_second"] >= 100, flat[-1]
+          assert bm["memory_1000msg"]["peak_mb"] <= 100, bm["memory_1000msg"]
+          print("benchmark gate OK:", flat[-1]["messages_per_second"], "msg/s |",
+                bm["memory_1000msg"]["peak_mb"], "MB peak @1k")
           EOF
 
       - name: Training smoke (tiny corpus, ~90s, exit-code only)
@@ -75,10 +86,8 @@ jobs:
           print("training smoke OK")
           EOF
 
-      - name: Graph smoke
+      - name: Graph smoke (full suite + collision validators)
         run: |
-          python - <<'EOF'
-          from evaluation.make_graphs import graph_architecture
-          graph_architecture()   # includes the overlap validator
-          EOF
-          test -f docs/architecture/architecture.png && echo "architecture OK"
+          PYTHONPATH=. python -m evaluation.make_graphs
+          test -f docs/architecture/architecture.png && echo "architecture OK (validators passed)"
+          test -f assets/graphs/efficiency_benchmarks.png && echo "graphs OK (validators passed)"
