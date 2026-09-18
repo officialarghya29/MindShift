@@ -85,8 +85,17 @@
       "f1_macro": 0.958,
       "f1_weighted": 0.9811
     },
-    "latency_ms": 3.48
+    "latency_ms": 3.43
   },
+  "fusion_weights": {
+    "text": 0.3,
+    "context": 0.22,
+    "memory": 0.14,
+    "behavior": 0.12,
+    "temporal": 0.1,
+    "hidden": 0.12
+  },
+  "fusion_tuning_status": "fallback (validation confidences saturated — weights unidentifiable, disclosed)",
   "error_analysis": {
     "counts": {
       "passive_aggression:false_negative": 6,
@@ -112,5 +121,5 @@
     },
     "n_samples": 9
   },
-  "wall_time_seconds": 51.4
+  "wall_time_seconds": 54.1
 }

@@ -460,7 +460,7 @@ def eval_stage():
     print("error analysis (40 test conversations)...")
     errs = error_analysis(engine, splits["test"][:40])
 
-    print("tuning fusion weights on validation (leave-one-stream-out, PS-01 §24)...")
+    print("tuning fusion weights on validation (calibration loss, PS-01 §24)...")
     from cerebro.models.pipeline import CerebroPipeline
     pipe = CerebroPipeline.from_trained(engine, val_convs=splits["val"])
     engine.fusion_weights = pipe.fusion_weights
