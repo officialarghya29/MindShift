@@ -525,8 +525,9 @@ MindShift/
 
 ## 🗺 Roadmap
 
-- **P1** — multilingual parsing · PDF report export · domain-adaptive context lexicons (the OOD sarcasm case in the worked example)
-- **P2** — public-dataset adapters (GoEmotions, SARC, iCas) · transformer backbone slot-in behind the same heads · real-time streaming analysis · conversation-to-conversation comparison
+- ✅ **Shipped from the original plan** — PDF report export (P1) · public-dataset adapters GoEmotions/SARC/DailyDialog (P2) · zero-shot transfer eval + fine-tuning protocol on real data
+- **P1 next** — multilingual parsing · domain-adaptive context lexicons (the OOD sarcasm case in the worked example) · head fine-tuning on GoEmotions at scale
+- **P2** — transformer backbone slot-in behind the same heads · real-time streaming analysis · conversation-to-conversation comparison
 
 ---
 
