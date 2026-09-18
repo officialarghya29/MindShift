@@ -30,6 +30,7 @@ from pathlib import Path
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
+from fastapi.staticfiles import StaticFiles
 
 from cerebro.parsers import auto_parse
 from cerebro.features.segmentation import segment_conversation
@@ -50,6 +51,12 @@ app = FastAPI(
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
                    allow_headers=["*"])
+
+# Static assets for the served dashboard (absolute /assets and /docs paths
+# keep the dashboard working both from file:// and from the live backend).
+_ASSETS = Path(__file__).resolve().parents[2]
+app.mount("/assets", StaticFiles(directory=_ASSETS / "assets"), name="assets")
+app.mount("/docs", StaticFiles(directory=_ASSETS / "docs"), name="docs")
 
 _STATE = {"pipeline": None, "loaded_at": None}
 _STORE: OrderedDict[str, tuple[dict, float]] = OrderedDict()

@@ -48,6 +48,7 @@ plt.rcParams.update({
     "xtick.color": "#D1D5DB", "ytick.color": "#D1D5DB",
     "text.color": "#F9FAFB", "grid.color": "#263244",
     "font.family": "DejaVu Sans", "axes.grid": True, "grid.alpha": .45,
+    "axes.axisbelow": True,   # grid BELOW bars/curves/labels — no line collisions
     "axes.titlesize": 20, "axes.titleweight": "bold",
     "axes.labelsize": 16.5, "xtick.labelsize": 14.5, "ytick.labelsize": 14.5,
     "legend.fontsize": 15, "figure.dpi": 150,
