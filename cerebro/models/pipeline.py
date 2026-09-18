@@ -41,7 +41,28 @@ class CerebroPipeline:
     @classmethod
     def from_trained(cls, engine: MultiTaskEngine, val_convs=None,
                      fusion_weights: dict | None = None):
-        return cls(engine, fusion_weights)
+        """Build the deployment pipeline.
+
+        Fusion-weight resolution order (PS-01 §24 — tuned over hand-picked):
+          1. explicit `fusion_weights` argument
+          2. weights tuned on `val_convs` via real leave-one-stream-out
+          3. weights persisted inside the engine (tuned at fit time)
+          4. documented fallback
+        """
+        if fusion_weights is None and val_convs:
+            from cerebro.fusion.fusion import tune_fusion_weights
+            from cerebro.models.pipeline import _add_behavior_flags as _abf
+            probe = cls(engine, None)
+            all_fused, all_gold = [], []
+            for conv in val_convs[:10]:          # pool validation conversations
+                msgs = [dict(m) for m in conv]
+                res = probe.engine.predict_conversation(msgs)
+                apply_hidden_signals(res)
+                _abf(res)
+                all_fused.extend(fuse_conversation(res, None))
+                all_gold.extend(g["tension"] for g in conv)
+            fusion_weights = tune_fusion_weights(all_fused, all_gold)
+        return cls(engine, fusion_weights or engine.fusion_weights)
 
     def analyze(self, messages: list[dict], conversation_id="conv_uploaded") -> dict:
         """Full analysis → dashboard-ready report dict (PS-01 §30)."""

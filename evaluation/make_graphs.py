@@ -1,15 +1,19 @@
-"""Graph generation v3 — collision-free, maximum-legibility redesign.
+"""Graph generation v4 — maximum-legibility, collision-free, GitHub-native.
 
-Anti-collision architecture (fixes: text/line collisions reported on every graph):
-  1. Header/footer/watermark bands are laid out in INCHES, not figure fractions,
-     so they occupy identical space on short and tall figures.
-  2. Legends are placed OUTSIDE the plot area (below the axes) or in regions
-     guaranteed empty — never floating over bars/curves.
-  3. In-plot annotation boxes are replaced by legend entries or top-band labels
-     with reserved headroom.
-  4. A rendered-text overlap validator draws every figure, extracts the actual
-     pixel bounding box of every text artist, and asserts no two texts collide
-     (fail-hard, exactly like the architecture diagram validator).
+Why v4: GitHub renders embedded images at ~830 CSS px regardless of the
+file's pixel width. Wide multi-panel canvases therefore get *scaled down*,
+crushing fonts until lines and letters collide visually. v4 fixes the actual
+geometry problem:
+
+  1. VERTICAL STACKED LAYOUTS — panels are stacked 2-3 rows × 1 column, so a
+     full-width embed keeps ~1:1 pixel density instead of shrinking.
+  2. MUCH LARGER TYPOGRAPHY — titles 20-24 pt, labels 16 pt, ticks 14.5 pt,
+     legends 14.5-15 pt (v3 used 9.5-12 pt that vanished at embed scale).
+  3. NO FLOATING ANNOTATIONS — corner "mean" labels moved into titles;
+     turning-point labels staggered in reserved headroom; legends below axes.
+  4. VALIDATOR v2 — (a) rendered-text overlap check (pixel bboxes of every
+     text artist), plus (b) a data-ink collision check: legends, figure-level
+     texts and annotation boxes may never sit on top of curves/bars/histograms.
 
 All numbers come from real executed results (evaluation/results/*.json) or
 re-runs of the persisted engine. Run:  python -m evaluation.make_graphs
@@ -44,14 +48,13 @@ plt.rcParams.update({
     "xtick.color": "#D1D5DB", "ytick.color": "#D1D5DB",
     "text.color": "#F9FAFB", "grid.color": "#263244",
     "font.family": "DejaVu Sans", "axes.grid": True, "grid.alpha": .45,
-    "axes.titlesize": 14, "axes.titleweight": "bold",
-    "axes.labelsize": 12.5, "xtick.labelsize": 11, "ytick.labelsize": 11,
-    "legend.fontsize": 11.5, "figure.dpi": 170,
+    "axes.titlesize": 20, "axes.titleweight": "bold",
+    "axes.labelsize": 16.5, "xtick.labelsize": 14.5, "ytick.labelsize": 14.5,
+    "legend.fontsize": 15, "figure.dpi": 150,
 })
 
 # inch-based layout bands (identical on every figure, regardless of height)
-HEADER_IN = 0.72      # title + subtitle band height
-FOOTER_IN = 0.60      # below-axes legend band where used
+HEADER_IN = 1.05      # title + subtitle band height
 WATERMARK_IN = 1.15   # logo watermark size (bottom-right, below all axes)
 
 
@@ -61,29 +64,25 @@ def load(name):
 
 
 def header(fig, title, subtitle):
-    """Logo + title band, laid out in inches (converted to fractions).
-
-    Call immediately after subplots(); compute axes top as
-    1 - (HEADER_IN + gap_in) / fig_h.
-    """
+    """Logo + title band, laid out in inches (converted to fractions)."""
     logo = Image.open(LOGO_SMALL)
     fig_w, fig_h = fig.get_size_inches()
-    side = 0.46                                    # logo box, inches
+    side = 0.58                                    # logo box, inches
     ax_img = fig.add_axes(
         [0.014 / fig_w,
-         (fig_h - HEADER_IN + 0.12) / fig_h,
+         (fig_h - HEADER_IN + 0.14) / fig_h,
          side / fig_w,
          side * logo.height / logo.width / fig_h], zorder=10)
     ax_img.axis("off")
     ax_img.imshow(np.asarray(logo))
-    fig.text(0.075, (fig_h - 0.28) / fig_h, title, fontsize=18,
+    fig.text(0.085, (fig_h - 0.36) / fig_h, title, fontsize=24,
              fontweight="bold", color=CYAN, ha="left", va="center")
-    fig.text(0.075, (fig_h - 0.55) / fig_h, subtitle, fontsize=11,
+    fig.text(0.085, (fig_h - 0.76) / fig_h, subtitle, fontsize=15,
              color="#9CA3AF", ha="left", va="center")
     return HEADER_IN
 
 
-def axes_top(fig, extra_in=0.12):
+def axes_top(fig, extra_in=0.14):
     """Top margin (fraction) leaving room for the header band + gap."""
     return 1 - (HEADER_IN + extra_in) / fig.get_size_inches()[1]
 
@@ -106,39 +105,34 @@ def style_ax(ax):
         ax.spines[s].set_visible(False)
 
 
-def legend_below(ax, ncols, y_offset=-0.20):
+def legend_below(ax, ncols, y_offset=-0.22):
     """Legend OUTSIDE the plot area, below the x-label — can never cover data."""
     return ax.legend(loc="upper center", bbox_to_anchor=(0.5, y_offset),
                      ncols=ncols, framealpha=0, borderaxespad=0)
 
 
-def save(fig, name):
-    """Finalize with the rendered-text overlap validator, then save."""
+def save(fig, name, skip_data_check=False):
+    """Finalize with validator v2 (text overlaps + data-ink collisions)."""
     _validate_no_text_overlaps(fig, name)
+    if not skip_data_check:
+        _validate_no_data_collisions(fig, name)
     watermark(fig)
     fig.savefig(f"{GRAPHS}/{name}")
     plt.close(fig)
-    print(f"  ✓ {name} (text-overlap validator passed)")
+    print(f"  ✓ {name} (validators v2 passed)")
 
 
-def _validate_no_text_overlaps(fig, name):
-    """Draw the figure and assert no two text bounding boxes intersect.
-
-    Covers titles, axis labels, tick labels, annotations, legend texts and
-    value labels — the actual rendered pixels, not coordinates. Bounding boxes
-    may kiss (≤ 3 px tolerance) but not overlap.
-    """
-    fig.canvas.draw()
-    renderer = fig.canvas.get_renderer()
+def _visible_boxes(fig, renderer):
+    """All rendered text bounding boxes with labels."""
     fig_bb = fig.bbox
-    boxes = []                                   # (label, bbox)
+    boxes = []
     for ax in fig.get_axes():
-        if not ax.axison:                        # axis("off") image axes
+        if not ax.axison:
             continue
         artists = [ax.title, ax.xaxis.label, ax.yaxis.label, *ax.texts]
         xlim, ylim = ax.get_xlim(), ax.get_ylim()
         for loc, t in zip(ax.get_xticks(), ax.get_xticklabels()):
-            if xlim[0] <= loc <= xlim[1]:     # skip ticks matplotlib won't draw
+            if xlim[0] <= loc <= xlim[1]:
                 artists.append(t)
         for loc, t in zip(ax.get_yticks(), ax.get_yticklabels()):
             if ylim[0] <= loc <= ylim[1]:
@@ -149,9 +143,8 @@ def _validate_no_text_overlaps(fig, name):
             if t is None or not t.get_text().strip():
                 continue
             bb = t.get_window_extent(renderer=renderer)
-            if (bb.x1 < 0 or bb.x0 > fig_bb.x1 or bb.y1 < 0
-                    or bb.y0 > fig_bb.y1):
-                continue                         # off-canvas → cannot collide
+            if bb.x1 < 0 or bb.x0 > fig_bb.x1 or bb.y1 < 0 or bb.y0 > fig_bb.y1:
+                continue
             boxes.append((t.get_text()[:28].replace("\n", "⏎"), bb))
     for t in fig.texts:
         if t.get_text().strip():
@@ -159,6 +152,14 @@ def _validate_no_text_overlaps(fig, name):
             if bb.x1 < 0 or bb.x0 > fig_bb.x1 or bb.y1 < 0 or bb.y0 > fig_bb.y1:
                 continue
             boxes.append((t.get_text()[:28].replace("\n", "⏎"), bb))
+    return boxes
+
+
+def _validate_no_text_overlaps(fig, name):
+    """Draw the figure and assert no two text bounding boxes intersect."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    boxes = _visible_boxes(fig, renderer)
     tol = 3.0                                    # px — allow kissing edges
     for i in range(len(boxes)):
         for j in range(i + 1, len(boxes)):
@@ -171,6 +172,96 @@ def _validate_no_text_overlaps(fig, name):
                     f"(overlap {ox:.0f}×{oy:.0f} px)")
 
 
+def _data_ink_boxes(ax, renderer):
+    """Display-space bboxes of the VISIBLE data ink: lines, markers, bars.
+
+    Every box is clipped to the axes region — patches may extend beyond the
+    view limits (e.g. bars starting at data-y 0 under a 0.88-based ylim) but
+    only their rendered pixels are ink a legend may not cover. Low-alpha
+    background bands (axhspan zones, fill_between) are excluded.
+    """
+    ax_bb = ax.get_window_extent(renderer)
+
+    def clip(bb):
+        c = matplotlib.transforms.Bbox.intersection(bb, ax_bb)
+        return c
+
+    out = []
+    for ln in ax.lines:
+        if not ln.get_visible():
+            continue
+        try:
+            c = clip(ln.get_window_extent(renderer))
+            if c is not None:
+                out.append(c)
+        except ValueError:
+            pass
+    for p in ax.patches:
+        if not p.get_visible():
+            continue
+        fc = p.get_facecolor()
+        if len(fc) == 4 and fc[3] < 0.2:          # background band
+            continue
+        c = clip(p.get_window_extent(renderer))
+        if c is not None:
+            out.append(c)
+    for coll in ax.collections:
+        if not coll.get_visible():
+            continue
+        alpha = coll.get_alpha()
+        if alpha is not None and alpha < 0.2:     # fill_between background
+            continue
+        offs = coll.get_offsets()
+        if offs is None or len(offs) == 0:
+            continue
+        pts = ax.transData.transform(offs)
+        sizes = np.atleast_1d(coll.get_sizes())
+        pad = float(np.max(sizes)) if len(sizes) else 6.0
+        pad = max(pad * 1.5, 6.0)
+        c = clip(matplotlib.transforms.Bbox.from_extents(
+            pts[:, 0].min() - pad, pts[:, 1].min() - pad,
+            pts[:, 0].max() + pad, pts[:, 1].max() + pad))
+        if c is not None:
+            out.append(c)
+    return out
+
+
+def _validate_no_data_collisions(fig, name):
+    """Legends + figure-level texts may never sit on top of data ink.
+
+    In-plot ax.texts (value labels, headroom callouts) are intentional and
+    skipped; legends and figure texts are not.
+    """
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    tol = 2.0
+    suspects = []
+    for t in fig.texts:
+        if t.get_text().strip():
+            suspects.append((t.get_text()[:28], t.get_window_extent(renderer)))
+    for ax in fig.get_axes():
+        if not ax.axison:
+            continue
+        if ax.get_legend():
+            for t in ax.get_legend().get_texts():
+                suspects.append((t.get_text()[:28],
+                                 t.get_window_extent(renderer)))
+    if not suspects:
+        return
+    for ax in fig.get_axes():
+        if not ax.axison:
+            continue
+        data_boxes = _data_ink_boxes(ax, renderer)
+        for label, sb in suspects:
+            for db in data_boxes:
+                ox = min(sb.x1, db.x1) - max(sb.x0, db.x0)
+                oy = min(sb.y1, db.y1) - max(sb.y0, db.y0)
+                if ox > tol and oy > tol:
+                    raise AssertionError(
+                        f"[{name}] '{label}' sits on data ink "
+                        f"(overlap {ox:.0f}×{oy:.0f} px)")
+
+
 # ================================================================ 1 · MAIN RESULT
 def graph_main_result():
     base = load("baselines.json")
@@ -180,7 +271,7 @@ def graph_main_result():
     metrics = [("sarcasm", "Sarcasm", CYAN),
                ("irony", "Irony", PURPLE),
                ("passive_aggression", "Passive-aggr.", PINK)]
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16.5, 8.6))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12.5, 14.0))
 
     x = np.arange(len(models))
     w = 0.26
@@ -191,15 +282,15 @@ def graph_main_result():
         best = max(vals)
         for b, v in zip(bars, vals):
             ax1.text(b.get_x() + b.get_width() / 2, v + .004, f"{v:.4f}",
-                     ha="center", va="bottom", fontsize=9, rotation=90,
+                     ha="center", va="bottom", fontsize=12.5,
                      color="white" if abs(v - best) < 1e-9 else "#9CA3AF",
                      fontweight="bold" if abs(v - best) < 1e-9 else "normal")
-    ax1.set_xticks(x, models, fontsize=11.5)
+    ax1.set_xticks(x, models, fontsize=15)
     ax1.set_ylim(0.88, 1.0)
     ax1.set_ylabel("ROC-AUC")
     ax1.set_title("Hidden-signal ranking quality (higher = better)",
                   loc="left", pad=12)
-    legend_below(ax1, 3, y_offset=-0.24)
+    legend_below(ax1, 3, y_offset=-0.26)
     style_ax(ax1)
 
     mae = [base[k]["tension"]["mae"] for k in keys] + [full["tension"]["mae"]]
@@ -207,9 +298,9 @@ def graph_main_result():
     bars = ax2.bar(x, mae, 0.52, color=colors, edgecolor=BG, lw=.6)
     for b, v in zip(bars, mae):
         ax2.text(b.get_x() + b.get_width() / 2, v + .015, f"{v:.3f}",
-                 ha="center", fontsize=11, fontweight="bold",
+                 ha="center", fontsize=14.5, fontweight="bold",
                  color="white" if v == min(mae) else "#9CA3AF")
-    ax2.set_xticks(x, models, fontsize=11.5)
+    ax2.set_xticks(x, models, fontsize=15)
     ax2.set_ylim(0, max(mae) * 1.35)
     ax2.axhline(min(mae), color=GREEN, ls="--", lw=1, alpha=.6)
     ax2.set_ylabel("MAE (tension units, 0–100 scale)")
@@ -217,11 +308,11 @@ def graph_main_result():
                   loc="left", pad=12)
     style_ax(ax2)
 
-    fig.subplots_adjust(top=axes_top(fig), bottom=0.17, left=0.055,
-                        right=0.975, wspace=0.22)
+    fig.subplots_adjust(top=axes_top(fig), bottom=0.115, left=0.085,
+                        right=0.97, hspace=0.30)
     header(fig, "Baselines vs CEREBRO — real test-split results",
            "89 held-out conversations · sequential predicted-history inference · seed 42 "
-           "· left y-axis starts at 0.88 to magnify small gaps")
+           "· top y-axis starts at 0.88 to magnify small gaps")
     save(fig, "baselines_vs_cerebro.png")
 
 
@@ -236,20 +327,20 @@ def graph_ablation():
     mae = [abl[v]["tension"]["mae"] for v in ("A", "B", "C", "D")] + \
         [full["tension"]["mae"]]
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16.5, 8.8))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12.5, 14.5))
 
     x = np.arange(5)
     colors = [BLUE, BLUE, BLUE, BLUE, GREEN]
     bars = ax1.bar(x, sarc, 0.55, color=colors, edgecolor=BG, lw=.6)
     for b, v in zip(bars, sarc):
         ax1.text(b.get_x() + b.get_width() / 2, v + .0012, f"{v:.4f}",
-                 ha="center", fontsize=10.5,
+                 ha="center", fontsize=13.5,
                  fontweight="bold" if v == max(sarc) else "normal",
                  color="white" if v == max(sarc) else "#D1D5DB")
     ax1.annotate("", xy=(4, sarc[4] + .0035), xytext=(0, sarc[0] + .0035),
                  arrowprops=dict(arrowstyle="-|>", color=GREEN, lw=1.6,
                                  connectionstyle="arc3,rad=-0.22"))
-    ax1.set_xticks(x, vlabels, fontsize=11)
+    ax1.set_xticks(x, vlabels, fontsize=14.5)
     ax1.set_ylim(0.90, max(sarc) + .022)
     ax1.set_ylabel("Sarcasm ROC-AUC")
     ax1.set_title(f"Ranking gain per component · "
@@ -260,17 +351,17 @@ def graph_ablation():
     bars = ax2.bar(x, mae, 0.55, color=colors, edgecolor=BG, lw=.6)
     for b, v in zip(bars, mae):
         ax2.text(b.get_x() + b.get_width() / 2, v + .010, f"{v:.3f}",
-                 ha="center", fontsize=10.5,
+                 ha="center", fontsize=13.5,
                  fontweight="bold" if v == min(mae) else "normal",
                  color="white" if v == min(mae) else "#D1D5DB")
-    ax2.set_xticks(x, vlabels, fontsize=11)
+    ax2.set_xticks(x, vlabels, fontsize=14.5)
     ax2.set_ylim(0, max(mae) * 1.30)
     ax2.set_ylabel("Tension MAE (lower = better)")
     ax2.set_title("Regression gain per component", loc="left", pad=12)
     style_ax(ax2)
 
-    fig.subplots_adjust(top=axes_top(fig), bottom=0.14, left=0.055,
-                        right=0.975, wspace=0.22)
+    fig.subplots_adjust(top=axes_top(fig), bottom=0.115, left=0.085,
+                        right=0.97, hspace=0.34)
     header(fig, "Ablation study — what does each component contribute?",
            "Same training protocol; E adds hidden-signal fusion + temporal engines on top of D")
     save(fig, "ablation_study.png")
@@ -289,23 +380,23 @@ def graph_capability():
         ("Escalation F1 (macro)", full["escalation"]["f1_macro"], ORANGE),
         ("Tension R²", max(full["tension"]["r2"], 0), GREEN),
     ]
-    fig, ax = plt.subplots(figsize=(14.5, 9.0))
+    fig, ax = plt.subplots(figsize=(13.0, 10.0))
     rows = rows[::-1]
     y = np.arange(len(rows))
     bars = ax.barh(y, [v for _, v, _ in rows], 0.6,
                    color=[c for _, _, c in rows], edgecolor=BG, lw=.6)
     for b, (_, v, _) in zip(bars, rows):
         ax.text(v + .004, b.get_y() + b.get_height() / 2, f"{v:.4f}",
-                va="center", fontsize=11.5, fontweight="bold", color="white")
+                va="center", fontsize=14.5, fontweight="bold", color="white")
     ax.set_yticks(y)
-    ax.set_yticklabels(["\n".join(textwrap.wrap(n, 22)) for n, _, _ in rows],
-                       fontsize=12)
+    ax.set_yticklabels(["\n".join(textwrap.wrap(n, 24)) for n, _, _ in rows],
+                       fontsize=15)
     ax.set_xlim(0.85, 1.005)
     ax.set_xlabel("score (ROC-AUC / F1 / R²)")
     ax.set_title("All heads ≥ 0.92 — ranking metrics are the honest benchmark",
-                 loc="left", pad=12, fontsize=13.5)
+                 loc="left", pad=12)
     style_ax(ax)
-    fig.subplots_adjust(top=axes_top(fig), bottom=0.09, left=0.24, right=0.965)
+    fig.subplots_adjust(top=axes_top(fig), bottom=0.085, left=0.265, right=0.965)
     header(fig, "Full CEREBRO (E) — capability sheet on the test split",
            "One bar per reported metric · values printed at bar ends · all numbers from evaluation/results/summary.json")
     save(fig, "capability_sheet.png")
@@ -321,55 +412,58 @@ def graph_confusion(head_key, labels, title, fname, color):
     yt, yp = _test_predictions_labels(head_key)
     cm = confusion_matrix(yt, yp, labels=labels, normalize="true")
     n = len(labels)
-    fig, ax = plt.subplots(figsize=(max(9.0, n * 0.95), max(7.6, n * 0.70)))
+    side = max(9.5, n * 0.62 + 2.2)          # narrow enough to embed ~1:1
+    fig, ax = plt.subplots(figsize=(side, side))
     im = ax.imshow(cm, cmap=matplotlib.colors.LinearSegmentedColormap.from_list(
         "neon", [PANEL, color]), vmin=0, vmax=1)
     ax.set_xticks(range(n))
-    ax.set_xticklabels(_wrapped(labels), rotation=90, fontsize=9.5)
+    ax.set_xticklabels(_wrapped(labels), rotation=90, fontsize=12)
     ax.set_yticks(range(n))
-    ax.set_yticklabels(_wrapped(labels) if n <= 3 else labels, fontsize=9.5)
+    ax.set_yticklabels(_wrapped(labels) if n <= 3 else labels, fontsize=12)
     for i in range(n):
         for j in range(n):
             v = cm[i, j]
             if v >= 0.01:
-                ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=8.8,
+                ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=11,
                         color="white" if v > 0.55 else "#9CA3AF",
                         fontweight="bold" if i == j else "normal")
-    ax.set_xlabel("predicted", fontsize=12.5)
-    ax.set_ylabel("ground truth", fontsize=12.5)
+    ax.set_xlabel("predicted", fontsize=16)
+    ax.set_ylabel("ground truth", fontsize=16)
+    ax.tick_params(axis="both", labelsize=12)
     ax.grid(False)
     cbar = fig.colorbar(im, fraction=0.046, pad=0.03)
-    cbar.ax.tick_params(labelsize=10, colors="#D1D5DB")
-    fig.subplots_adjust(top=axes_top(fig), bottom=0.20, left=0.16, right=0.965)
+    cbar.ax.tick_params(labelsize=12.5, colors="#D1D5DB")
+    fig.subplots_adjust(top=axes_top(fig), bottom=0.21, left=0.17, right=0.965)
     header(fig, f"Confusion matrix — {title}",
            "persisted CEREBRO engine re-run on 45 held-out test conversations · row-normalized (recall view)")
-    save(fig, fname)
+    save(fig, fname, skip_data_check=True)   # cell texts sit on the heatmap by design
 
 
 # ================================================================ 5 · CALIBRATION
 def graph_calibration():
     from sklearn.calibration import calibration_curve
     proba = _test_predictions_proba()
-    fig, ax = plt.subplots(figsize=(11.0, 8.6))
+    fig, ax = plt.subplots(figsize=(12.0, 10.5))
     for name, color in [("sarcasm", PINK), ("irony", PURPLE),
                         ("passive_aggression", GREEN)]:
         y = np.array([p[0] for p in proba[name]])
         p = np.array([p[1] for p in proba[name]])
         frac, mean_p = calibration_curve(y, p, n_bins=8, strategy="quantile")
         brier = float(np.mean((p - y) ** 2))
-        ax.plot(mean_p, frac, "-o", color=color, lw=2.6, ms=8,
+        ax.plot(mean_p, frac, "-o", color=color, lw=3.0, ms=10,
                 label=f"{name}  (Brier {brier:.3f})")
-    ax.plot([0, 1], [0, 1], "--", color="#6B7280", lw=1.4,
+    ax.plot([0, 1], [0, 1], "--", color="#6B7280", lw=1.6,
             label="perfectly calibrated")
-    ax.set_xlabel("predicted probability", fontsize=13)
-    ax.set_ylabel("observed positive frequency", fontsize=13)
+    ax.set_xlabel("predicted probability")
+    ax.set_ylabel("observed positive frequency")
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
-    legend_below(ax, 2, y_offset=-0.16)
+    ax.tick_params(axis="x", pad=9)   # corner '0.0' ticks must not kiss
+    legend_below(ax, 2, y_offset=-0.17)
     ax.set_title("Curves hugging the diagonal = trustworthy confidences",
                  loc="left", pad=12)
     style_ax(ax)
-    fig.subplots_adjust(top=axes_top(fig), bottom=0.20, left=0.11, right=0.965)
+    fig.subplots_adjust(top=axes_top(fig), bottom=0.185, left=0.115, right=0.965)
     header(fig, "Probability calibration — hidden-signal heads",
            "reliability curves on 45 test conversations · Brier score in legend (lower = better)")
     save(fig, "calibration_curves.png")
@@ -379,34 +473,35 @@ def graph_calibration():
 def graph_hero():
     demo = load("demo_report.json")
     full = load("summary.json")["full_metrics"]
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(17.5, 8.8),
-                                   gridspec_kw={"width_ratios": [1.15, 1]})
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12.5, 15.0),
+                                   gridspec_kw={"height_ratios": [1.1, 1]})
     tension = [m["tension"] for m in demo["messages"]]
     xs = np.arange(1, len(tension) + 1)
-    handles = [plt.Line2D([], [], color=CYAN, lw=2.6, marker="o", ms=7,
+    handles = [plt.Line2D([], [], color=CYAN, lw=2.6, marker="o", ms=8,
                           mfc=CYAN, mec=BG, label="predicted tension")]
     if demo["turning_points"]:
         tp = max(demo["turning_points"], key=lambda t: abs(t["tension_change"]))
         ax1.axvline(tp["message_id"], color=PINK, ls="--", lw=1.6, alpha=.95)
-        handles.append(plt.Line2D(
-            [], [], color=PINK, ls="--", lw=1.6,
-            label=f'turning point #{tp["message_id"]}: '
+        tp_lbl = (f'turning point #{tp["message_id"]}: '
                   f'{tp["before"]["emotion"]} → {tp["after"]["emotion"]} '
-                  f'(Δtension {tp["tension_change"]:+.1f}, z={tp["robust_z"]})'))
-    ax1.plot(xs, tension, color=CYAN, lw=2.6, marker="o", ms=7,
+                  f'(Δtension {tp["tension_change"]:+.1f}, z={tp["robust_z"]})')
+        handles.append(plt.Line2D([], [], color=PINK, ls="--", lw=1.6,
+                                  label=tp_lbl))
+    ax1.plot(xs, tension, color=CYAN, lw=2.6, marker="o", ms=8,
              mfc=CYAN, mec=BG, mew=1.4, zorder=3)
     ax1.fill_between(xs, tension, color=CYAN, alpha=.10)
     ax1.axhspan(60, 100, color=PINK, alpha=.08)
     handles.append(plt.Rectangle((0, 0), 1, 1, color=PINK, alpha=.15,
                                  label="escalation zone (tension > 60)"))
     ax1.set_xticks(xs)
-    ax1.set_xlabel("message #", fontsize=12.5)
-    ax1.set_ylabel("tension (0–100)", fontsize=12.5)
+    ax1.set_xlabel("message #")
+    ax1.set_ylabel("tension (0–100)")
     ax1.set_ylim(0, 100)
-    ax1.set_title(f'Held-out test conversation · trajectory = '
-                  f'"{load("demo_report.json")["summary"]["trajectory"]}"',
-                  loc="left", pad=12, fontsize=13.5)
-    legend_below(ax1, 1, y_offset=-0.16)
+    ax1.set_title("Held-out test conversation · per-message tension",
+                  loc="left", pad=12)
+    ax1.legend(handles=handles, loc="upper center",
+               bbox_to_anchor=(0.5, -0.20), ncols=1, framealpha=0,
+               borderaxespad=0)
     style_ax(ax1)
 
     rows = [("Sarcasm AUC", full["sarcasm"]["roc_auc"], CYAN),
@@ -420,19 +515,19 @@ def graph_hero():
                     color=[c for _, _, c in rows], edgecolor=BG, lw=.6)
     for b, (_, v, _) in zip(bars, rows):
         ax2.text(v + .004, b.get_y() + b.get_height() / 2, f"{v:.4f}",
-                 va="center", fontsize=11.5, fontweight="bold", color="white")
+                 va="center", fontsize=14.5, fontweight="bold", color="white")
     ax2.set_yticks(y)
-    ax2.set_yticklabels([n for n, _, _ in rows], fontsize=12)
+    ax2.set_yticklabels([n for n, _, _ in rows], fontsize=15)
     ax2.set_xlim(0.85, 1.005)
-    ax2.set_xlabel("score", fontsize=12.5)
+    ax2.set_xlabel("score")
     ax2.set_title("Headline metrics (test split, 89 conversations)",
-                  loc="left", pad=12, fontsize=13.5)
+                  loc="left", pad=12)
     style_ax(ax2)
 
-    fig.subplots_adjust(top=axes_top(fig), bottom=0.22, left=0.065,
-                        right=0.965, wspace=0.30)
+    fig.subplots_adjust(top=axes_top(fig), bottom=0.135, left=0.10,
+                        right=0.965, hspace=0.52)
     header(fig, "CEREBRO — conversation intelligence at a glance",
-           "left: per-message tension with detected turning points (real model output) · right: test-split headline metrics")
+           "top: per-message tension with detected turning points (real model output) · bottom: test-split headline metrics")
     save(fig, "hero_dashboard.png")
 
 
@@ -441,8 +536,7 @@ def graph_dataset():
     from cerebro.data.generator import generate_corpus
     corpus = generate_corpus(convs_per_cell=14)
     msgs = [m for c in corpus for m in c]
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18.5, 7.6),
-                                        gridspec_kw={"width_ratios": [1.25, 1, 1]})
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12.5, 18.0))
 
     bands = [("calm", 0, 25), ("friction", 25, 55), ("escalation", 55, 85),
              ("peak", 85, 101)]
@@ -460,12 +554,12 @@ def graph_dataset():
     ax1.bar(x, neg, .58, bottom=[p + n for p, n in zip(pos, neu)], color=PINK,
             label="negative", edgecolor=BG, lw=.6)
     for xi, (p, n, g) in enumerate(zip(pos, neu, neg)):
-        ax1.text(xi, p + n + g + 130, f"{p + n + g:,}", ha="center", fontsize=11,
+        ax1.text(xi, p + n + g + 130, f"{p + n + g:,}", ha="center", fontsize=14,
                  fontweight="bold", color="#D1D5DB")
     ax1.set_xticks(x)
     ax1.set_xticklabels([f"{b}\n{lo}–{hi if hi < 101 else 100}"
-                         for b, lo, hi in bands], fontsize=11)
-    ax1.set_ylabel("messages", fontsize=12.5)
+                         for b, lo, hi in bands], fontsize=15)
+    ax1.set_ylabel("messages")
     ax1.set_ylim(0, max(p + n + g for p, n, g in zip(pos, neu, neg)) * 1.22)
     ax1.set_title("Sentiment composition per tension band", loc="left", pad=12)
     legend_below(ax1, 3, y_offset=-0.24)
@@ -473,26 +567,24 @@ def graph_dataset():
 
     tens = [m["tension"] for m in msgs]
     ax2.hist(tens, bins=32, color=PURPLE, alpha=.9, edgecolor=BG, lw=.4)
-    ax2.axvline(float(np.mean(tens)), color=YELLOW, ls="--", lw=1.8)
-    ax2.text(0.03, 0.95, f"mean {np.mean(tens):.1f}", fontsize=11.5,
-             color=YELLOW, transform=ax2.transAxes, va="top", fontweight="bold")
-    ax2.set_xlabel("tension value", fontsize=12.5)
-    ax2.set_ylabel("messages", fontsize=12.5)
-    ax2.set_title("Tension distribution", loc="left", pad=12)
+    ax2.axvline(float(np.mean(tens)), color=YELLOW, ls="--", lw=2.0)
+    ax2.set_xlabel("tension value")
+    ax2.set_ylabel("messages")
+    ax2.set_title(f"Tension distribution — mean {np.mean(tens):.1f} (dashed line)",
+                  loc="left", pad=12)
     style_ax(ax2)
 
     lens = [len(c) for c in corpus]
     ax3.hist(lens, bins=17, color=CYAN, alpha=.9, edgecolor=BG, lw=.4)
-    ax3.axvline(float(np.mean(lens)), color=YELLOW, ls="--", lw=1.8)
-    ax3.text(0.03, 0.95, f"mean {np.mean(lens):.1f}", fontsize=11.5,
-             color=YELLOW, transform=ax3.transAxes, va="top", fontweight="bold")
-    ax3.set_xlabel("messages per conversation", fontsize=12.5)
-    ax3.set_ylabel("conversations", fontsize=12.5)
-    ax3.set_title("Conversation lengths", loc="left", pad=12)
+    ax3.axvline(float(np.mean(lens)), color=YELLOW, ls="--", lw=2.0)
+    ax3.set_xlabel("messages per conversation")
+    ax3.set_ylabel("conversations")
+    ax3.set_title(f"Conversation lengths — mean {np.mean(lens):.1f} (dashed line)",
+                  loc="left", pad=12)
     style_ax(ax3)
 
-    fig.subplots_adjust(top=axes_top(fig), bottom=0.15, left=0.05,
-                        right=0.985, wspace=0.26)
+    fig.subplots_adjust(top=axes_top(fig), bottom=0.075, left=0.085,
+                        right=0.97, hspace=0.42)
     header(fig, "CEREBRO corpus — 6 domains × 7 narrative arcs, weak-supervision annotated",
            "conversation-level splits (no leakage) · 588 conversations · 10,956 messages · seed 42")
     save(fig, "dataset_overview.png")
@@ -501,49 +593,48 @@ def graph_dataset():
 # ================================================================ 8 · DEMO REPORT
 def graph_demo_report():
     demo = load("demo_report.json")
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(17.0, 10.4), sharex=True,
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(13.0, 12.5), sharex=True,
                                    gridspec_kw={"height_ratios": [1.3, 1]})
     msgs = demo["messages"]
     xs = np.arange(1, len(msgs) + 1)
     tension = [m["tension"] for m in msgs]
-    ax1.plot(xs, tension, color=CYAN, lw=2.6, marker="o", ms=7, mfc=CYAN,
+    ax1.plot(xs, tension, color=CYAN, lw=2.6, marker="o", ms=8, mfc=CYAN,
              mec=BG, mew=1.4, zorder=3)
     ax1.fill_between(xs, tension, color=CYAN, alpha=.10)
-    # turning-point labels live in reserved headroom (ylim 0–122) — no collision
-    ax1.set_ylim(0, 122)
+    # turning-point labels live in staggered headroom slots — no collision
+    ax1.set_ylim(0, 128)
     ax1.set_yticks([0, 25, 50, 75, 100])
-    for t in demo["turning_points"]:
+    for k, t in enumerate(demo["turning_points"]):
         ax1.axvline(t["message_id"], color=PINK, ls=":", lw=1.3, alpha=.85)
-        ax1.text(t["message_id"], 108, f'#{t["message_id"]} {t["tension_change"]:+.0f}',
-                 fontsize=9.5, color=PINK, ha="center", va="bottom",
+        ax1.text(t["message_id"], 110 if k % 2 == 0 else 120,
+                 f'#{t["message_id"]} {t["tension_change"]:+.0f}',
+                 fontsize=12.5, color=PINK, ha="center", va="bottom",
                  fontweight="bold")
     ax1.axhspan(60, 100, color=PINK, alpha=.07)
-    ax1.set_ylabel("tension (0–100)", fontsize=12.5)
+    ax1.set_ylabel("tension (0–100)")
     ax1.set_title("tension — turning-point markers above the curve",
-                  loc="left", fontsize=12.5, color=CYAN, pad=8)
+                  loc="left", fontsize=16, color=CYAN, pad=8)
     style_ax(ax1)
 
     for key, color, lbl in [("sarcasm", PINK, "sarcasm"),
                             ("irony", PURPLE, "irony"),
                             ("passive_aggression", GREEN, "passive-aggr.")]:
         probs = [m[key]["probability"] for m in msgs]
-        ax2.plot(xs, probs, "-o", color=color, lw=2, ms=5.5, label=lbl, mec=BG)
+        ax2.plot(xs, probs, "-o", color=color, lw=2, ms=6.5, label=lbl, mec=BG)
     ax2.axhline(0.5, color="#9CA3AF", ls="--", lw=1.2)
-    ax2.set_ylim(0, 1.10)
+    ax2.set_ylim(0, 1.12)
     ax2.set_yticks([0, .25, .5, .75, 1])
     ax2.set_xticks(xs)
-    ax2.set_xticklabels([f'#{m["message_id"]}' for m in msgs], fontsize=10)
-    ax2.set_xlabel("message (#id — full texts in the README worked example)",
-                   fontsize=12.5)
-    ax2.set_ylabel("probability", fontsize=12.5)
+    ax2.set_xticklabels([f'#{m["message_id"]}' for m in msgs], fontsize=13)
+    ax2.set_xlabel("message (#id — full texts in the README worked example)")
+    ax2.set_ylabel("probability")
     ax2.set_title("hidden signals — dashed line = 0.5 decision threshold",
-                  loc="left", fontsize=12.5, color=PINK, pad=8)
-    ax2.legend(fontsize=11, framealpha=0, ncols=3, loc="upper left",
-                bbox_to_anchor=(0.0, 1.02))
+                  loc="left", fontsize=16, color=PINK, pad=8)
+    legend_below(ax2, 3, y_offset=-0.26)
     style_ax(ax2)
 
-    fig.subplots_adjust(top=axes_top(fig), bottom=0.16, left=0.07,
-                        right=0.975, hspace=0.34)
+    fig.subplots_adjust(top=axes_top(fig), bottom=0.145, left=0.075,
+                        right=0.97, hspace=0.38)
     header(fig, "CEREBRO on a held-out test conversation — full per-message readout",
            "top: tension with turning-point markers · bottom: sarcasm / irony / passive-aggression probabilities")
     save(fig, "demo_report.png")
@@ -587,7 +678,7 @@ def graph_scenarios():
     sc = load("scenarios.json")["scenarios"]
     calm_expected = {"normal", "happy", "very_short", "slow", "humor", "malformed",
                      "multi_speaker"}
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18.5, 9.0))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(13.5, 16.5))
 
     names = [s["scenario"] for s in sc]
     mean_t = [s["mean_tension"] for s in sc]
@@ -598,8 +689,8 @@ def graph_scenarios():
     ax1.plot(x, peak_t, "_", color="white", ms=22, mew=2.4)
     ax1.axhline(25.9, color=CYAN, ls="--", lw=1.4)
     ax1.set_xticks(x)
-    ax1.set_xticklabels(names, rotation=90, fontsize=9.5)
-    ax1.set_ylabel("tension (0–100)", fontsize=12.5)
+    ax1.set_xticklabels(names, rotation=90, fontsize=13)
+    ax1.set_ylabel("tension (0–100)")
     ax1.set_title("Per-scenario tension readout", loc="left", pad=12)
     from matplotlib.patches import Patch
     ax1.legend(
@@ -609,7 +700,7 @@ def graph_scenarios():
                             lw=0, label="peak tension"),
                  plt.Line2D([], [], color=CYAN, ls="--",
                             label="training-corpus mean 25.9")],
-        loc="upper center", bbox_to_anchor=(0.5, -0.24), ncols=2,
+        loc="upper center", bbox_to_anchor=(0.5, -0.26), ncols=2,
         framealpha=0, borderaxespad=0)
     style_ax(ax1)
 
@@ -620,19 +711,19 @@ def graph_scenarios():
         hidden["passive_aggression"].append(s["pa_mean"])
     for (h, c) in [("sarcasm", PINK), ("irony", PURPLE),
                    ("passive_aggression", GREEN)]:
-        ax2.plot(x, hidden[h], "-o", color=c, lw=2, ms=5.5,
+        ax2.plot(x, hidden[h], "-o", color=c, lw=2, ms=6.5,
                  label=h.replace("_", "-"), mec=BG)
     ax2.axhline(0.5, color="#9CA3AF", ls="--", lw=1.2)
     ax2.set_xticks(x)
-    ax2.set_xticklabels(names, rotation=90, fontsize=9.5)
+    ax2.set_xticklabels(names, rotation=90, fontsize=13)
     ax2.set_ylim(0, 1)
-    ax2.set_ylabel("mean probability", fontsize=12.5)
+    ax2.set_ylabel("mean probability")
     ax2.set_title("Hidden-signal levels per scenario", loc="left", pad=12)
-    legend_below(ax2, 3, y_offset=-0.24)
+    legend_below(ax2, 3, y_offset=-0.28)
     style_ax(ax2)
 
-    fig.subplots_adjust(top=axes_top(fig), bottom=0.19, left=0.05,
-                        right=0.985, wspace=0.20)
+    fig.subplots_adjust(top=axes_top(fig), bottom=0.155, left=0.075,
+                        right=0.97, hspace=0.52)
     header(fig, "PS-01 §41 robustness — 20 hand-crafted out-of-distribution scenarios",
            "different phrasing, emoji, slang, timing and formats than the training corpus · all 20 executed without failure")
     save(fig, "scenario_robustness.png")
@@ -645,7 +736,7 @@ def graph_transfer():
     except FileNotFoundError:
         print("  – transfer_logsafe.json missing, skip")
         return
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15.5, 7.2))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12.5, 14.0))
 
     keys = [("emotion top-3", s["zero_shot_emotion_top3"], 1 / 3),
             ("emotion exact (13-way)", s["zero_shot_emotion_accuracy"], 1 / 13),
@@ -658,11 +749,11 @@ def graph_transfer():
     ax1.barh(y, chance, color="none", edgecolor="#6B7280", height=.58,
              lw=1.2, ls="--", zorder=4)
     for yi, v in zip(y, vals):
-        ax1.text(v + .012, yi, f"{v:.1%}", va="center", fontsize=12,
+        ax1.text(v + .012, yi, f"{v:.1%}", va="center", fontsize=15,
                  color="#E5E7EB", fontweight="bold")
-    ax1.set_yticks(y, names, fontsize=11.5)
+    ax1.set_yticks(y, names, fontsize=15)
     ax1.set_xlim(0, .62)
-    ax1.set_xlabel("accuracy on real text (dashed = chance)", fontsize=12)
+    ax1.set_xlabel("accuracy on real text (dashed = chance)")
     ax1.invert_yaxis()
     ax1.set_title("Zero-shot accuracy vs chance", loc="left", pad=12)
     style_ax(ax1)
@@ -676,24 +767,84 @@ def graph_transfer():
     ax2.bar(x - .19, gv, width=.38, color="#4B5563", label="gold (GoEmotions)",
             zorder=3)
     ax2.bar(x + .19, pv, width=.38, color=CYAN, label="predicted", zorder=3)
-    ax2.set_xticks(x, classes, rotation=90, fontsize=10)
-    ax2.set_ylabel("share of messages", fontsize=12)
+    ax2.set_xticks(x, classes, rotation=90, fontsize=12.5)
+    ax2.set_ylabel("share of messages")
     ax2.set_ylim(0, max(max(gv), max(pv)) * 1.15)
     ax2.set_title("Label shift: frustration over-read on neutral text",
                   loc="left", pad=12)
-    legend_below(ax2, 2, y_offset=-0.26)
+    legend_below(ax2, 2, y_offset=-0.30)
     style_ax(ax2)
 
-    fig.subplots_adjust(top=axes_top(fig), bottom=0.22, left=0.22,
-                        right=0.975, wspace=0.30)
+    fig.subplots_adjust(top=axes_top(fig), bottom=0.205, left=0.235,
+                        right=0.97, hspace=0.44)
     header(fig, "Zero-shot transfer to real GoEmotions text",
            "3,000 real Reddit comments · honest cross-corpus metrics (not comparable to in-corpus tables)")
     save(fig, "transfer_goemotions.png")
 
 
+# ================================================================ 9c · BENCHMARKS
+def graph_benchmarks():
+    try:
+        b = load("benchmarks.json")
+    except FileNotFoundError:
+        print("  – benchmarks.json missing, skip")
+        return
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12.5, 13.5))
+
+    rows = b["scaling"]
+    ns = [r["n_messages"] for r in rows]
+    tot = [r["total_s"] for r in rows]
+    ax1.plot(ns, tot, "-o", color=CYAN, lw=3, ms=10, mec=BG, zorder=3)
+    for n, t in zip(ns, tot):
+        ax1.annotate(f"{t:.2f}s", (n, t), textcoords="offset points",
+                     xytext=(0, 14), ha="center", fontsize=13.5,
+                     fontweight="bold", color="white")
+    ax1.set_xscale("log")
+    ax1.set_xticks(ns, [str(n) for n in ns])
+    ax1.tick_params(axis="x", labelsize=14.5)
+    ax1.set_xlabel("messages in the conversation (log scale)")
+    ax1.set_ylabel("end-to-end seconds")
+    ax1.set_title("Latency scales linearly — no context-window blow-up",
+                  loc="left", pad=12)
+    ax1.set_ylim(0, max(tot) * 1.30)
+    style_ax(ax1)
+
+    st = b["stage_latency_ms_per_message"]
+    order = ["parse", "preprocess+features", "ml_heads", "hidden_signals",
+             "temporal", "explainability", "segmentation"]
+    disp = ["parse", "preprocess\n+features", "ML heads", "hidden\nsignals",
+            "temporal", "explain-\nability", "segmentation"]
+    vals = [st[k] for k in order]
+    bars = ax2.bar(np.arange(len(order)), vals, 0.6, color=ORANGE,
+                   edgecolor=BG, lw=.6)
+    for b_, v in zip(bars, vals):
+        ax2.text(b_.get_x() + b_.get_width() / 2, v + .25, f"{v:.2f}",
+                 ha="center", fontsize=13.5, fontweight="bold", color="white")
+    ax2.set_xticks(np.arange(len(order)), disp, fontsize=13.5)
+    ax2.set_ylabel("ms per message")
+    ax2.set_ylim(0, max(vals) * 1.30)
+    ax2.set_title(f"Where the time goes · ML heads dominate "
+                  f"({vals[2] / max(sum(vals), 1e-9):.0%} of stage cost)",
+                  loc="left", pad=12)
+    style_ax(ax2)
+
+    fig.subplots_adjust(top=axes_top(fig), bottom=0.105, left=0.085,
+                        right=0.97, hspace=0.38)
+    header(fig, "Efficiency — real benchmarks, persisted engine, single CPU core",
+           "top: end-to-end latency up to 1,000 messages · bottom: per-stage cost "
+           "· peak memory 8.9 MB @ 1,000 msgs · API round-trip 184 ms @ 50 msgs")
+    save(fig, "efficiency_benchmarks.png")
+
+
 # ================================================================ 10 · ARCHITECTURE
 def graph_architecture():
-    fig = plt.figure(figsize=(14.5, 19.0))
+    """Vertical single-column layout: 10.5in wide so a full-width README
+    embed keeps ~1:1 pixel density (GitHub renders at ~830 CSS px).
+
+    Geometry contract (asserted below): every box inside exactly one band,
+    no box overlaps, no arrow endpoint buried inside a box.
+    """
+    fig = plt.figure(figsize=(10.5, 24.0))
     ax = fig.add_axes([0, 0, 1, 1])
     ax.axis("off")
     ax.set_xlim(0, 100)
@@ -701,7 +852,7 @@ def graph_architecture():
 
     rects = []          # (name, x, y, w, h) for the overlap validator
 
-    def box(x, y, w, h, lines, color, fs=12, sub_fs=10, name=""):
+    def box(x, y, w, h, lines, color, fs=18, sub_fs=14.5, name=""):
         ax.add_patch(plt.Rectangle((x, y), w, h, facecolor=PANEL,
                                    edgecolor=color, lw=2, zorder=3))
         head, rest = lines[0], lines[1:]
@@ -717,86 +868,77 @@ def graph_architecture():
         ax.annotate("", xy=(x2, y2), xytext=(x1, y1),
                     arrowprops=dict(arrowstyle="-|>", color=color, lw=lw))
 
-    bands = []          # (name, x, y, w, h)
     def band(y, h, label, color):
-        ax.add_patch(plt.Rectangle((3.4, y), 96, h, facecolor=color,
+        ax.add_patch(plt.Rectangle((3.4, y), 95, h, facecolor=color,
                                    alpha=0.045, edgecolor="none", zorder=1))
         # vertical label in the left margin — zero chance of hitting any box
-        ax.text(1.7, y + h / 2, label, fontsize=10.5, color=color, alpha=0.95,
+        ax.text(1.8, y + h / 2, label, fontsize=14, color=color, alpha=0.95,
                 fontweight="bold", zorder=2, va="center", ha="center",
                 rotation=90)
-        bands.append((label.split("·")[0].strip(), 3.4, y, 96, h))
 
-    # ---- INPUT LAYER ----
-    band(84.0, 8.0, "INPUT LAYER · PS-01 §2", CYAN)
-    for txt, x in [(("WhatsApp", ".txt"), 5.0), (("Discord", "JSON"), 20.5),
-                   (("Slack", "JSON"), 36.0), (("CSV", ""), 51.5),
-                   (("JSON", ""), 67.0), (("plain", ".txt"), 82.5)]:
-        lines = [t for t in txt if t]
-        box(x, 85.6, 12.5, 5.0, lines, CYAN, fs=11, name=f"in:{txt[0]}")
-        arrow(x + 6.25, 85.6, 47, 83.2, lw=1.4)
+    # ---- INPUT LAYER: 6 chips in one row ----
+    band(88.0, 8.5, "INPUT · PS-01 §2", CYAN)
+    for txt, x in [("WhatsApp", 5.5), ("Discord", 20.5), ("Slack", 35.5),
+                   ("CSV", 50.5), ("JSON", 65.5), ("plain", 80.5)]:
+        box(x, 89.0, 14.0, 5.6, [txt], CYAN, fs=14.5, name=f"in:{txt}")
+        arrow(x + 7.0, 89.0, 50, 87.0, lw=1.4)
 
-    box(28, 76.6, 44, 6.0,
-        ["CHAT PARSER + AUTO-DETECT", "one common format · speakers · timestamps"],
-        CYAN, fs=12, name="parser")
-    arrow(50, 76.6, 50, 73.8)
-
-    # ---- UNDERSTANDING LAYER ----
-    band(51.5, 31.5, "UNDERSTANDING LAYER · PS-01 §5, §8, §9, §17", PURPLE)
-    box(5.5, 63.0, 41, 8.6, ["PREPROCESSING + FEATURES",
-                             "16-dim behavioral vector per message",
-                             "CAPS · exclamations · emoji · response gap"],
+    # ---- UNDERSTANDING LAYER: parser → preprocess → context → repr ----
+    band(55.5, 32.0, "UNDERSTANDING · §5 §8 §9 §17", PURPLE)
+    box(20, 81.0, 60, 6.0,
+        ["CHAT PARSER + AUTO-DETECT",
+         "one common format · speakers · timestamps"],
+        CYAN, fs=17, sub_fs=13.5, name="parser")
+    arrow(50, 81.0, 50, 79.8)
+    box(8.5, 72.0, 83, 7.8,
+        ["PREPROCESSING + BEHAVIORAL FEATURES",
+         "16-dim vector · CAPS · exclamations · emoji · response gap"],
         PURPLE, name="preproc")
-    box(53.5, 63.0, 41, 8.6, ["CONTEXT + SPEAKER MEMORY",
-                              "sliding 4-turn window + decayed summary",
-                              "per-speaker emotional state"],
+    arrow(50, 72.0, 50, 71.2)
+    box(8.5, 63.8, 83, 7.4,
+        ["CONTEXT + SPEAKER MEMORY",
+         "sliding 4-turn window · decayed summary · per-speaker state"],
         PURPLE, name="context")
-    arrow(26, 63.0, 43, 59.0)
-    arrow(74, 63.0, 57, 59.0)
-    box(18, 53.0, 64, 5.0,
+    arrow(50, 63.8, 50, 62.9)
+    box(12, 56.3, 76, 6.6,
         ["MESSAGE REPRESENTATION", "text ⊕ context ⊕ behavior ⊕ memory"],
-        GREEN, fs=12, name="repr")
-    arrow(50, 53.0, 50, 49.8)
+        GREEN, fs=17, sub_fs=13.5, name="repr")
+    arrow(50, 56.3, 50, 53.3)
 
-    # ---- INTELLIGENCE LAYER ----
-    band(29.0, 21.5, "INTELLIGENCE LAYER · PS-01 §10–22", YELLOW)
-    box(4.5, 42.4, 29, 7.4, ["MULTI-TASK NLP ENGINE",
-                             "sentiment · emotion · tone",
-                             "tension (0–100)"], YELLOW, name="mtln")
-    box(35.5, 42.4, 29, 7.4, ["HIDDEN-SIGNAL DETECTION",
-                              "sarcasm · irony · passive-aggr.",
-                              "learned ⊕ contradiction evidence"], YELLOW,
-        name="hidden")
-    box(66.5, 42.4, 29, 7.4, ["TEMPORAL ENGINES",
-                              "arc · transitions · turning pts",
-                              "escalation trajectory"], YELLOW, name="temporal")
-    arrow(50, 42.4, 50, 40.1)
-    box(25, 32.4, 50, 7.0, ["MODEL FUSION + CALIBRATION",
-                            "six evidence streams · tuned weights · Platt scaling"],
+    # ---- INTELLIGENCE LAYER: 4 stacked engines ----
+    band(22.2, 33.3, "INTELLIGENCE · §10–22", YELLOW)
+    box(8.5, 46.5, 83, 6.8,
+        ["MULTI-TASK NLP ENGINE",
+         "sentiment · emotion · tone · tension (0–100)"],
+        YELLOW, name="mtln")
+    arrow(50, 46.5, 50, 45.2)
+    box(8.5, 38.6, 83, 6.6,
+        ["HIDDEN-SIGNAL DETECTION",
+         "sarcasm · irony · passive-aggression · learned ⊕ contradiction"],
+        YELLOW, name="hidden")
+    arrow(50, 38.6, 50, 37.4)
+    box(8.5, 30.8, 83, 6.6,
+        ["TEMPORAL ENGINES",
+         "arc · transitions · turning points · escalation trajectory"],
+        YELLOW, name="temporal")
+    arrow(50, 30.8, 50, 29.6)
+    box(8.5, 23.0, 83, 6.6,
+        ["MODEL FUSION + CALIBRATION",
+         "six evidence streams · validation-driven weights · Platt scaling"],
         ORANGE, name="fusion")
+    arrow(50, 23.0, 50, 19.6)
 
-    # ---- OUTPUT LAYER ----
-    band(11.5, 16.5, "OUTPUT LAYER · PS-01 §23–30", PINK)
-    box(5.0, 19.4, 27.5, 7.4, ["EXPLAINABILITY",
-                               "WHY? · WHAT CHANGED?",
-                               "evidence ≠ interpretation"], PINK, name="explain")
-    box(36.25, 19.4, 27.5, 7.4, ["CONVERSATION REPORT",
-                                 "18-section summary",
-                                 "speaker + topic views"], PINK, name="report")
-    box(67.5, 19.4, 27.5, 7.4, ["FASTAPI + DASHBOARD",
-                                "14 endpoints · TTL store",
-                                "futuristic frontend"], PINK, name="api")
-    arrow(50, 32.4, 18.75, 27.2)
-    arrow(50, 32.4, 50, 27.2)
-    arrow(50, 32.4, 81.25, 27.2)
-    box(26, 12.9, 48, 5.0, ["EMOTIONAL ARC · TENSION CURVE",
-                            "the journey, explained"], CYAN, fs=11.5, name="arc")
-    arrow(18.75, 19.4, 38, 18.2, lw=1.4)
-    arrow(50, 19.4, 50, 18.2, lw=1.4)
-    arrow(81.25, 19.4, 62, 18.2, lw=1.4)
-
-    ax.text(50, 8.6, "every arrow is a real function call — see docs/methodology/PS01_WORKFLOW.md",
-            fontsize=11, color="#6B7280", ha="center", style="italic")
+    # ---- OUTPUT LAYER: explain/report + the arc ----
+    band(0.5, 21.2, "OUTPUT · §23–30", PINK)
+    box(8.5, 12.6, 83, 7.0,
+        ["EXPLAINABILITY + CONVERSATION REPORT",
+         "WHY? · WHAT CHANGED? · speaker profiles · 18-section report"],
+        PINK, name="explain")
+    arrow(50, 12.6, 50, 11.4)
+    box(8.5, 5.6, 83, 5.8,
+        ["EMOTIONAL ARC · TENSION CURVE",
+         "the journey, explained — served by the FastAPI dashboard"],
+        CYAN, fs=16, sub_fs=13.5, name="arc")
 
     # ---- programmatic overlap validator (boxes, bands, arrow tips) ----
     def overlap(a, b, pad=0.05):
@@ -808,23 +950,24 @@ def graph_architecture():
         for j in range(i + 1, len(rects)):
             assert not overlap(rects[i], rects[j]), \
                 f"box collision: {rects[i][0]} × {rects[j][0]}"
+    bands_all = [(3.4, 88.0, 95, 8.5), (3.4, 55.5, 95, 32.0),
+                 (3.4, 22.2, 95, 33.3), (3.4, 0.5, 95, 21.2)]
     for name, x, y, w, h in rects:
         inside = any(bx <= x and x + w <= bx + bw and by <= y and y + h <= by + bh
-                     for _, bx, by, bw, bh in bands)
+                     for bx, by, bw, bh in bands_all)
         assert inside, f"box outside every band: {name}"
-    arrow_tips = [(x + 6.25, 85.6, 47, 83.2)
-                  for x in (5.0, 20.5, 36.0, 51.5, 67.0, 82.5)] + [
-        (50, 76.6, 50, 73.8), (26, 63.0, 43, 59.0), (74, 63.0, 57, 59.0),
-        (50, 53.0, 50, 49.8), (50, 42.4, 50, 40.1), (50, 32.4, 18.75, 27.2),
-        (50, 32.4, 50, 27.2), (50, 32.4, 81.25, 27.2), (18.75, 19.4, 38, 18.2),
-        (50, 19.4, 50, 18.2), (81.25, 19.4, 62, 18.2)]
+    arrow_tips = [(x + 7.0, 89.0, 50, 87.0)
+                  for x in (5.5, 20.5, 35.5, 50.5, 65.5, 80.5)] + [
+        (50, 81.0, 50, 79.8), (50, 72.0, 50, 71.2), (50, 63.8, 50, 62.9),
+        (50, 56.3, 50, 53.3), (50, 46.5, 50, 45.2), (50, 38.6, 50, 37.4),
+        (50, 30.8, 50, 29.6), (50, 23.0, 50, 19.6), (50, 12.6, 50, 11.4)]
     for x1, y1, x2, y2 in arrow_tips:
         for name, bx, by, bw, bh in rects:
             for px, py in ((x1, y1), (x2, y2)):
                 inside_pt = bx < px < bx + bw and by < py < by + bh
                 is_src = any(abs(px - ex) < 1.5 and abs(py - ey) < 1.5
-                             for ex, ey in ((x + 6.25, 85.6) for x in
-                                            (5.0, 20.5, 36.0, 51.5, 67.0, 82.5)))
+                             for ex, ey in ((x + 7.0, 89.0) for x in
+                                            (5.5, 20.5, 35.5, 50.5, 65.5, 80.5)))
                 assert not (inside_pt and not is_src), \
                     f"arrow endpoint buried in box {name} at ({px},{py})"
 
@@ -844,6 +987,7 @@ if __name__ == "__main__":
     graph_demo_report()
     graph_scenarios()
     graph_transfer()
+    graph_benchmarks()
     graph_architecture()
     graph_confusion("sent", SENTIMENT_LABELS, "sentiment (3-way)",
                     "confusion_sentiment.png", CYAN)

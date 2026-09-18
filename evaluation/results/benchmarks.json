@@ -1,0 +1,63 @@
+{
+ "seed": 42,
+ "engine": "models/saved/cerebro_engine",
+ "load_seconds": 0.016,
+ "engine_heads": [
+  "emotion",
+  "irony",
+  "passive_aggression",
+  "sarcasm",
+  "sentiment",
+  "tension",
+  "tone"
+ ],
+ "stage_latency_ms_per_message": {
+  "parse": 0.004,
+  "preprocess+features": 0.038,
+  "ml_heads": 11.294,
+  "hidden_signals": 9.244,
+  "temporal": 8.156,
+  "explainability": 3.19,
+  "segmentation": 0.008
+ },
+ "scaling": [
+  {
+   "n_messages": 10,
+   "total_s": 0.036,
+   "ms_per_message": 3.59,
+   "messages_per_second": 278.7
+  },
+  {
+   "n_messages": 50,
+   "total_s": 0.158,
+   "ms_per_message": 3.17,
+   "messages_per_second": 315.7
+  },
+  {
+   "n_messages": 200,
+   "total_s": 0.638,
+   "ms_per_message": 3.19,
+   "messages_per_second": 313.7
+  },
+  {
+   "n_messages": 500,
+   "total_s": 1.65,
+   "ms_per_message": 3.3,
+   "messages_per_second": 303.0
+  },
+  {
+   "n_messages": 1000,
+   "total_s": 3.328,
+   "ms_per_message": 3.33,
+   "messages_per_second": 300.5
+  }
+ ],
+ "memory_1000msg": {
+  "peak_mb": 8.9,
+  "report_size_kb": 3135.5
+ },
+ "api_50msg": {
+  "mean_s": 0.184,
+  "p95_s": 0.187
+ }
+}
