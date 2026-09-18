@@ -337,11 +337,14 @@ def graph_ablation():
                  ha="center", fontsize=13.5,
                  fontweight="bold" if v == max(sarc) else "normal",
                  color="white" if v == max(sarc) else "#D1D5DB")
-    ax1.annotate("", xy=(4, sarc[4] + .0035), xytext=(0, sarc[0] + .0035),
+    # lift bracket ABOVE every value label (labels top ≈ v+.006) — never
+    # crosses the bars' printed numbers
+    y_hi = max(sarc) + .013
+    ax1.annotate("", xy=(4, y_hi), xytext=(0, y_hi),
                  arrowprops=dict(arrowstyle="-|>", color=GREEN, lw=1.6,
-                                 connectionstyle="arc3,rad=-0.22"))
+                                 connectionstyle="arc3,rad=-0.18"))
     ax1.set_xticks(x, vlabels, fontsize=14.5)
-    ax1.set_ylim(0.90, max(sarc) + .022)
+    ax1.set_ylim(0.90, max(sarc) + .040)
     ax1.set_ylabel("Sarcasm ROC-AUC")
     ax1.set_title(f"Ranking gain per component · "
                   f"+{(sarc[4] - sarc[0]) * 100:.1f} pts AUC from the full stack",
@@ -605,7 +608,9 @@ def graph_demo_report():
     ax1.set_ylim(0, 128)
     ax1.set_yticks([0, 25, 50, 75, 100])
     for k, t in enumerate(demo["turning_points"]):
-        ax1.axvline(t["message_id"], color=PINK, ls=":", lw=1.3, alpha=.85)
+        # ymax caps the dotted line BELOW its own label — no line-through-text
+        ax1.axvline(t["message_id"], color=PINK, ls=":", lw=1.3, alpha=.85,
+                    ymax=0.84)
         ax1.text(t["message_id"], 110 if k % 2 == 0 else 120,
                  f'#{t["message_id"]} {t["tension_change"]:+.0f}',
                  fontsize=12.5, color=PINK, ha="center", va="bottom",
@@ -795,9 +800,12 @@ def graph_benchmarks():
     ns = [r["n_messages"] for r in rows]
     tot = [r["total_s"] for r in rows]
     ax1.plot(ns, tot, "-o", color=CYAN, lw=3, ms=10, mec=BG, zorder=3)
+    # labels BELOW-RIGHT of each point: on a rising log-x curve the incoming
+    # segment arrives from lower-left and the outgoing leaves up-right, so
+    # below-right is the empty quadrant (verified by the line-vs-text probe)
     for n, t in zip(ns, tot):
         ax1.annotate(f"{t:.2f}s", (n, t), textcoords="offset points",
-                     xytext=(0, 14), ha="center", fontsize=13.5,
+                     xytext=(9, -22), ha="left", fontsize=13.5,
                      fontweight="bold", color="white")
     ax1.set_xscale("log")
     ax1.set_xticks(ns, [str(n) for n in ns])
@@ -881,7 +889,10 @@ def graph_architecture():
     for txt, x in [("WhatsApp", 5.5), ("Discord", 20.5), ("Slack", 35.5),
                    ("CSV", 50.5), ("JSON", 65.5), ("plain", 80.5)]:
         box(x, 89.0, 14.0, 5.6, [txt], CYAN, fs=14.5, name=f"in:{txt}")
-        arrow(x + 7.0, 89.0, 50, 87.0, lw=1.4)
+        # fan into DISTINCT points across the parser's top edge — six
+        # arrowheads never stack on one another
+        tx = 50 + (x + 7.0 - 50) * 0.35
+        arrow(x + 7.0, 89.0, tx, 87.0, lw=1.4)
 
     # ---- UNDERSTANDING LAYER: parser → preprocess → context → repr ----
     band(55.5, 32.0, "UNDERSTANDING · §5 §8 §9 §17", PURPLE)
@@ -956,7 +967,7 @@ def graph_architecture():
         inside = any(bx <= x and x + w <= bx + bw and by <= y and y + h <= by + bh
                      for bx, by, bw, bh in bands_all)
         assert inside, f"box outside every band: {name}"
-    arrow_tips = [(x + 7.0, 89.0, 50, 87.0)
+    arrow_tips = [((x + 7.0), 89.0, 50 + (x + 7.0 - 50) * 0.35, 87.0)
                   for x in (5.5, 20.5, 35.5, 50.5, 65.5, 80.5)] + [
         (50, 81.0, 50, 79.8), (50, 72.0, 50, 71.2), (50, 63.8, 50, 62.9),
         (50, 56.3, 50, 53.3), (50, 46.5, 50, 45.2), (50, 38.6, 50, 37.4),
