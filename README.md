@@ -437,6 +437,8 @@ The repo ships a **Render Blueprint** — deploy without changing any code:
 Also runs anywhere containers run (`docker compose up --build`), and the free instance can be pointed at the local engine with zero config — the Dockerfile listens on `$PORT`.
 
 > **Free-tier notes (honest constraints):** Render's free instance sleeps after ~15 min idle (first request wakes it, ~30–60 s) and the conversation store is **in-memory with a 1-hour TTL** — restarts clear stored conversations by design (privacy, §40). A paid instance or an external store removes both limits.
+>
+> **Social preview:** [`docs/social_preview.png`](docs/social_preview.png) is a 1280×640 card rendered from real engine output — upload it once under *Settings → Social preview* so shared links show the engine, not a generic icon.
 
 ## 🔒 Privacy & ethics (PS-01 §40)
 
@@ -482,6 +484,7 @@ python -m pytest tests/ backend/tests/ -q
 | Zero-shot transfer (real GoEmotions) | `python evaluation/run_transfer.py` | `transfer_goemotions.json` + graph |
 | Fine-tune on real data (protocol) | `python evaluation/run_finetune.py` | `finetune_summary.json` (before/after) |
 | Efficiency benchmarks | `python scripts/benchmark.py` | `benchmarks.json` + graph |
+| Social preview (1280×640) | `python scripts/make_social_preview.py` | `docs/social_preview.png` |
 | API deepscan (17 checks) | `python scripts/deepscan_api.py` | pass/fail per endpoint |
 | Adversarial deepscan | `python scripts/deepscan_advanced.py` | scan-by-scan pass/fail |
 
