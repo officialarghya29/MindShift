@@ -1,0 +1,12 @@
+services:
+  # CEREBRO conversation-intelligence API + dashboard (PS-01 §31/§34)
+  - type: web
+    name: cerebro-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"

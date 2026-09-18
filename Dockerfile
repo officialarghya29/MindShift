@@ -12,4 +12,6 @@ COPY models/saved/ ./models/saved/
 COPY assets/ ./assets/
 
 EXPOSE 8000
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Render (and most PaaS) route traffic to $PORT; default to 8000 locally.
+ENV PORT=8000
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT}"]

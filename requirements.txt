@@ -11,3 +11,4 @@ httpx>=0.27
 pydantic>=2.6
 Pillow>=10.0
 pytest>=8.0
+fpdf2>=2.7  # optional: PDF report export (/conversation/{id}/report.pdf)

@@ -113,3 +113,15 @@ def test_upload_rejects_garbage():
     c = _client()
     r = c.post("/upload", files={"file": ("x.txt", io.BytesIO(b""), "text/plain")})
     assert r.status_code == 422
+
+
+def test_pdf_report_endpoint():
+    """PDF export returns a valid PDF document (PS-01 §30 P2 item)."""
+    c = _client()
+    r = c.post("/analyze", files={
+        "file": ("t.txt", b"Aarav: Hey!\nMeera: Fine. Do what you want then.\n")})
+    cid = r.json()["summary"]["conversation_id"]
+    p = c.get(f"/conversation/{cid}/report.pdf")
+    assert p.status_code == 200
+    assert p.headers["content-type"] == "application/pdf"
+    assert p.content[:4] == b"%PDF"
