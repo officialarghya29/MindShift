@@ -44,6 +44,7 @@ class MultiTaskEngine:
         self.heads = {}
         self.trained = False
         self.cfg: dict | None = None   # modality flags the engine was trained with
+        self.fusion_weights: dict | None = None  # validation-tuned (PS-01 §24)
 
     # ---------------- training ----------------
     def fit(self, convs: list[list[dict]], use_context=True, use_memory=True,
@@ -91,7 +92,7 @@ class MultiTaskEngine:
         import os
         os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
         joblib.dump({"vec": self.vec, "heads": self.heads, "seed": self.seed,
-                     "cfg": self.cfg},
+                     "cfg": self.cfg, "fusion_weights": self.fusion_weights},
                     path + ".joblib")
         return path + ".joblib"
 
@@ -102,6 +103,7 @@ class MultiTaskEngine:
         self.heads = blob["heads"]
         self.seed = blob["seed"]
         self.cfg = blob.get("cfg")
+        self.fusion_weights = blob.get("fusion_weights")
         self.trained = True
         return self
 

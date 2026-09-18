@@ -11,11 +11,11 @@ Sentiment · Emotion · Tone · Sarcasm · Irony · Passive-Aggression · Tensio
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.9-B388FF?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-7CFFB2?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/officialarghya29/MindShift/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-34%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-quality-gates--reproducibility)
+[![Tests](https://img.shields.io/badge/tests-39%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-quality-gates--reproducibility)
 [![Lint](https://img.shields.io/badge/pyflakes-0%20issues-7CFFB2?style=flat-square)](#-quality-gates--reproducibility)
 [![PS-01](https://img.shields.io/badge/problem_statement-PS--01--Tone%20Intelligence-FF5C8A?style=flat-square)](#-documentation)
 
-**📊 Figure — the two hero panels.** *Left:* the demo conversation's tension curve with its strongest turning point annotated (state change + robust z). *Right:* the five headline test metrics.
+**📊 Figure — the two hero panels, stacked.** *Top:* the demo conversation's tension curve with its strongest turning point annotated (state change + robust z). *Bottom:* the five headline test metrics.
 
 <div align="center">
   <img src="assets/graphs/hero_dashboard.png" alt="CEREBRO hero dashboard" width="100%"/>
@@ -39,7 +39,7 @@ Sentiment · Emotion · Tone · Sarcasm · Irony · Passive-Aggression · Tensio
 | [Why CEREBRO is different](#-why-cerebro-is-different) · [Theory](#-the-theory-behind-the-engine) · [Architecture](#-architecture) | the design and the ideas behind it |
 | [Corpus](#-the-corpus) · [Results](#-results--real-executed-reproducible) · [Robustness](#robustness--the-20-41-scenarios-executed-out-of-distribution) · [Worked example](#-worked-example--actual-pipeline-output) | data, real numbers, honest failure analysis |
 | [Quickstart](#-quickstart) · [API surface](#api-surface-ps-01-34) · [Dashboard](#dashboard) | run it yourself in under two minutes |
-| [Privacy & ethics](#-privacy--ethics-ps-01-40) · [Quality gates](#-quality-gates--reproducibility) · [Docs](#-documentation) · [Roadmap](#-roadmap) | governance, verification, next steps |
+| [Privacy & ethics](#-privacy--ethics-ps-01-40) · [Performance](#-performance--real-benchmarks) · [Quality gates](#-quality-gates--reproducibility) · [Docs](#-documentation) · [Roadmap](#-roadmap) | governance, verification, next steps |
 
 ---
 
@@ -92,9 +92,9 @@ The temporal engines treat a conversation as a **non-stationary emotional proces
 - **Turning points** — shifts detected by **robust z-scores** on first differences of tension (median/MAD scale, immune to outliers) — a change-point statistic in the spirit of CUSUM, reported as *model-estimated association*, never causal claim.
 - **Escalation** — trajectory classification (stable / escalating / de-escalating / volatile) via phase means + linear trend slope, with escalation onset = first sustained monotonic run above the baseline mean.
 
-### 4 · Fusion should be *tuned*, not hand-waved
+### 4 · Fusion weights are *tuned on validation* — or the fallback is disclosed
 
-PS-01 §24 asks for learned or validation-tuned fusion. CEREBRO composes six evidence streams — `text · context · memory · behavior · temporal · hidden` — with weights ∝ inverse reliability estimated on validation behavior, and applies **noisy-OR** composition for independent evidence channels (the probability that *no* source signals sarcasm, multiplied — the standard noisy-OR). All binary heads are **Platt-calibrated** (sigmoid on held-out folds) and reported with **Brier scores**.
+PS-01 §24 asks for learned or validation-tuned fusion. CEREBRO publishes six evidence streams — `text · context · memory · behavior · temporal · hidden` — per message, and `tune_fusion_weights` fits the stream weights on the **validation split** by minimizing the squared gap between fused confidence and validation *soft correctness* (a kernel of the tension error). When validation confidences saturate (the case on this corpus), the loss surface is flat, no weighting is identifiable — so the tuner **deterministically returns the documented fallback and says so**: `summary.json → fusion_tuning_status` records which happened. Hidden-signal probabilities compose via **noisy-OR** across independent evidence channels (learned head, contradiction prior, behavioral spike — the probability that *no* source signals sarcasm, multiplied), with sincerity markers damping the prior for cooperative messages. All binary heads are **Platt-calibrated** (sigmoid on held-out folds) and reported with **Brier scores**.
 
 ### 5 · Behavioral signals are thermometers, not verdicts
 
@@ -115,13 +115,13 @@ Response latency, CAPS ratio, message-length collapse (24 words → 7 words arou
 | Hidden signals | sarcasm ⊕ irony ⊕ passive-aggression (learned + symbolic) | `cerebro/models/hidden_signals.py` | §14–16 |
 | Temporal | arc · transitions · turning points · escalation | `cerebro/temporal/*.py` | §18–22 |
 | Topics | time-gap + TextTiling-style cohesion segmentation | `cerebro/features/segmentation.py` | §23 |
-| Fusion | validation-tuned stream composition | `cerebro/fusion/fusion.py` | §24–25 |
+| Fusion | validation-tuned stream weights (fallback disclosed) | `cerebro/fusion/fusion.py` | §24–25 |
 | Explainability | WHY? · WHAT CHANGED? · speaker profiles | `cerebro/explain/explanation_engine.py` | §26–29 |
 | Serving | FastAPI (upload→parse→analyze→report), TTL-bounded store | `backend/app/main.py` | §31, §34 |
 
 **📊 Figure — the whole system on one tall diagram.** Color bands = the four layers (input → understanding → intelligence → output); every box names its PS-01 section and maps to a real module in the table above.
 
-<div align="center"><img src="docs/architecture/architecture.png" width="56%"/></div>
+<div align="center"><img src="docs/architecture/architecture.png" width="100%"/></div>
 
 ---
 
@@ -145,7 +145,7 @@ CEREBRO trains on a **synthetic-but-annotated conversational corpus** built at g
 
 The corpus is generated, not harvested — chosen deliberately so every label is exact, the split is leak-free, and the full methodology is reproducible from a single `python -m evaluation.run_full` run. Public datasets (GoEmotions, SARC, iCas–Sarcasm, DailyDialog) plug into the same unified schema; see [dataset docs](docs/dataset/DATASET_CARD.md) for the license-checked extension path.
 
-**📊 Figure — the corpus at a glance.** *Left:* sentiment composition shifts negative as tension rises — the generator's arcs produce genuinely graded data. *Middle/right:* tension and conversation-length distributions with means marked.
+**📊 Figure — the corpus at a glance, stacked.** *Top:* sentiment composition shifts negative as tension rises — the generator's arcs produce genuinely graded data. *Middle/bottom:* tension and conversation-length distributions (means marked in the panel titles).
 
 ---
 
@@ -162,9 +162,9 @@ Protocol: seed 42 · 1,678 features (826 text n-grams + context block + 16 behav
 | B3 · TF-IDF + context window | 1.000 | 1.000 | 1.000 | 0.9328 | 3.227 |
 | **CEREBRO (E) · full engine** | 1.000 | 1.000 | 1.000 | **0.9695** | **3.079** |
 
-**📊 Figure — the two headline races.** *Left:* hidden-signal ROC-AUC per model — CEREBRO's evidence fusion takes sarcasm from 0.927 (text-only) to **0.9695**. *Right:* tension regression error — behavioral features cut MAE to **3.079**. (The AUC panel's y-axis starts at 0.88 so the small-but-consistent gaps are visible; this is labeled on the chart.)
+**📊 Figure — the two headline races, stacked.** *Top:* hidden-signal ROC-AUC per model — CEREBRO's evidence fusion takes sarcasm from 0.927 (text-only) to **0.9695**. *Bottom:* tension regression error — behavioral features cut MAE to **3.079**. (The AUC panel's y-axis starts at 0.88 so the small-but-consistent gaps are visible; this is labeled on the chart.)
 
-<div align="center"><img src="assets/graphs/baselines_vs_cerebro.png" width="96%"/></div>
+<div align="center"><img src="assets/graphs/baselines_vs_cerebro.png" width="100%"/></div>
 
 ### Ablation study (PS-01 §38) — what does each component buy?
 
@@ -178,9 +178,9 @@ Protocol: seed 42 · 1,678 features (826 text n-grams + context block + 16 behav
 
 **Reading:** the hidden-signal fusion layer (D→E) delivers the largest single ranking gain (+3.5 points sarcasm AUC over the best head), and behavioral features deliver the largest regression gain (MAE −3.9%). Context+memory help ranking modestly but stabilize the sequence models; their full value shows in the turning-point and escalation analyses, not in per-message accuracy.
 
-**📊 Figure — the same story, two panels.** *Left:* sarcasm AUC climbs with every added component; the arrow marks the **+4.3-point** total lift from A to E. *Right:* the MAE drop at D is where behavioral features pay off.
+**📊 Figure — the same story, two panels.** *Top:* sarcasm AUC climbs with every added component; the arrow marks the **+4.3-point** total lift from A to E. *Bottom:* the MAE drop at D is where behavioral features pay off.
 
-<div align="center"><img src="assets/graphs/ablation_study.png" width="96%"/></div>
+<div align="center"><img src="assets/graphs/ablation_study.png" width="100%"/></div>
 
 ### Full-system metric sheet — CEREBRO (E), test split
 
@@ -210,29 +210,31 @@ The table above is in-corpus. The honest stress test is **real human text**: 3,0
 
 **Reading — disclosed, not spun.** On real text the engine beats chance on every axis and its tension scale separates negative from positive valence well above coin-flip, but absolute emotion labels drift: the template-trained lexicons over-read *frustration* on neutral Reddit text (mean tension 51.4 vs ≈12 in-corpus). This is the documented teacher-forcing gap, now quantified — and the public-dataset adapters are the training-side fix. Full per-message results in [`evaluation/results/transfer_goemotions.json`](evaluation/results/transfer_goemotions.json).
 
-**📊 Figure — the transfer story in two panels.** *Left:* zero-shot accuracy vs the dashed chance lines. *Right:* label shift — gold vs predicted emotion shares; note the frustration bar where gold is neutral.
+**📊 Figure — the transfer story in two panels.** *Top:* zero-shot accuracy vs the dashed chance lines. *Bottom:* label shift — gold vs predicted emotion shares; note the frustration bar where gold is neutral.
 
-<div align="center"><img src="assets/graphs/transfer_goemotions.png" width="96%"/></div>
+<div align="center"><img src="assets/graphs/transfer_goemotions.png" width="100%"/></div>
 
 **📊 Figure — every reported metric on one honest axis.** All heads land between 0.92 and 1.0; the ranking metrics (AUCs) are where models genuinely separate.
 
-<div align="center"><img src="assets/graphs/capability_sheet.png" width="86%"/></div>
+<div align="center"><img src="assets/graphs/capability_sheet.png" width="100%"/></div>
 
 ### Where the model disagrees with itself — confusion structure
 
 **📊 Figure 1 — sentiment (3-way).** A nearly perfect diagonal, as the honesty note below explains.
 
-<div align="center"><img src="assets/graphs/confusion_sentiment.png" width="46%"/>&nbsp;<img src="assets/graphs/confusion_emotion.png" width="46%"/></div>
+<div align="center"><img src="assets/graphs/confusion_sentiment.png" width="100%"/></div>
 
-**📊 Figure 2 — emotion (13-way, left) and tone (14-way, below).** Row-normalized recall; off-diagonal mass concentrates on semantically adjacent pairs (frustration↔anger, casual↔friendly).
+**📊 Figure 2 — emotion (13-way).** Row-normalized recall; off-diagonal mass concentrates on semantically adjacent pairs (frustration↔anger, casual↔friendly). Tone (14-way) follows below.
 
-<div align="center"><img src="assets/graphs/confusion_tone.png" width="62%"/></div>
+<div align="center"><img src="assets/graphs/confusion_emotion.png" width="100%"/></div>
+
+<div align="center"><img src="assets/graphs/confusion_tone.png" width="100%"/></div>
 
 ### Calibration — can you trust the confidences?
 
 **📊 Figure — reliability curves.** All three hidden-signal heads hug the diagonal (Brier ≤ 0.020), so a stated 0.8 confidence really means ≈80% on this distribution.
 
-<div align="center"><img src="assets/graphs/calibration_curves.png" width="70%"/></div>
+<div align="center"><img src="assets/graphs/calibration_curves.png" width="100%"/></div>
 
 ### Error analysis (PS-01 §39) — with noise attribution
 
@@ -274,7 +276,7 @@ WHAT CHANGED @5: { "tension_delta": 16.3, "emotion_shift": "frustration → frus
 
 **📊 Figure — full per-message readout of the demo conversation.** *Top:* tension curve with every detected turning point marked `#id Δtension`. *Bottom:* the three hidden-signal probability traces against the 0.5 decision threshold — watch passive-aggression (green) spike exactly at *"Fine. Do what you want then."* (#5) and decay after the apology.
 
-<div align="center"><img src="assets/graphs/demo_report.png" width="92%"/></div>
+<div align="center"><img src="assets/graphs/demo_report.png" width="100%"/></div>
 
 **OOD fix note:** *"Wow. Great. Just great."* was the documented weak spot (0.22 in earlier runs) — literal-positive sarcasm with no recognized failure words in its window. The contradiction evidence now also reads **ambient tension heat** (a heated exchange is a negative situational context even when its words are neutral) and **echoic repetition** (use→mention shift on repeated positive words), while sincerity markers ("thanks", "I'll…") damp the same evidence for cooperative messages. It now scores **0.61** with supporting signals `positive wording in negative context · marker words: great, great · repeated wording: great`; the 2 borderline FPs this gate trades are disclosed in the error table above.
 
@@ -325,13 +327,33 @@ All 20 PS-01 §41 scenario types (emoji-heavy, slang-heavy, rapid/slow timing, m
 | 18 | irony | ✅ irony/sarcasm highest of all scenarios (sarc 0.35 / irony 0.41) though below threshold |
 | 19–20 | humor · malformed | ✅ executed; null bytes and empty messages survived |
 
-**📊 Figure — all 20 scenarios side by side.** Left: mean (bars) and peak (ticks) tension per scenario vs the training-corpus mean; green = scenarios where calm is expected. Right: hidden-signal probability traces — note the PA separation on scenario 5 and the near-zero false alarms on ambiguous scenario 17.
+**📊 Figure — all 20 scenarios side by side.** *Top:* mean (bars) and peak (ticks) tension per scenario vs the training-corpus mean; green = scenarios where calm is expected. *Bottom:* hidden-signal probability traces — note the PA separation on scenario 5 and the near-zero false alarms on ambiguous scenario 17.
 
 <div align="center"><img src="assets/graphs/scenario_robustness.png" width="100%"/></div>
 
-> **OOD honesty note.** The engine never crashes and separates conflict from calm, but absolute emotion labels on unseen phrasing drift (benign chats read as tension ≈40; the OOD sarcastic scenario reaches sarc 0.29 — the *worked example* below shows the pipeline catching fresh sarcastic phrasing at 0.61 once context evidence accumulates). This is the documented teacher-forcing gap: the model has only seen template phrasings. The public-dataset adapters (P2) are the structural fix.
+> **OOD honesty note.** The engine never crashes and separates conflict from calm, but absolute emotion labels on unseen phrasing drift (benign chats read as tension ≈40; the OOD sarcastic scenario reaches sarc 0.29 — the *worked example* below shows the pipeline catching fresh sarcastic phrasing at 0.61 once context evidence accumulates). This is the documented teacher-forcing gap: the model has only seen template phrasings. The public-dataset adapters (P2) are the structural fix.---
+
+## ⚡ Performance — real benchmarks
+
+Measured with [`scripts/benchmark.py`](scripts/benchmark.py) against the **persisted engine** on a single CPU core (results in [`evaluation/results/benchmarks.json`](evaluation/results/benchmarks.json)):
+
+| Metric | Value |
+|---|---|
+| Model cold-load | **0.016 s** |
+| End-to-end throughput | **≈300 messages/s** (flat from 10 → 1,000 messages) |
+| 1,000-message conversation | **3.3 s** total, 3.3 ms/msg |
+| Peak memory @ 1,000 messages | **8.9 MB** (analysis only) |
+| API round-trip (50 msgs, incl. HTTP) | **184 ms** mean · 187 ms p95 |
+| Dominant cost | ML heads ≈ 38% of stage time — the context/temporal/explain stages are nearly free |
+
+> Latency scales **linearly** with conversation length — the context window and decayed speaker memory keep per-message cost constant, so there is no blow-up on long chats. Full per-stage table and the scaling plot are rendered below.
+
+**📊 Figure — efficiency, measured.** *Top:* end-to-end latency up to 1,000 messages (log-x). *Bottom:* where the time goes per message.
+
+<div align="center"><img src="assets/graphs/efficiency_benchmarks.png" width="100%"/></div>
 
 ---
+
 ## 🚀 Quickstart
 
 ```bash
@@ -390,7 +412,7 @@ uvicorn backend.app.main:app --port 8000
 
 Features: drag-and-drop upload (all parser formats), auto-detect platform, live emotional-arc and hidden-signal charts (no JS libraries), a clickable message inspector wired to the WHY? panel, turning-point badges, escalation zone, and speaker stats — with a graceful offline demo mode when the API isn't running.
 
-<div align="center"><img src="docs/dashboard_preview.png" width="88%"/></div>
+<div align="center"><img src="docs/dashboard_preview.png" width="100%"/></div>
 *Dashboard preview (offline demo mode, real engine output values).*
 
 ## ☁️ Deployment
@@ -422,7 +444,7 @@ Every gate below is executable against this repository right now — no gate is 
 |---|---|---|
 | CI (GitHub Actions) | lint → tests → metric gates → training smoke → graph smoke on every push | ✅ [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 | Static analysis (0 warnings) | `python -m pyflakes cerebro/ backend/ evaluation/ tests/ scripts/` | ✅ 0 issues |
-| Unit + API test suite | `python -m pytest tests/ backend/tests/ -q` | ✅ 34 passed |
+| Unit + API test suite | `python -m pytest tests/ backend/tests/ -q` | ✅ 39 passed |
 | Module import audit | all 29 project modules import cleanly | ✅ |
 | API end-to-end (real engine) | `python scripts/deepscan_api.py` | ✅ 17/17 checks |
 | Adversarial robustness | `python scripts/deepscan_advanced.py` — 500-payload parser fuzz, pipeline fuzz, state-leak, numeric bounds, schema | ✅ all scans |
@@ -432,7 +454,7 @@ Every gate below is executable against this repository right now — no gate is 
 | Docs integrity | image links, cross-references, 10 tables column-aligned | ✅ |
 | Determinism | scenario outputs byte-identical across re-runs (seed 42) | ✅ |
 
-**34 functional tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases), the public-dataset adapters (GoEmotions/SARC/DailyDialog conversion + schema validation), PDF report export, and the full API flow with a stubbed pipeline:
+**39 functional tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases), the public-dataset adapters (GoEmotions/SARC/DailyDialog conversion + schema validation), PDF report export, fusion-weight tuning (simplex validity, fallback honesty, determinism), and the full API flow with a stubbed pipeline:
 
 ```bash
 python -m pytest tests/ backend/tests/ -q
@@ -448,6 +470,7 @@ python -m pytest tests/ backend/tests/ -q
 | Live API demo | `python scripts/demo_api.py` | per-message readout to stdout |
 | Zero-shot transfer (real GoEmotions) | `python evaluation/run_transfer.py` | `transfer_goemotions.json` + graph |
 | Fine-tune on real data (protocol) | `python evaluation/run_finetune.py` | `finetune_summary.json` (before/after) |
+| Efficiency benchmarks | `python scripts/benchmark.py` | `benchmarks.json` + graph |
 | API deepscan (17 checks) | `python scripts/deepscan_api.py` | pass/fail per endpoint |
 | Adversarial deepscan | `python scripts/deepscan_advanced.py` | scan-by-scan pass/fail |
 
@@ -463,14 +486,14 @@ MindShift/
 │   ├── context/                #   §8,§9  context window · speaker memory
 │   ├── models/                 #   §6,§10–16 baselines · 7-head engine · hidden signals
 │   ├── temporal/               #   §18–22 arc · transitions · turning points · escalation
-│   ├── fusion/                 #   §24–25 tuned fusion
+│   ├── fusion/                 #   §24–25 validation-tuned fusion (fallback disclosed)
 │   ├── explain/                #   §26–29 WHY? · WHAT CHANGED? · speaker profiles
 │   └── data/                   #   §3–4  corpus generator + domain templates
 ├── backend/                    #   §31,§34 FastAPI service + API tests
 ├── frontend/                   #   zero-build futuristic dashboard (index.html)
 ├── evaluation/                 #   §37–39 runner · results · graph generation
 │   └── results/                #   the actual JSONs behind every table above
-├── scripts/                    #   demo_api.py · deepscan_api.py · deepscan_advanced.py
+├── scripts/                    #   demo_api.py · deepscans · benchmark.py
 ├── assets/graphs/              #   logo-branded charts (dark futuristic)
 ├── docs/                       #   dataset card · methodology · architecture
 ├── models/saved/               #   persisted engine (joblib)

@@ -460,11 +460,15 @@ def eval_stage():
     print("error analysis (40 test conversations)...")
     errs = error_analysis(engine, splits["test"][:40])
 
+    print("tuning fusion weights on validation (leave-one-stream-out, PS-01 §24)...")
+    from cerebro.models.pipeline import CerebroPipeline
+    pipe = CerebroPipeline.from_trained(engine, val_convs=splits["val"])
+    engine.fusion_weights = pipe.fusion_weights
+    print(f"  tuned: {engine.fusion_weights}")
+
     engine.save("models/saved/cerebro_engine")
     print("engine saved → models/saved/cerebro_engine.joblib")
 
-    from cerebro.models.pipeline import CerebroPipeline
-    pipe = CerebroPipeline.from_trained(engine)
     demo = pipe.analyze([dict(m) for m in splits["test"][0]])
     save_json(demo, f"{RESULTS_DIR}/demo_report.json")
     print(f"demo report: {demo['summary']['n_messages']} msgs, "
@@ -481,6 +485,11 @@ def eval_stage():
         "n_features_text": n_text,
         "corpus_stats": stats,
         "full_metrics": full_metrics,
+        "fusion_weights": engine.fusion_weights,
+        "fusion_tuning_status": (
+            "tuned on validation" if engine.fusion_weights !=
+            __import__("cerebro.fusion.fusion", fromlist=["_DEFAULT_W"])._DEFAULT_W
+            else "fallback (validation confidences saturated — weights unidentifiable, disclosed)"),
         "error_analysis": errs,
         "wall_time_seconds": round(time.time() - t_start, 1),
     }, f"{RESULTS_DIR}/summary.json")
