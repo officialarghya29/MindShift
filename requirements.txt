@@ -12,3 +12,11 @@ pydantic>=2.6
 Pillow>=10.0
 pytest>=8.0
 fpdf2>=2.7  # optional: PDF report export (/conversation/{id}/report.pdf)
+
+# Optional, evaluation-only (NOT needed to serve the API or run the dashboard):
+#   onnxruntime — runs the frozen pretrained-transformer baselines B2/B3
+#                 via `python -m evaluation.run_transformer_baseline`.
+#   It is imported lazily inside cerebro/models/transformer_baseline.py, so a
+#   deployment without it is unaffected. Kept out of this file deliberately so
+#   the container stays small and CI stays fast.
+#   pip install onnxruntime

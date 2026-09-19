@@ -1,0 +1,546 @@
+{
+ "corpus": {
+  "conversations": 588,
+  "messages": 10956,
+  "speakers_per_conversation": 2.0,
+  "avg_messages_per_conversation": 18.63,
+  "sarcasm_positive_rate": 0.0381,
+  "irony_positive_rate": 0.0361,
+  "passive_aggression_positive_rate": 0.0391,
+  "sentiment_distribution": {
+   "positive": 6110,
+   "neutral": 2474,
+   "negative": 2372
+  },
+  "tension_mean": 26.14
+ },
+ "splits": {
+  "train": 411,
+  "val": 88,
+  "test": 89
+ },
+ "n_test_messages": 1648,
+ "context": {
+  "n_probe_turns": 176,
+  "ceiling": 0.6364,
+  "text_only": 0.6364,
+  "full": 0.9091,
+  "full_emotion": 0.9318,
+  "full_tone": 0.9545,
+  "seen_full": 1.0,
+  "gain_pp": 27.3,
+  "mcnemar_p": 0.0,
+  "ci95": [
+   0.2102,
+   0.3466
+  ],
+  "tx_no_context": 0.6364,
+  "tx_context": 0.9773,
+  "flip_sentiment": 0.7273
+ },
+ "metrics": {
+  "sarcasm_auc": 0.9485,
+  "irony_auc": 0.9267,
+  "pa_auc": 0.9386,
+  "tension_mae": 3.205,
+  "tension_r2": 0.9753,
+  "latency_ms": 3.48,
+  "ece_sentiment": 0.0064,
+  "ece_emotion": 0.0171,
+  "ece_tone": 0.0189
+ },
+ "baselines": {
+  "B1_tfidf_logreg": {
+   "sentiment": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "emotion": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "tone": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "sarcasm": {
+    "accuracy": 0.9933,
+    "precision": 0.9966,
+    "recall": 0.9141,
+    "f1_macro": 0.9513,
+    "f1_weighted": 0.993,
+    "roc_auc": 0.9352,
+    "pr_auc": 0.8888,
+    "brier": 0.006
+   },
+   "irony": {
+    "accuracy": 0.9933,
+    "precision": 0.9965,
+    "recall": 0.9154,
+    "f1_macro": 0.9521,
+    "f1_weighted": 0.993,
+    "roc_auc": 0.9292,
+    "pr_auc": 0.8507,
+    "brier": 0.0072
+   },
+   "passive_aggression": {
+    "accuracy": 0.9939,
+    "precision": 0.9968,
+    "recall": 0.9306,
+    "f1_macro": 0.9611,
+    "f1_weighted": 0.9937,
+    "roc_auc": 0.9398,
+    "pr_auc": 0.8934,
+    "brier": 0.0063
+   },
+   "tension": {
+    "mae": 3.359,
+    "rmse": 4.38,
+    "r2": 0.9723
+   },
+   "escalation": {
+    "accuracy": 0.9788,
+    "precision": 0.9533,
+    "recall": 0.9514,
+    "f1_macro": 0.9523,
+    "f1_weighted": 0.9787
+   },
+   "latency_ms": 3.68
+  },
+  "B2_tfidf_svc": {
+   "sentiment": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "emotion": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "tone": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "sarcasm": {
+    "accuracy": 0.9951,
+    "precision": 0.9975,
+    "recall": 0.9375,
+    "f1_macro": 0.9654,
+    "f1_weighted": 0.995,
+    "roc_auc": 0.9323,
+    "pr_auc": 0.8844,
+    "brier": 0.0049
+   },
+   "irony": {
+    "accuracy": 0.9933,
+    "precision": 0.9965,
+    "recall": 0.9154,
+    "f1_macro": 0.9521,
+    "f1_weighted": 0.993,
+    "roc_auc": 0.9351,
+    "pr_auc": 0.8514,
+    "brier": 0.0067
+   },
+   "passive_aggression": {
+    "accuracy": 0.9945,
+    "precision": 0.9972,
+    "recall": 0.9375,
+    "f1_macro": 0.9652,
+    "f1_weighted": 0.9944,
+    "roc_auc": 0.9434,
+    "pr_auc": 0.8987,
+    "brier": 0.0055
+   },
+   "tension": {
+    "mae": 3.359,
+    "rmse": 4.38,
+    "r2": 0.9723
+   },
+   "escalation": {
+    "accuracy": 0.9788,
+    "precision": 0.9533,
+    "recall": 0.9514,
+    "f1_macro": 0.9523,
+    "f1_weighted": 0.9787
+   },
+   "latency_ms": 6.57
+  },
+  "B3_tfidf_context": {
+   "sentiment": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "emotion": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "tone": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "sarcasm": {
+    "accuracy": 0.9933,
+    "precision": 0.9966,
+    "recall": 0.9141,
+    "f1_macro": 0.9513,
+    "f1_weighted": 0.993,
+    "roc_auc": 0.9465,
+    "pr_auc": 0.8885,
+    "brier": 0.0069
+   },
+   "irony": {
+    "accuracy": 0.9921,
+    "precision": 0.9959,
+    "recall": 0.9,
+    "f1_macro": 0.9424,
+    "f1_weighted": 0.9917,
+    "roc_auc": 0.9437,
+    "pr_auc": 0.8556,
+    "brier": 0.0081
+   },
+   "passive_aggression": {
+    "accuracy": 0.9927,
+    "precision": 0.9962,
+    "recall": 0.9167,
+    "f1_macro": 0.9526,
+    "f1_weighted": 0.9924,
+    "roc_auc": 0.9429,
+    "pr_auc": 0.9107,
+    "brier": 0.0069
+   },
+   "tension": {
+    "mae": 3.405,
+    "rmse": 4.444,
+    "r2": 0.9715
+   },
+   "escalation": {
+    "accuracy": 0.9782,
+    "precision": 0.9527,
+    "recall": 0.9491,
+    "f1_macro": 0.9509,
+    "f1_weighted": 0.9781
+   },
+   "latency_ms": 3.18
+  }
+ },
+ "ablations": {
+  "A": {
+   "sentiment": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "emotion": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "tone": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "sarcasm": {
+    "accuracy": 0.9933,
+    "precision": 0.9966,
+    "recall": 0.9141,
+    "f1_macro": 0.9513,
+    "f1_weighted": 0.993,
+    "roc_auc": 0.9352,
+    "pr_auc": 0.8888,
+    "brier": 0.006
+   },
+   "irony": {
+    "accuracy": 0.9933,
+    "precision": 0.9965,
+    "recall": 0.9154,
+    "f1_macro": 0.9521,
+    "f1_weighted": 0.993,
+    "roc_auc": 0.9292,
+    "pr_auc": 0.8507,
+    "brier": 0.0072
+   },
+   "passive_aggression": {
+    "accuracy": 0.9939,
+    "precision": 0.9968,
+    "recall": 0.9306,
+    "f1_macro": 0.9611,
+    "f1_weighted": 0.9937,
+    "roc_auc": 0.9398,
+    "pr_auc": 0.8934,
+    "brier": 0.0063
+   },
+   "tension": {
+    "mae": 3.359,
+    "rmse": 4.38,
+    "r2": 0.9723
+   },
+   "escalation": {
+    "accuracy": 0.9788,
+    "precision": 0.9533,
+    "recall": 0.9514,
+    "f1_macro": 0.9523,
+    "f1_weighted": 0.9787
+   },
+   "latency_ms": 3.09
+  },
+  "B": {
+   "sentiment": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "emotion": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "tone": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "sarcasm": {
+    "accuracy": 0.9933,
+    "precision": 0.9966,
+    "recall": 0.9141,
+    "f1_macro": 0.9513,
+    "f1_weighted": 0.993,
+    "roc_auc": 0.9465,
+    "pr_auc": 0.8885,
+    "brier": 0.0069
+   },
+   "irony": {
+    "accuracy": 0.9921,
+    "precision": 0.9959,
+    "recall": 0.9,
+    "f1_macro": 0.9424,
+    "f1_weighted": 0.9917,
+    "roc_auc": 0.9437,
+    "pr_auc": 0.8556,
+    "brier": 0.0081
+   },
+   "passive_aggression": {
+    "accuracy": 0.9927,
+    "precision": 0.9962,
+    "recall": 0.9167,
+    "f1_macro": 0.9526,
+    "f1_weighted": 0.9924,
+    "roc_auc": 0.9429,
+    "pr_auc": 0.9107,
+    "brier": 0.0069
+   },
+   "tension": {
+    "mae": 3.405,
+    "rmse": 4.444,
+    "r2": 0.9715
+   },
+   "escalation": {
+    "accuracy": 0.9782,
+    "precision": 0.9527,
+    "recall": 0.9491,
+    "f1_macro": 0.9509,
+    "f1_weighted": 0.9781
+   },
+   "latency_ms": 3.21
+  },
+  "C": {
+   "sentiment": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "emotion": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "tone": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "sarcasm": {
+    "accuracy": 0.9933,
+    "precision": 0.9966,
+    "recall": 0.9141,
+    "f1_macro": 0.9513,
+    "f1_weighted": 0.993,
+    "roc_auc": 0.946,
+    "pr_auc": 0.8883,
+    "brier": 0.0068
+   },
+   "irony": {
+    "accuracy": 0.9921,
+    "precision": 0.9959,
+    "recall": 0.9,
+    "f1_macro": 0.9424,
+    "f1_weighted": 0.9917,
+    "roc_auc": 0.9415,
+    "pr_auc": 0.8547,
+    "brier": 0.0082
+   },
+   "passive_aggression": {
+    "accuracy": 0.9939,
+    "precision": 0.9968,
+    "recall": 0.9306,
+    "f1_macro": 0.9611,
+    "f1_weighted": 0.9937,
+    "roc_auc": 0.9442,
+    "pr_auc": 0.9048,
+    "brier": 0.0069
+   },
+   "tension": {
+    "mae": 3.404,
+    "rmse": 4.446,
+    "r2": 0.9715
+   },
+   "escalation": {
+    "accuracy": 0.9782,
+    "precision": 0.9544,
+    "recall": 0.947,
+    "f1_macro": 0.9507,
+    "f1_weighted": 0.9781
+   },
+   "latency_ms": 3.32
+  },
+  "D": {
+   "sentiment": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "emotion": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "tone": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_macro": 1.0,
+    "f1_weighted": 1.0
+   },
+   "sarcasm": {
+    "accuracy": 0.9939,
+    "precision": 0.9969,
+    "recall": 0.9219,
+    "f1_macro": 0.9561,
+    "f1_weighted": 0.9937,
+    "roc_auc": 0.9451,
+    "pr_auc": 0.8889,
+    "brier": 0.0068
+   },
+   "irony": {
+    "accuracy": 0.9921,
+    "precision": 0.9959,
+    "recall": 0.9,
+    "f1_macro": 0.9424,
+    "f1_weighted": 0.9917,
+    "roc_auc": 0.9328,
+    "pr_auc": 0.8511,
+    "brier": 0.0083
+   },
+   "passive_aggression": {
+    "accuracy": 0.9933,
+    "precision": 0.9889,
+    "recall": 0.9302,
+    "f1_macro": 0.9575,
+    "f1_weighted": 0.9931,
+    "roc_auc": 0.9448,
+    "pr_auc": 0.9021,
+    "brier": 0.007
+   },
+   "tension": {
+    "mae": 3.205,
+    "rmse": 4.139,
+    "r2": 0.9753
+   },
+   "escalation": {
+    "accuracy": 0.9794,
+    "precision": 0.9555,
+    "recall": 0.9518,
+    "f1_macro": 0.9536,
+    "f1_weighted": 0.9793
+   },
+   "latency_ms": 3.36
+  }
+ },
+ "audit": {
+  "conversation_overlap": 0,
+  "shared_templates": 62,
+  "distinct_texts": 62,
+  "min_kappa": 0.915,
+  "messages": 10956,
+  "conversations": 588,
+  "leakage_pass": true
+ },
+ "bench": {
+  "load_s": 0.016,
+  "peak_mb": 8.9,
+  "api_mean": 0.184,
+  "msgs_per_s": 88.5
+ },
+ "scenarios": {
+  "n": 20,
+  "passed": 20
+ },
+ "transfer": {
+  "dataset": "google-research-datasets/go_emotions (simplified), research license",
+  "zero_shot_emotion": 0.136,
+  "zero_shot_valence_auc": 0.6909,
+  "ft_emotion": 0.4459,
+  "ft_top3": 0.7528,
+  "ft_sentiment": 0.6071,
+  "ft_valence_auc": 0.8276
+ }
+}

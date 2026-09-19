@@ -4,22 +4,22 @@
   "n_val_conversations": 88,
   "n_test_conversations": 89,
   "n_test_messages": 1648,
-  "n_features_total": 1678,
-  "n_features_text": 826,
+  "n_features_total": 1852,
+  "n_features_text": 913,
   "corpus_stats": {
     "conversations": 588,
     "messages": 10956,
     "speakers_per_conversation": 2.0,
     "avg_messages_per_conversation": 18.63,
-    "sarcasm_positive_rate": 0.0282,
-    "irony_positive_rate": 0.0339,
-    "passive_aggression_positive_rate": 0.0406,
+    "sarcasm_positive_rate": 0.0381,
+    "irony_positive_rate": 0.0361,
+    "passive_aggression_positive_rate": 0.0391,
     "sentiment_distribution": {
-      "positive": 5670,
-      "neutral": 2615,
-      "negative": 2671
+      "positive": 6110,
+      "neutral": 2474,
+      "negative": 2372
     },
-    "tension_mean": 25.9
+    "tension_mean": 26.14
   },
   "full_metrics": {
     "sentiment": {
@@ -44,48 +44,98 @@
       "f1_weighted": 1.0
     },
     "sarcasm": {
-      "accuracy": 0.9945,
-      "precision": 0.9648,
-      "recall": 0.9366,
-      "f1_macro": 0.9502,
-      "f1_weighted": 0.9945,
-      "roc_auc": 0.9697,
-      "pr_auc": 0.9097,
-      "brier": 0.0119
+      "accuracy": 0.9921,
+      "precision": 0.9633,
+      "recall": 0.9284,
+      "f1_macro": 0.9451,
+      "f1_weighted": 0.992,
+      "roc_auc": 0.9485,
+      "pr_auc": 0.8859,
+      "brier": 0.0207
     },
     "irony": {
-      "accuracy": 0.9945,
-      "precision": 0.9698,
-      "recall": 0.9455,
-      "f1_macro": 0.9573,
-      "f1_weighted": 0.9945,
-      "roc_auc": 0.9509,
-      "pr_auc": 0.9032,
-      "brier": 0.01
+      "accuracy": 0.9909,
+      "precision": 0.9694,
+      "recall": 0.9067,
+      "f1_macro": 0.9357,
+      "f1_weighted": 0.9906,
+      "roc_auc": 0.9267,
+      "pr_auc": 0.8379,
+      "brier": 0.0195
     },
     "passive_aggression": {
-      "accuracy": 0.9945,
-      "precision": 0.9972,
-      "recall": 0.9262,
-      "f1_macro": 0.9588,
-      "f1_weighted": 0.9943,
-      "roc_auc": 0.9194,
-      "pr_auc": 0.888,
-      "brier": 0.0193
+      "accuracy": 0.9939,
+      "precision": 0.9893,
+      "recall": 0.9372,
+      "f1_macro": 0.9617,
+      "f1_weighted": 0.9938,
+      "roc_auc": 0.9386,
+      "pr_auc": 0.8985,
+      "brier": 0.0198
     },
     "tension": {
-      "mae": 3.074,
-      "rmse": 3.961,
-      "r2": 0.9774
+      "mae": 3.205,
+      "rmse": 4.143,
+      "r2": 0.9753
     },
     "escalation": {
-      "accuracy": 0.9812,
-      "precision": 0.9626,
-      "recall": 0.9534,
-      "f1_macro": 0.958,
-      "f1_weighted": 0.9811
+      "accuracy": 0.9794,
+      "precision": 0.9555,
+      "recall": 0.9518,
+      "f1_macro": 0.9536,
+      "f1_weighted": 0.9793
     },
-    "latency_ms": 3.5
+    "calibration": {
+      "sentiment": {
+        "ece": 0.0064,
+        "mce": 0.0339,
+        "mean_confidence": 0.9936,
+        "accuracy": 1.0,
+        "n_bins_used": 10,
+        "n": 1648
+      },
+      "emotion": {
+        "ece": 0.0171,
+        "mce": 0.0691,
+        "mean_confidence": 0.9829,
+        "accuracy": 1.0,
+        "n_bins_used": 10,
+        "n": 1648
+      },
+      "tone": {
+        "ece": 0.0189,
+        "mce": 0.0761,
+        "mean_confidence": 0.9811,
+        "accuracy": 1.0,
+        "n_bins_used": 10,
+        "n": 1648
+      },
+      "sarcasm": {
+        "ece": 0.0637,
+        "mce": 0.2131,
+        "mean_confidence": 0.1015,
+        "accuracy": 0.0388,
+        "n_bins_used": 8,
+        "n": 1648
+      },
+      "irony": {
+        "ece": 0.0472,
+        "mce": 0.1996,
+        "mean_confidence": 0.0832,
+        "accuracy": 0.0394,
+        "n_bins_used": 10,
+        "n": 1648
+      },
+      "passive_aggression": {
+        "ece": 0.0709,
+        "mce": 0.2016,
+        "mean_confidence": 0.1112,
+        "accuracy": 0.0437,
+        "n_bins_used": 10,
+        "n": 1648
+      }
+    },
+    "latency_ms": 3.48
   },
   "fusion_weights": {
     "text": 0.3,
@@ -98,28 +148,35 @@
   "fusion_tuning_status": "fallback (validation confidences saturated — weights unidentifiable, disclosed)",
   "error_analysis": {
     "counts": {
-      "passive_aggression:false_negative": 6,
-      "sarcasm:false_negative": 1,
-      "sarcasm:false_positive": 1,
-      "irony:false_positive": 1
+      "sarcasm:false_negative": 5,
+      "irony:false_negative": 4,
+      "passive_aggression:false_negative": 5,
+      "sarcasm:false_positive": 3,
+      "irony:false_positive": 2,
+      "passive_aggression:false_positive": 1
     },
     "binary_breakdown": {
-      "passive_aggression:false_negative": 6,
-      "sarcasm:false_negative": 1,
-      "sarcasm:false_positive": 1,
-      "irony:false_positive": 1
+      "sarcasm:false_negative": 5,
+      "irony:false_negative": 4,
+      "passive_aggression:false_negative": 5,
+      "sarcasm:false_positive": 3,
+      "irony:false_positive": 2,
+      "passive_aggression:false_positive": 1
     },
     "noise_attribution": {
-      "passive_aggression:false_negative": 6,
-      "sarcasm:false_negative": 1
+      "passive_aggression:false_negative": 5,
+      "sarcasm:false_negative": 4,
+      "irony:false_negative": 3
     },
     "real_errors_after_noise_removal": {
+      "sarcasm:false_negative": 1,
+      "irony:false_negative": 1,
       "passive_aggression:false_negative": 0,
-      "sarcasm:false_negative": 0,
-      "sarcasm:false_positive": 1,
-      "irony:false_positive": 1
+      "sarcasm:false_positive": 3,
+      "irony:false_positive": 2,
+      "passive_aggression:false_positive": 1
     },
-    "n_samples": 9
+    "n_samples": 20
   },
-  "wall_time_seconds": 53.7
+  "wall_time_seconds": 53.3
 }

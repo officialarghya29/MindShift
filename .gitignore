@@ -27,3 +27,9 @@ evaluation/results/transfer_goemotions_full.json
 # fine-tune engine artifact stays local-only
 evaluation/results/finetune_engine.joblib
 models/saved/finetune_engine.joblib
+
+# downloaded pretrained weights for the evaluation-only transformer baselines
+# (~90 MB, re-fetched on demand by cerebro/models/transformer_baseline.py)
+models/cache/
+
+docs/presentation/slides.pdf.tmp

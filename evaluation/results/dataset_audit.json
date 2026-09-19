@@ -4,91 +4,136 @@
       0.0037,
       0.0375
     ],
+    "annotator_agreement": {
+      "emotion": {
+        "alpha": 1.0,
+        "expected_agreement": 0.1251,
+        "kappa": 1.0,
+        "n": 10956,
+        "observed_agreement": 1.0
+      },
+      "irony": {
+        "alpha": 0.9435,
+        "expected_agreement": 0.9338,
+        "kappa": 0.9435,
+        "n": 10956,
+        "observed_agreement": 0.9963
+      },
+      "passive_aggression": {
+        "alpha": 0.915,
+        "expected_agreement": 0.9302,
+        "kappa": 0.915,
+        "n": 10956,
+        "observed_agreement": 0.9941
+      },
+      "sarcasm": {
+        "alpha": 0.9182,
+        "expected_agreement": 0.9319,
+        "kappa": 0.9182,
+        "n": 10956,
+        "observed_agreement": 0.9944
+      },
+      "sentiment": {
+        "alpha": 1.0,
+        "expected_agreement": 0.4089,
+        "kappa": 1.0,
+        "n": 10956,
+        "observed_agreement": 1.0
+      },
+      "tone": {
+        "alpha": 1.0,
+        "expected_agreement": 0.1455,
+        "kappa": 1.0,
+        "n": 10956,
+        "observed_agreement": 1.0
+      }
+    },
     "flips_per_head": {
-      "irony": 42,
-      "passive_aggression": 60,
-      "sarcasm": 44
+      "irony": 41,
+      "passive_aggression": 65,
+      "sarcasm": 61
     },
     "injected_rate": 0.015,
-    "measured_rate": 0.0133,
-    "messages_with_flipped_label": 146,
-    "note": "measured disagreement is the ONLY label inconsistency; the template design is taken as ground truth",
+    "measured_rate": 0.0152,
+    "messages_with_flipped_label": 167,
+    "min_kappa": 0.915,
+    "note": "annotator B is simulated (design + injected disagreement), so \u03ba/\u03b1 quantify the injected noise, not human rater variance; a human multi-annotator study remains future work",
     "passed": true
   },
   "class_imbalance": {
     "emotion": {
       "counts": {
-        "affection": 821,
-        "anger": 732,
-        "anxiety": 592,
-        "confusion": 145,
-        "disgust": 136,
-        "excitement": 411,
-        "fear": 68,
-        "frustration": 928,
-        "joy": 1604,
-        "neutral": 2983,
-        "relief": 1535,
-        "sadness": 588,
-        "surprise": 0
+        "affection": 666,
+        "anger": 633,
+        "anxiety": 540,
+        "confusion": 106,
+        "disgust": 179,
+        "excitement": 340,
+        "fear": 61,
+        "frustration": 982,
+        "joy": 1960,
+        "neutral": 2483,
+        "relief": 1264,
+        "sadness": 540,
+        "surprise": 862
       },
-      "imbalance_ratio": 2983.0,
-      "majority_share": 0.2723,
+      "imbalance_ratio": 40.7,
+      "majority_share": 0.2266,
       "ok": true
     },
     "irony": {
-      "imbalance_ratio": 28.53,
-      "negative": 10585,
+      "imbalance_ratio": 26.67,
+      "negative": 10560,
       "note": "binary heads are deliberately minority-positive",
       "ok": true,
-      "positive": 371,
-      "positive_rate": 0.0339
+      "positive": 396,
+      "positive_rate": 0.0361
     },
     "passive_aggression": {
-      "imbalance_ratio": 23.62,
-      "negative": 10511,
+      "imbalance_ratio": 24.6,
+      "negative": 10528,
       "note": "binary heads are deliberately minority-positive",
       "ok": true,
-      "positive": 445,
-      "positive_rate": 0.0406
+      "positive": 428,
+      "positive_rate": 0.0391
     },
     "sarcasm": {
-      "imbalance_ratio": 34.46,
-      "negative": 10647,
+      "imbalance_ratio": 25.27,
+      "negative": 10539,
       "note": "binary heads are deliberately minority-positive",
       "ok": true,
-      "positive": 309,
-      "positive_rate": 0.0282
+      "positive": 417,
+      "positive_rate": 0.0381
     },
     "sentiment": {
       "counts": {
-        "negative": 2671,
-        "neutral": 2615,
-        "positive": 5670
+        "negative": 2372,
+        "neutral": 2474,
+        "positive": 6110
       },
-      "imbalance_ratio": 2.17,
-      "majority_share": 0.5175,
+      "imbalance_ratio": 2.58,
+      "majority_share": 0.5577,
       "ok": true
     },
     "tone": {
       "counts": {
-        "aggressive": 399,
-        "apologetic": 645,
-        "casual": 2701,
-        "cold": 358,
-        "concerned": 182,
-        "defensive": 503,
-        "dismissive": 207,
-        "friendly": 2858,
-        "frustrated": 307,
-        "humorous": 0,
-        "passive-aggressive": 185,
-        "professional": 1457,
-        "sarcastic": 265,
-        "supportive": 889
+        "aggressive": 353,
+        "apologetic": 598,
+        "casual": 2557,
+        "cold": 325,
+        "concerned": 310,
+        "defensive": 404,
+        "dismissive": 195,
+        "friendly": 2659,
+        "frustrated": 260,
+        "humorous": 849,
+        "passive-aggressive": 181,
+        "professional": 1242,
+        "sarcastic": 301,
+        "supportive": 722
       },
-      "imbalance_ratio": 2858.0,
-      "majority_share": 0.2609,
+      "imbalance_ratio": 14.69,
+      "majority_share": 0.2427,
       "ok": true
     }
   },
@@ -112,34 +157,34 @@
     "passed": true
   },
   "duplicate_messages": {
-    "distinct_normalized_texts": 54,
-    "max_repeats_of_one_text": 424,
+    "distinct_normalized_texts": 62,
+    "max_repeats_of_one_text": 348,
     "messages": 10956,
     "note": "expected for a template corpus; reported so the saturation of the classification heads is never mistaken for a modelling win",
     "passed": true,
-    "template_reuse_factor": 202.889
+    "template_reuse_factor": 176.71
   },
   "label_leakage_empirical": {
     "heads": {
       "emotion": {
-        "chi2_p": 0.1657,
+        "chi2_p": 0.3624,
         "chi2_testable": true,
-        "classes_absent_from_corpus": 1,
-        "max_class_share_deviation": 0.0201,
+        "classes_absent_from_corpus": 0,
+        "max_class_share_deviation": 0.0164,
         "ok": true
       },
       "sentiment": {
-        "chi2_p": 0.0487,
+        "chi2_p": 0.0778,
         "chi2_testable": true,
         "classes_absent_from_corpus": 0,
-        "max_class_share_deviation": 0.0309,
+        "max_class_share_deviation": 0.0267,
         "ok": true
       },
       "tone": {
-        "chi2_p": 0.512,
+        "chi2_p": 0.378,
         "chi2_testable": true,
-        "classes_absent_from_corpus": 1,
-        "max_class_share_deviation": 0.0297,
+        "classes_absent_from_corpus": 0,
+        "max_class_share_deviation": 0.0164,
         "ok": true
       }
     },
@@ -184,15 +229,15 @@
   "n_messages": 10956,
   "passed": true,
   "split_balance": {
-    "cohens_d": 0.0696,
+    "cohens_d": 0.0751,
     "criterion": "|Cohen's d| < 0.2 (negligible)",
-    "ks_p_value": 0.0023,
+    "ks_p_value": 0.0021,
     "note": "the split is hash-ranked by conversation id, not stratified by arc, so a small tension drift between splits is expected; the effect size above is what matters",
     "passed": true,
-    "test_mean": 27.21,
-    "test_sd": 26.32,
-    "train_mean": 25.41,
-    "train_sd": 25.81
+    "test_mean": 27.61,
+    "test_sd": 26.33,
+    "train_mean": 25.69,
+    "train_sd": 25.48
   },
   "synthetic_overrepresentation": {
     "arcs": 7,
@@ -221,6 +266,6 @@
     "conversation_overlap_val": 0,
     "note": "template phrasings recur across splits by construction; whole conversations never do, so no context is ever shared",
     "passed": true,
-    "shared_template_texts_train": 54
+    "shared_template_texts_train": 62
   }
 }

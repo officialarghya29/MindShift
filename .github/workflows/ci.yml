@@ -76,14 +76,58 @@ jobs:
                 bm["memory_1000msg"]["peak_mb"], "MB peak @1k")
           EOF
 
-      - name: Training smoke (tiny corpus, ~90s, exit-code only)
+      - name: Training smoke (tiny corpus, exit-code only)
         run: |
           python - <<'EOF'
-          import sys
-          from evaluation.run_full import fit_stage, eval_stage
-          fit_stage(convs_per_cell=3)
-          eval_stage()
-          print("training smoke OK")
+          import os, tempfile
+          from evaluation import run_full
+          # run the smoke into a throwaway results dir: fitting on a tiny corpus
+          # produces deliberately bad metrics, and clobbering evaluation/results/
+          # would feed those into the graph step below
+          tmp = tempfile.mkdtemp(prefix="ci_smoke_")
+          run_full.RESULTS_DIR = tmp
+          run_full.fit_stage(convs_per_cell=3)
+          run_full.eval_stage()
+          assert sorted(os.listdir(tmp)), "smoke wrote nothing"
+          print("training smoke OK (results isolated to", tmp, ")")
+          EOF
+
+      - name: Dataset quality & leakage audit (PS-01 §38)
+        run: |
+          PYTHONPATH=. python -m evaluation.audit_dataset
+          python - <<'EOF'
+          import json
+          a = json.load(open("evaluation/results/dataset_audit.json"))
+          assert a["passed"], a
+          sep = a["conversation_level_separation"]
+          assert all(v == 0 for v in sep["id_overlaps"].values()), sep
+          assert a["duplicate_conversations"]["duplicate_conversations"] == 0
+          assert abs(a["split_balance"]["cohens_d"]) < 0.2, a["split_balance"]
+          heads = a["label_leakage_empirical"]["heads"]
+          assert all(h["classes_absent_from_corpus"] == 0 for h in heads.values()), heads
+          print("dataset audit gates OK: 0 split overlap · d =",
+                a["split_balance"]["cohens_d"], "· min kappa",
+                a["annotation_consistency"]["min_kappa"])
+          EOF
+
+      - name: Context-dependence proof gate (PS-01 §3 — the headline claim)
+        run: |
+          PYTHONPATH=. python -m evaluation.run_context_proof
+          python - <<'EOF'
+          import json
+          r = json.load(open("evaluation/results/context_proof.json"))
+          reg = r["regimes"][r["primary_regime"]]
+          v, ceil = reg["variants"], reg["text_only_lexical_ceiling"]
+          for head in ("sentiment", "emotion", "tone"):
+              a = v["A"][head]["accuracy"]
+              e = v["E"][head]["accuracy"]
+              # the design REQUIRES text-only to sit on the analytic ceiling;
+              # if that ever drifts the experiment has silently broken
+              assert abs(a - ceil[head]["accuracy"]) < 1e-9, (head, a, ceil[head])
+              assert e - a >= 0.20, (head, a, e)
+              print(f"  {head}: text-only {a:.4f} == ceiling | full {e:.4f} "
+                    f"(+{(e - a) * 100:.1f} pp)")
+          print("context proof gate OK — context beats the ceiling-bound reader")
           EOF
 
       - name: Graphs (full suite + 7 legibility validators per figure)
@@ -94,3 +138,20 @@ jobs:
 
       - name: Figure audit (independent of the in-process validators)
         run: python scripts/audit_figures.py
+
+      - name: Docs integrity (links, anchors, figure embeds)
+        run: python scripts/audit_docs.py
+
+      - name: Presentation deck regenerates from the measured results
+        run: |
+          python scripts/make_deck.py
+          test -f docs/presentation/slides.html
+          python - <<'EOF'
+          import json, re
+          h = open("docs/presentation/slides.html", encoding="utf-8").read()
+          assert h.count('class="slide"') == 10, "expected 10 slides"
+          assert not re.findall(r"\{[A-Z_]+\}", h), "unsubstituted placeholder"
+          facts = json.load(open("docs/presentation/facts.json"))
+          assert facts["context"]["gain_pp"] > 0
+          print("deck OK: 10 slides |", facts["context"]["gain_pp"], "pp context gain")
+          EOF

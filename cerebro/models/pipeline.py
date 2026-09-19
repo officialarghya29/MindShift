@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from cerebro.common.labels import SCHEMA_VERSION
 from cerebro.models.engines import MultiTaskEngine
 from cerebro.models.hidden_signals import apply_hidden_signals
 from cerebro.fusion.fusion import fuse_conversation, _DEFAULT_W
@@ -74,10 +75,16 @@ class CerebroPipeline:
                             "sarcasm_level": 0.0, "irony_level": 0.0,
                             "passive_aggression_level": 0.0, "mean_tension": 0.0,
                             "peak_tension": 0.0, "trajectory": "stable"},
+                "conversation": {"conversation_id": conversation_id,
+                                 "platform": "generic", "message_count": 0,
+                                 "speakers": [], "first_timestamp": None,
+                                 "last_timestamp": None,
+                                 "schema_version": SCHEMA_VERSION},
                 "messages": [], "emotional_arc": None, "emotion_transitions": [],
                 "transition_matrix": None, "turning_points": [],
                 "escalation": classify_trajectory([]), "escalation_phases": [],
-                "speaker_profiles": [], "explanations": [], "topics": None,
+                "speaker_profiles": [], "speakers": [],
+                "explanations": [], "topics": None,
                 "disclaimer": ("All outputs are model-estimated with calibrated confidence; "
                                "turning points are associations, not causal claims."),
             }
@@ -121,7 +128,27 @@ class CerebroPipeline:
             "trajectory": escalation["trajectory"],
         }
 
+        # blueprint §33 puts `speaker` and a per-message `explanation` on each
+        # message. The canonical explanation list stays top-level, so we attach
+        # the same object here rather than computing it twice — the two views are
+        # always identical by construction.
+        for r, ex in zip(results, explanations):
+            r["speaker"] = r["speaker_id"]
+            r["explanation"] = ex
+
+        # blueprint §33 conversation block
+        conversation = {
+            "conversation_id": conversation_id,
+            "platform": messages[0].get("platform", "uploaded"),
+            "message_count": n,
+            "speakers": sorted({r["speaker"] for r in results}),
+            "first_timestamp": messages[0].get("timestamp"),
+            "last_timestamp": messages[-1].get("timestamp"),
+            "schema_version": SCHEMA_VERSION,
+        }
+
         return {
+            "conversation": conversation,
             "summary": summary,
             "messages": results,
             "emotional_arc": arc,
@@ -131,6 +158,7 @@ class CerebroPipeline:
             "escalation": escalation,
             "escalation_phases": phases,
             "speaker_profiles": profiles,
+            "speakers": profiles,          # blueprint §33 name for the same data
             "explanations": explanations,
             "topics": None,  # filled by caller via segmentation if desired
             "disclaimer": ("All outputs are model-estimated with calibrated confidence; "

@@ -28,11 +28,14 @@ Sentiment · Emotion · Tone · Sarcasm · Irony · Passive-Aggression · Tensio
 
 | 🏆 | |
 |---|---|
-| 🎯 | **Sarcasm ROC-AUC 0.9695 · tension MAE 3.08** on held-out conversations — every headline backed by a re-runnable command |
+| 🧪 | **Controlled proof that context is required, not merely helpful** — on a probe set where the wording is identical and only the history differs, text-only *and* a frozen pretrained transformer both land **exactly on the analytic ceiling (0.636)**; adding context reaches **0.909–0.955** (+27 pp, McNemar p < 10⁻⁸) |
+| 🎯 | **Sarcasm ROC-AUC 0.9485 · tension MAE 3.21** on held-out conversations — every headline backed by a re-runnable command |
 | ⚡ | **≈300 messages/s, flat to 1,000-message chats** · 8.9 MB peak memory · 184 ms API round-trip — measured, not estimated |
 | 🔍 | **Zero crashes across 500 adversarial payloads**, state-leak-proof, all probabilities bounds-checked — validated on every push by CI |
 | 🧠 | **Explainability built-in**: every prediction ships WHY? evidence (detected ≠ inferred), WHAT CHANGED? deltas, and speaker profiles |
-| 📊 | **14 legibility-verified figures** — regenerated from real executed results by code that *refuses to ship clipped titles, colliding labels or lines-through-text* (7 independent checks per figure, run in CI) |
+| 📊 | **16 legibility-verified figures** — regenerated from real executed results by code that *refuses to ship clipped titles, colliding labels or lines-through-text* (7 independent checks per figure, run in CI) |
+| 📐 | **Calibrated, not just accurate**: top-1 ECE 0.006–0.019 on the categorical heads · min annotator κ 0.92 — because a confidence you cannot trust is not a result |
+| 🎤 | **[Presentation deck](docs/presentation/slides.html)** (10 slides, [PDF](docs/presentation/slides.pdf)) generated *from* the result files — a claim that was not measured cannot reach a slide |
 | 🔬 | **Honest science**: a saturated corpus is called saturated, a transfer gap is quantified, the fallback is disclosed — nothing is spun |
 
 ---
@@ -47,7 +50,7 @@ Sentiment · Emotion · Tone · Sarcasm · Irony · Passive-Aggression · Tensio
 
 | | |
 |---|---|
-| [Why CEREBRO is different](#-why-cerebro-is-different) · [Theory](#-the-theory-behind-the-engine) · [Architecture](#-architecture) | the design and the ideas behind it |
+| [**The controlled proof**](#-the-controlled-proof--context-is-required-not-merely-helpful) · [Why CEREBRO is different](#-why-cerebro-is-different) · [Theory](#-the-theory-behind-the-engine) · [Architecture](#-architecture) | the evidence first, then the design and the ideas behind it |
 | [Corpus](#-the-corpus) · [Results](#-results--real-executed-reproducible) · [Robustness](#robustness--the-20-41-scenarios-executed-out-of-distribution) · [Worked example](#-worked-example--actual-pipeline-output) | data, real numbers, honest failure analysis |
 | [Quickstart](#-quickstart) · [API surface](#api-surface-ps-01-34) · [Dashboard](#dashboard) | run it yourself in under two minutes |
 | [Privacy & ethics](#-privacy--ethics-ps-01-40) · [Performance](#-performance--real-benchmarks) · [Quality gates](#-quality-gates--reproducibility) · [Docs](#-documentation) · [Roadmap](#-roadmap) | governance, verification, next steps |
@@ -71,6 +74,47 @@ Most NLP pipelines score each message **in isolation**. CEREBRO never does. The 
 ```
 
 The same sentence — *"Fine."* — is **neutral acceptance** in a calm chat and a **concessive withdrawal** after three broken promises. Isolated classifiers cannot tell the difference. CEREBRO's speaker memory and context window can.
+
+---
+
+## 🧪 The controlled proof — context is *required*, not merely helpful
+
+PS-01's central question is whether context and history actually improve understanding over message-only analysis. The corpus above **cannot answer that question**, and it is worth being explicit about why: every utterance there carries a *fixed* label, so a text-only model is already Bayes-optimal and context has literally no information to add. Reporting only that corpus would be reporting a measurement that could not have come out any other way.
+
+So we built the complementary experiment — [`cerebro/data/context_probes.py`](cerebro/data/context_probes.py), run by [`evaluation/run_context_proof.py`](evaluation/run_context_proof.py):
+
+- **16 ambiguous utterance types** (*"Fine."*, *"Sure."*, *"Whatever."*, *"No problem."*, *"Wow, perfect timing."*, …) that PS-01 §12 names by hand, each instantiated over a **benign** and a **tense** history built from the same corpus vocabulary, plus **6 unambiguous controls**.
+- **Utterance-level label balance**: every probe appears equally often with each of its gold labels, so the mutual information between the words and the label is **0 by construction**. A context-free model cannot beat the majority-class rate, and the analytic ceiling is `(16 × ½ + 6) / 22 = 0.6364`.
+- **Held-out history wording**: a whole history *script* is withheld from training, so a model cannot succeed by memorising the history text — it has to read the state.
+- **72.7% of probe utterances flip** sentiment, emotion and tone between the two conditions.
+
+### What happens when the words are the same and only the history differs
+
+176 held-out probe turns, unseen history wording:
+
+| Variant | Sentiment | Emotion | Tone | PA F1 | Tension MAE ↓ |
+|---|---|---|---|---|---|
+| **Analytic text-only ceiling** | **0.6364** | **0.6364** | **0.6364** | — | — |
+| A · text only | 0.6364 | 0.6364 | 0.6364 | 0.698 | 18.59 |
+| B · + context window | 0.6591 | 0.7045 | 0.6364 | 0.880 | 17.85 |
+| C · + speaker memory | 0.6364 | 0.8182 | 0.7955 | 0.924 | 18.77 |
+| D · + behavioral features | 0.9091 | 0.9318 | 0.9545 | 0.443 | 13.86 |
+| **E · full CEREBRO** | **0.9091** | **0.9318** | **0.9545** | **0.781** | **13.86** |
+| E · same test, *seen* history wording | 1.000 | 1.000 | 1.000 | 0.804 | 7.02 |
+
+**Reading it honestly.**
+
+- **Text-only lands exactly on the analytic ceiling** (0.6364 at all three heads) — the design check that makes the rest of the table meaningful. Not *near* the ceiling: *exactly* on it, as the design requires.
+- **Context closes the gap**: **+27.3 pp sentiment**, **+29.5 pp emotion**, **+31.8 pp tone**. Exact McNemar: 48 vs 0 discordant pairs for sentiment (**p < 10⁻¹⁴**), 60 vs 8 emotion (p ≈ 3 × 10⁻¹⁰), 64 vs 8 tone (p ≈ 6 × 10⁻¹¹). Bootstrap 95% CI on the sentiment gain: **[+21.0, +34.7] pp**.
+- **A raw context window is not enough.** Variant B — context with no memory, no behavioural features — is **not** statistically distinguishable from text-only on unseen wording (p = 1.0; CI on the sentiment delta spans zero, −7.4 to +12.5 pp). The information is there, but a bag-of-neighbours representation does not transfer it. Speaker memory and behavioural features are what convert it.
+- **Fusion earns its place on the hardest head.** Passive-aggression F1 *drops* at D (0.443) as behavioural features flood the head, and recovers to **0.781** only once hidden-signal fusion re-weights the evidence — the clearest case in the project of §24 fusion doing real work.
+- **The plausible failure mode is the one we tested.** If we had tested on the history wording the model trained on, every variant from B onward would score 1.000 and the result would have meant nothing. That row is shown for exactly that reason.
+
+**📊 Figure — the proof, in one image.** *Panels 1–3:* the component ladder for sentiment, emotion and tone; the dashed orange line is the analytic ceiling. *Panel 4:* why the ceiling is the right comparison — a **frozen pretrained transformer** (B2) sits on it too, and only gains by being given the history (B3).
+
+<div align="center"><img src="assets/graphs/context_proof.png" width="100%"/></div>
+
+> **Scope, stated plainly.** The probe corpus is *constructed, not sampled* — its purpose is to isolate the mechanism, not to estimate field accuracy. It says: when context is the only available evidence, CEREBRO uses it (+27 to +32 pp over a ceiling-bound reader). It does not say the engine is 91% accurate on real conversations; [the transfer section](#zero-shot-transfer-to-real-text--goemotions-measured-and-disclosed) reports what happens on real human text, where numbers are much lower and are reported as such.
 
 ---
 
@@ -150,9 +194,13 @@ CEREBRO trains on a **synthetic-but-annotated conversational corpus** built at g
 | Speakers / conversation | 2.0 |
 | Split (by conversation, no leakage) | 411 train / 88 val / 89 test |
 | Messages per split | 7,748 / 1,560 / 1,648 |
-| Sentiment distribution | 5,670 positive · 2,615 neutral · 2,671 negative |
-| Positive-class rates | sarcasm 2.82% · irony 3.39% · passive-aggression 4.06% |
-| Tension | mean 25.9, range 0–100 |
+| Sentiment distribution | 6,110 positive · 2,474 neutral · 2,372 negative |
+| Positive-class rates | sarcasm 3.81% · irony 3.61% · passive-aggression 3.91% |
+| Tension | mean 26.1, range 0–100 |
+| Emotion classes with support | **13 / 13** (incl. *surprise*) |
+| Tone classes with support | **14 / 14** (incl. *humorous*) |
+
+All 13 emotion and all 14 tone classes now carry non-zero support. They previously did not: *surprise* and *humorous* had **zero** training examples, which meant the two heads were structurally **incapable** of emitting them no matter what the input said. The dataset audit caught this (`class_imbalance.*.classes_absent_from_corpus`), and the fix was to author covering turns in all three arousal bands rather than to hide the dead classes.
 
 The corpus is generated, not harvested — chosen deliberately so every label is exact, the split is leak-free, and the full methodology is reproducible from a single `python -m evaluation.run_full` run. Public datasets (GoEmotions, SARC, iCas–Sarcasm, DailyDialog) plug into the same unified schema; see [dataset docs](docs/dataset/DATASET_CARD.md) for the license-checked extension path.
 
@@ -160,53 +208,127 @@ The corpus is generated, not harvested — chosen deliberately so every label is
 
 ---
 
+### Data quality & leakage audit (PS-01 §38)
+
+PS-01 §38 calls leakage/quality control *"critical for credible results"*. It is not
+a checklist we assert — it is a program: [`evaluation/audit_dataset.py`](evaluation/audit_dataset.py)
+regenerates the corpus and re-derives every claim from the data, writing
+[`dataset_audit.json`](evaluation/results/dataset_audit.json) and failing loudly if a
+check regresses.
+
+| Check | Method | Result |
+|---|---|---|
+| Conversation-level separation | id-set intersection across splits | **0** train↔test, 0 train↔val, 0 val↔test |
+| Static label leakage | AST scan of `split_conversations()` for any label field | **0** label fields referenced; keys on `conversation_id` only |
+| Empirical label leakage | per-head χ² of class share vs split size | p = 0.078 / 0.362 / 0.378 — no split-dependent label drift |
+| Duplicate conversations | normalised signature grouping | 588 distinct signatures, **0** duplicates |
+| Duplicate messages | normalised text reuse | **62** distinct texts over 10,956 messages (reuse ×176.7) — *disclosed, not hidden* |
+| Test-set contamination | template phrasings shared between train and test | 62/62 shared — reported explicitly, with whole conversations never shared |
+| Split balance | Cohen's *d* on tension (p-values at n≈10⁴ are the wrong yardstick) | d = **0.075** → negligible |
+| Synthetic overrepresentation | 6 × 7 design grid coverage | every cell exactly 14 conversations |
+| Class coverage | count classes with zero support | **0** (was 2 — see corpus note above) |
+| Annotation agreement | Cohen's κ + Krippendorff's α, design vs released label | κ = α = **1.00** on categorical heads, **0.915–0.944** on the hidden signals |
+| Licensing | per-source licence + raw-text-committed flag | 4 sources checked, none committing restricted raw text |
+
+**Two honest distinctions this table is designed to force.**
+
+1. **Duplicate messages are not duplication of *context*.** Template phrasings recur
+   across splits by construction, but a whole conversation never does — so no model
+   ever sees a message's own history at training time. That is the leakage mode that
+   matters, and it is zero. The reuse factor is printed anyway, because a reader who
+   discovered it unaided would be right to distrust the table above it.
+2. **κ/α here measure simulated disagreement, not human rater variance.** Annotator
+   B is the released label = design + injected flips, so the numbers quantify the
+   injected 1.5% disagreement (measured 1.52%, flips 61/41/65 across the three hidden
+   signals). A human multi-annotator study is on the roadmap and is *not* claimed here.
+
+---
+
 ## 📈 Results — real, executed, reproducible
 
-Protocol: seed 42 · 1,678 features (826 text n-grams + context block + 16 behavioral + 10 memory) · test = **89 held-out conversations** · sequential inference with **predicted-history** speaker memory (deployment-faithful) · every number below is produced by [`evaluation/run_full.py`](evaluation/run_full.py) and stored verbatim in [`evaluation/results/`](evaluation/results/).
+Protocol: seed 42 · 1,852 features (913 text n-grams + context block + 16 behavioral + 10 memory) · test = **89 held-out conversations** · sequential inference with **predicted-history** speaker memory (deployment-faithful) · every number below is produced by [`evaluation/run_full.py`](evaluation/run_full.py) and stored verbatim in [`evaluation/results/`](evaluation/results/).
 
-### Baselines vs CEREBRO (PS-01 §6)
+### Baselines vs CEREBRO (PS-01 §6, §9)
 
-| Model | Sentiment F1 (macro) | Emotion F1 | Tone F1 | Sarcasm ROC-AUC | Tension MAE ↓ |
-|---|---|---|---|---|---|
-| B1 · TF-IDF + Logistic Regression | 1.000 | 1.000 | 1.000 | 0.9270 | 3.205 |
-| B2 · TF-IDF + Linear SVC | 1.000 | 1.000 | 1.000 | **0.9414** | 3.205 |
-| B3 · TF-IDF + context window | 1.000 | 1.000 | 1.000 | 0.9328 | 3.227 |
-| **CEREBRO (E) · full engine** | 1.000 | 1.000 | 1.000 | **0.9695** | **3.079** |
+PS-01 §9 asks for three specific reference points. The table maps each blueprint slot
+to what we actually built, keeping the extra lexical controls as well:
 
-**📊 Figure — the two headline races, stacked.** *Top:* hidden-signal ROC-AUC per model — CEREBRO's evidence fusion takes sarcasm from 0.927 (text-only) to **0.9695**. *Bottom:* tension regression error — behavioral features cut MAE to **3.079**. (The AUC panel's y-axis starts at 0.88 so the small-but-consistent gaps are visible; this is labeled on the chart.)
+| §9 slot | Implementation | Sentiment F1 | Emotion F1 | Tone F1 | Sarcasm ROC-AUC | Tension MAE ↓ |
+|---|---|---|---|---|---|---|
+| **B1** · TF-IDF + Logistic Regression | lexical control | 1.000 | 1.000 | 1.000 | 0.9352 | 3.359 |
+| *B1b* · TF-IDF + Linear SVC | extra lexical control | 1.000 | 1.000 | 1.000 | 0.9323 | 3.359 |
+| *B1c* · TF-IDF + context window | extra lexical control | 1.000 | 1.000 | 1.000 | 0.9465 | 3.405 |
+| **B2** · Pretrained Transformer + classification head | **frozen `sentence-transformers/all-MiniLM-L6-v2`** (ONNX, CPU) + same heads, no fine-tuning | 1.000 | 0.9986 | 1.000 | 0.9326 | 3.791 |
+| **B3** · Transformer + conversation context | MiniLM utterance embedding ⊕ mean history embedding | 1.000 | 0.9991 | 1.000 | 0.9348 | 3.856 |
+| **CEREBRO (E)** · full engine | context + memory + behaviour + temporal + fusion | 1.000 | 1.000 | 1.000 | **0.9485** | **3.205** |
+
+The transformer baselines run through [`cerebro/models/transformer_baseline.py`](cerebro/models/transformer_baseline.py)
+— a frozen public encoder executed via `onnxruntime` with a self-contained BERT
+WordPiece tokenizer, so **no new runtime dependency enters the service** and §41's
+"do not train a large model from scratch" holds: the innovation is context, memory,
+temporal reasoning and fusion, not pre-training.
+
+**Reading the in-corpus table honestly.** Every model family saturates here — the
+frozen transformer included — which is the *point*: this corpus measures system
+integrity, not language understanding, and its 62 distinct phrasings are disclosed
+in the [leakage audit](#data-quality--leakage-audit-ps-01-38). Where real separation
+appears is (a) tension error and (b) **ranking** quality on the rare hidden signals,
+where CEREBRO's evidence fusion is the only component that lifts sarcasm AUC above
+every text-only and transformer competitor.
+
+**📊 Figure — the two races that actually separate, stacked.** *Top:* hidden-signal ROC-AUC per model — CEREBRO's evidence fusion takes sarcasm from 0.935 (text-only) to **0.9485**. *Bottom:* tension regression error — behavioural features cut MAE to **3.205**, below both transformer baselines (3.79 / 3.86). (The AUC panel's y-axis starts at 0.88 so the small-but-consistent gaps are visible; this is labeled on the chart.)
 
 <div align="center"><img src="assets/graphs/baselines_vs_cerebro.png" width="100%"/></div>
+
+**📊 Figure — the transformer baselines in full.** *Top:* on the probe set, B2 (no context) sits exactly on the lexical ceiling while B3 (+ context) jumps — a second, independent confirmation of the §3 claim. *Bottom:* on the template corpus all families converge, which is exactly why the probe experiment is the informative one.
+
+<div align="center"><img src="assets/graphs/transformer_baselines.png" width="100%"/></div>
 
 ### Ablation study (PS-01 §38) — what does each component buy?
 
 | Variant | Configuration | Sarcasm AUC ↑ | Tension MAE ↓ | Tension R² ↑ |
 |---|---|---|---|---|
-| A | text only | 0.9270 | 3.205 | 0.9744 |
-| B | + context window | 0.9328 | 3.227 | 0.9739 |
-| C | + speaker memory | 0.9344 | 3.226 | 0.9740 |
-| D | + behavioral features (full heads) | 0.9342 | **3.079** | 0.9774 |
-| **E** | **full CEREBRO (D + hidden-signal fusion + temporal)** | **0.9695** | **3.079** | **0.9774** |
+| A | text only | 0.9352 | 3.359 | 0.9723 |
+| B | + context window | **0.9465** | 3.405 | 0.9715 |
+| C | + speaker memory | 0.9460 | 3.404 | 0.9715 |
+| D | + behavioral features (full heads) | 0.9451 | **3.205** | **0.9753** |
+| **E** | **full CEREBRO (D + hidden-signal fusion + temporal)** | **0.9485** | **3.205** | **0.9753** |
 
-**Reading:** the hidden-signal fusion layer (D→E) delivers the largest single ranking gain (+3.5 points sarcasm AUC over the best head), and behavioral features deliver the largest regression gain (MAE −3.9%). Context+memory help ranking modestly but stabilize the sequence models; their full value shows in the turning-point and escalation analyses, not in per-message accuracy.
+**Reading — and a correction to the earlier version of this table.** On a corpus
+where the text alone already determines the label, an ablation *cannot* show a
+context benefit, and it does not: A→C differences here are within noise, and the
+honest conclusion is that **this corpus is the wrong instrument for that question**.
+What it does show is that behavioural features carry the regression gain (MAE
+3.36 → 3.21, R² 0.972 → 0.975) and that hidden-signal fusion adds the final
+ranking lift (0.9451 → 0.9485).
 
-**📊 Figure — the same story, two panels.** *Top:* sarcasm AUC climbs with every added component; the arrow marks the **+4.25-point** total lift from A to E. *Bottom:* the MAE drop at D is where behavioral features pay off.
+The question "does context help?" is answered where it *can* be answered — the
+controlled probe experiment above, where context is worth **+27 to +32 pp** and a
+raw context window alone is provably insufficient.
+
+**📊 Figure — the same story, two panels.** *Top:* sarcasm AUC across the ladder; the arrow marks the total lift from A to E. *Bottom:* the MAE drop at D is where behavioural features pay off.
 
 <div align="center"><img src="assets/graphs/ablation_study.png" width="100%"/></div>
 
 ### Full-system metric sheet — CEREBRO (E), test split
 
-| Head | Accuracy | Precision | Recall | F1 (macro) | ROC-AUC | PR-AUC | Brier ↓ |
-|---|---|---|---|---|---|---|---|
-| Sentiment (3-way) | 1.000 | 1.000 | 1.000 | 1.000 | — | — | — |
-| Emotion (13-way) | 1.000 | 1.000 | 1.000 | 1.000 | — | — | — |
-| Tone (14-way) | 1.000 | 1.000 | 1.000 | 1.000 | — | — | — |
-| Sarcasm | 0.9945 | 0.9648 | 0.9366 | 0.9502 | **0.9695** | 0.9096 | 0.0119 |
-| Irony | 0.9945 | 0.9698 | 0.9455 | 0.9573 | 0.9507 | 0.9032 | 0.0101 |
-| Passive-aggression | 0.9945 | 0.9972 | 0.9262 | 0.9588 | 0.9203 | 0.8872 | 0.0195 |
-| Tension (0–100) | — | — | — | MAE **3.08** · RMSE 3.96 | — | — | — |
-| Escalation (t ≥ 60) | 0.9812 | 0.9626 | 0.9534 | 0.9580 | — | — | — |
+| Head | Accuracy | Precision | Recall | F1 (macro) | ROC-AUC | PR-AUC | Brier ↓ | Top-1 ECE ↓ |
+|---|---|---|---|---|---|---|---|---|
+| Sentiment (3-way) | 1.000 | 1.000 | 1.000 | 1.000 | — | — | — | **0.0064** |
+| Emotion (13-way) | 1.000 | 1.000 | 1.000 | 1.000 | — | — | — | **0.0171** |
+| Tone (14-way) | 1.000 | 1.000 | 1.000 | 1.000 | — | — | — | **0.0189** |
+| Sarcasm | 0.9921 | 0.9633 | 0.9284 | 0.9451 | **0.9485** | 0.8859 | 0.0207 | 0.0637 |
+| Irony | 0.9909 | 0.9694 | 0.9067 | 0.9357 | 0.9267 | 0.8379 | 0.0195 | 0.0472 |
+| Passive-aggression | 0.9939 | 0.9893 | 0.9372 | 0.9617 | 0.9386 | 0.8985 | 0.0198 | 0.0709 |
+| Tension (0–100) | — | — | — | MAE **3.205** · RMSE 4.143 · R² 0.9753 | — | — | — | — |
+| Escalation (t ≥ 60) | 0.9794 | 0.9555 | 0.9518 | 0.9536 | — | — | — | — |
 
 **Throughput:** 3.48 ms/message end-to-end (sequential, context+memory inference) · single CPU core.
+
+**A note on the 1.000 rows.** They are real outputs of a real held-out run, and they
+mean what the corpus note says they mean: a template corpus with a frozen label per
+phrasing is *learnable to ceiling*. They are reported because hiding them would be
+worse, and because they are the correct target for the probe experiment's contrast.
 
 ### Zero-shot transfer to real text — GoEmotions, measured and disclosed
 
@@ -241,9 +363,29 @@ The table above is in-corpus. The honest stress test is **real human text**: 3,0
 
 <div align="center"><img src="assets/graphs/confusion_tone.png" width="100%"/></div>
 
-### Calibration — can you trust the confidences?
+### Calibration — can you trust the confidences? (PS-01 §28)
 
-**📊 Figure — reliability curves.** All three hidden-signal heads hug the diagonal (Brier ≤ 0.020), so a stated 0.8 confidence really means ≈80% on this distribution.
+Every prediction carries a confidence; PS-01 §28 asks that those confidences be
+*calibrated on validation data* and never presented as human certainty. So we measure
+it per head rather than asserting it — top-1 **expected calibration error** (ECE),
+quantile-binned so no bin is empty:
+
+| Head | Mean confidence | Accuracy | ECE ↓ | MCE ↓ |
+|---|---|---|---|---|
+| Sentiment | 0.994 | 1.000 | **0.0064** | 0.032 |
+| Emotion | 0.983 | 1.000 | **0.0171** | 0.069 |
+| Tone | 0.981 | 1.000 | **0.0189** | 0.075 |
+| Sarcasm | 0.101 | 0.039 | 0.0637 | 0.213 |
+| Irony | 0.083 | 0.039 | 0.0472 | 0.196 |
+| Passive-aggression | 0.111 | 0.044 | 0.0709 | 0.202 |
+
+A stated confidence is trustworthy to within ~0.6–1.9 points on the categorical
+heads and ~5–7 points on the rare hidden signals. The binary rows also show *why*
+calibration matters: their mean confidence sits at 0.08–0.11 because the positive
+rate is ~4%, so a naive threshold at 0.5 is a deliberate, calibrated choice rather
+than an accident.
+
+**📊 Figure — reliability curves.** Heads hug the diagonal; ECE per head is printed in the legend and in the panel subtitle.
 
 <div align="center"><img src="assets/graphs/calibration_curves.png" width="100%"/></div>
 
@@ -260,7 +402,7 @@ Across 40 test conversations the binary heads make **9 raw mistakes**. Reverse-l
 
 The remaining hard failure mode for unseen phrasing is documented in the worked example below — addressed via tension-heat context modeling and sincerity-marked noisy-OR fusion, with the residual ambiguity disclosed rather than tuned away.
 
-> **Why the classification heads read 1.000 — stated plainly.** The corpus is template-composed, so its lexicons are perfectly learnable; on this data sentiment/emotion/tone saturate for *every* model, baselines included. That is exactly why the hidden-signal heads (sarcasm/irony/PA), tension regression and calibration metrics — where models genuinely separate (AUC 0.927→0.9695, MAE 3.2→3.08) — are the honest benchmarks here. The public-dataset extension path above is how the saturated heads get stressed.
+> **Why the classification heads read 1.000 — stated plainly.** The corpus is template-composed, so its lexicons are perfectly learnable; on this data sentiment/emotion/tone saturate for *every* model, baselines included. That is exactly why the hidden-signal heads (sarcasm/irony/PA), tension regression and calibration metrics — where models genuinely separate (sarcasm AUC 0.935→0.9485, tension MAE 3.36→3.21) — are the honest benchmarks here. The public-dataset extension path above is how the saturated heads get stressed.
 
 ---
 
@@ -338,7 +480,7 @@ All 20 PS-01 §41 scenario types (emoji-heavy, slang-heavy, rapid/slow timing, m
 | 18 | irony | ✅ irony/sarcasm highest of all scenarios (sarc 0.35 / irony 0.41) though below threshold |
 | 19–20 | humor · malformed | ✅ executed; null bytes and empty messages survived |
 
-**📊 Figure — all 20 scenarios side by side.** *Top:* mean (bars) and peak (white ticks) tension per scenario vs the corpus mean 25.9 (cyan dash); **green = calm expected, orange = conflict expected**, and each scenario's name is tinted with its own bar colour so the chart needs no colour legend. *Bottom:* hidden-signal probability traces (legend below the figure) — note the PA separation on scenario 5 and the near-zero false alarms on ambiguous scenario 17.
+**📊 Figure — all 20 scenarios side by side.** *Top:* mean (bars) and peak (white ticks) tension per scenario vs the corpus mean 26.1 (cyan dash); **green = calm expected, orange = conflict expected**, and each scenario's name is tinted with its own bar colour so the chart needs no colour legend. *Bottom:* hidden-signal probability traces (legend below the figure) — note the PA separation on scenario 5 and the near-zero false alarms on ambiguous scenario 17.
 
 <div align="center"><img src="assets/graphs/scenario_robustness.png" width="100%"/></div>
 
@@ -413,6 +555,30 @@ curl -s -X POST http://localhost:8000/analyze -F "file=@chat.txt" \
 docker compose up --build
 ```
 
+### Response schema (PS-01 §33)
+
+The report shape follows §33 field-for-field. Where our name differs it is because
+the field already existed under another name, so §33's name is provided as an alias
+of the *same object* — never a re-computation, so the two views cannot disagree:
+
+| §33 field | In a CEREBRO report | Note |
+|---|---|---|
+| `conversation` | `report.conversation` | id · platform · message_count · speakers · first/last timestamp · schema_version |
+| `messages[].message_id` | `report.messages[].message_id` | |
+| `messages[].speaker` | `report.messages[].speaker` | same value as `speaker_id` |
+| `messages[].sentiment / emotion / tone` | `{label, confidence, probabilities}` | §28 confidence on every one |
+| `messages[].sarcasm / irony / passive_aggression` | `{probability, prediction, supporting_signals}` | |
+| `messages[].tension` | `report.messages[].tension` | 0–100 continuum |
+| `messages[].confidence` | `report.messages[].confidence` | fused, calibrated |
+| `messages[].explanation` | `report.messages[].explanation` | identical to its entry in `report.explanations` |
+| `speakers` | `report.speakers` = `report.speaker_profiles` | §29 speaker analysis |
+| `emotion_arc` | `report.emotional_arc` | |
+| `transitions` | `report.emotion_transitions` (+ `transition_matrix`) | §22 |
+| `turning_points` | `report.turning_points` | §24 |
+| `escalation` | `report.escalation` (+ `escalation_phases`) | §25 |
+| `topics` | `report.topics` | §23 segmentation |
+| `summary` | `report.summary` | §30 headline aggregates |
+
 ### Dashboard
 
 A zero-build, dependency-free futuristic frontend ships in [`frontend/index.html`](frontend/index.html) — **the backend serves it itself**, so the dashboard runs same-origin with zero CORS setup:
@@ -458,19 +624,23 @@ Every gate below is executable against this repository right now — no gate is 
 |---|---|---|
 | CI (GitHub Actions) | lint → tests → metric gates → training smoke → graph smoke on every push | ✅ [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 | Static analysis (0 warnings) | `python -m pyflakes cerebro/ backend/ evaluation/ tests/ scripts/` | ✅ 0 issues |
-| Unit + API test suite | `python -m pytest tests/ backend/tests/ -q` | ✅ 47 passed |
-| Module import audit | all 29 project modules import cleanly | ✅ |
+| Unit + API test suite | `python -m pytest tests/ backend/tests/ -q` | ✅ 62 passed |
+| Module import audit | all 65 project modules import cleanly | ✅ |
 | API end-to-end (real engine) | `python scripts/deepscan_api.py` | ✅ 17/17 checks |
 | Adversarial robustness | `python scripts/deepscan_advanced.py` — 500-payload parser fuzz, pipeline fuzz, state-leak, numeric bounds, schema | ✅ all scans |
-| Figure legibility | all 14 figures pass 7 validators each: on-canvas (no clipped text), text-vs-text overlap, on-screen clearance, display-size floor, watermark clearance, legend-vs-data-ink, and exact segment-level line-through-text | ✅ 14/14 |
-| Figure audit (independent) | `python scripts/audit_figures.py` — re-checks the written PNGs from the outside: frame ink, width cap, ink coverage | ✅ 14/14 |
+| Figure legibility | all 16 figures pass 7 validators each: on-canvas (no clipped text), text-vs-text overlap, on-screen clearance, display-size floor, watermark clearance, legend-vs-data-ink, and exact segment-level line-through-text | ✅ 16/16 |
+| Figure audit (independent) | `python scripts/audit_figures.py` — re-checks the written PNGs from the outside: frame ink, width cap, ink coverage | ✅ 16/16 |
 | Diagram integrity | architecture graph ships with a programmatic box/band/arrow overlap validator | ✅ |
 | Security pattern scan | no `eval`/`exec`/`shell=True`/secret patterns | ✅ clean |
 | Frontend validity | balanced HTML, unique ids, all DOM lookups resolve | ✅ |
-| Docs integrity | image links, cross-references, 10 tables column-aligned | ✅ |
+| Docs integrity | `python scripts/audit_docs.py` — every README link target exists, every in-page `#anchor` resolves using GitHub's own slug algorithm, heading slugs unique, every figure embed present | ✅ 21 anchors · 44 paths |
+| Dataset leakage gate | `python -m evaluation.audit_dataset` + assertions on split overlap, duplicate conversations, split balance and class coverage | ✅ |
+| **Context-proof gate** | `python -m evaluation.run_context_proof` — asserts text-only sits *exactly* on the analytic ceiling and that the full stack beats it by ≥ 20 pp on every categorical head | ✅ |
 | Determinism | scenario outputs byte-identical across re-runs (seed 42) | ✅ |
 
-**47 functional tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases, schema stability for 0-3-message conversations), the context engine (predicted-tension ranking of older turns), the public-dataset adapters (GoEmotions/SARC/DailyDialog conversion + schema validation), PDF report export, the executive digest, fusion-weight tuning (simplex validity, fallback honesty, determinism), and the full API flow with a stubbed pipeline:
+**62 functional tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases, schema stability for 0-3-message conversations), the context engine (predicted-tension ranking of older turns), the public-dataset adapters (GoEmotions/SARC/DailyDialog conversion + schema validation), PDF report export, the executive digest, fusion-weight tuning (simplex validity, fallback honesty, determinism), and the full API flow with a stubbed pipeline.
+
+A further **12 tests guard the science itself**, which matters more than the rest: the probe corpus's *design invariants* (utters balanced across conditions → I(text;label)=0, no conversation overlap, held-out history wording disjoint from train, every split carrying both conditions, monotone timestamps), the calibration metric (perfect calibration → ECE 0, over-confidence penalised, and a regression test for points sitting exactly on the lowest bin edge), Cohen's κ / Krippendorff's α bounds, and the WordPiece tokenizer (greedy longest-match, `##` continuations, `[UNK]` fallback, `MAX_LEN` truncation).
 
 ```bash
 python -m pytest tests/ backend/tests/ -q
@@ -488,9 +658,14 @@ python -m pytest tests/ backend/tests/ -q
 | Zero-shot transfer (real GoEmotions) | `python evaluation/run_transfer.py` | `transfer_goemotions.json` + graph |
 | Fine-tune on real data (protocol) | `python evaluation/run_finetune.py` | `finetune_summary.json` (before/after) |
 | Efficiency benchmarks | `python scripts/benchmark.py` | `benchmarks.json` + graph |
+| **Controlled context proof** | `python -m evaluation.run_context_proof` | `context_proof.json` + graph |
+| **Pretrained-transformer baselines B2/B3** | `python -m evaluation.run_transformer_baseline` | `transformer_baselines.json` + graph (fetches MiniLM ONNX once) |
+| **Dataset quality / leakage audit** | `python -m evaluation.audit_dataset` | `dataset_audit.json` |
+| **Presentation deck** | `python scripts/make_deck.py` | `docs/presentation/slides.html` + `facts.json` |
 | Social preview (1280×640) | `python scripts/make_social_preview.py` | `docs/social_preview.png` |
 | API deepscan (17 checks) | `python scripts/deepscan_api.py` | pass/fail per endpoint |
 | Adversarial deepscan | `python scripts/deepscan_advanced.py` | scan-by-scan pass/fail |
+| Docs integrity | `python scripts/audit_docs.py` | pass/fail per link + anchor |
 
 ### 🔍 Figure legibility policy — why these charts stay readable when GitHub shrinks them
 
@@ -545,7 +720,7 @@ MindShift/
 ├── assets/graphs/              #   logo-branded charts (dark futuristic)
 ├── docs/                       #   dataset card · methodology · architecture
 ├── models/saved/               #   persisted engine (joblib)
-└── tests/                      #   47-test suite (+ public-dataset adapters)
+└── tests/                      #   62-test suite (+ public-dataset adapters)
 ```
 
 ---
@@ -556,12 +731,14 @@ MindShift/
 - [Methodology & theory](docs/methodology/CONTEXT_TEMPORAL_THEORY.md) — the formal write-up of the five commitments above
 - [Architecture notes](docs/architecture/ARCHITECTURE.md) — data flow, column layout of the design matrix, inference protocol
 - [PS-01 workflow](docs/methodology/PS01_WORKFLOW.md) — the full 46-stage pipeline as implemented, stage by stage
+- **[Presentation deck](docs/presentation/slides.html)** ([PDF](docs/presentation/slides.pdf)) — 10 slides, generated from `evaluation/results/*.json` by [`scripts/make_deck.py`](scripts/make_deck.py), so no slide can state a number the evaluation did not measure. `docs/presentation/facts.json` holds the same values machine-readable.
+- **Context-dependence probes** — [`cerebro/data/context_probes.py`](cerebro/data/context_probes.py) is the controlled experiment behind the headline claim; its design guarantees are documented in the module docstring.
 
 ## 🗺 Roadmap
 
-- ✅ **Shipped from the original plan** — PDF report export (P1) · public-dataset adapters GoEmotions/SARC/DailyDialog (P2) · zero-shot transfer eval + fine-tuning protocol on real data
-- **P1 next** — multilingual parsing · domain-adaptive context lexicons (the OOD sarcasm case in the worked example) · head fine-tuning on GoEmotions at scale
-- **P2** — transformer backbone slot-in behind the same heads · real-time streaming analysis · conversation-to-conversation comparison
+- ✅ **Shipped from the original plan** — PDF report export (P1) · public-dataset adapters GoEmotions/SARC/DailyDialog (P2) · zero-shot transfer eval + fine-tuning protocol on real data · **pretrained-transformer baselines B2/B3 (frozen MiniLM, ONNX, CPU)** · **controlled context-dependence proof** · **top-1 calibration (ECE) per head** · **synthetic-annotator agreement (κ/α)** · **generated slide deck**
+- **P1 next** — human multi-annotator study (κ/α currently measure *simulated* disagreement) · multilingual parsing · domain-adaptive context lexicons (the OOD sarcasm case in the worked example) · head fine-tuning on GoEmotions at scale
+- **P2** — multi-turn real conversation corpora (DailyDialog transfer) · real-time streaming analysis · conversation-to-conversation comparison · transformer backbone slot-in behind the same heads (the frozen B2/B3 baselines are the entry point)
 
 ---
 
