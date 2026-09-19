@@ -174,6 +174,11 @@ class MultiTaskEngine:
         mem = SpeakerMemory()
         cached = CachedVectorizer(self.vec)
         n_out = len(self.vec.get_feature_names_out())
+        # Writable copies: predicted tension is fed back into the context
+        # window's "tension-ranked older turns" selection, so uploads (which
+        # carry no tension labels) get salience-ranked context exactly like
+        # gold-labeled training conversations (PS-01 §8).
+        ctx_messages = [dict(m) for m in messages]
         results = []
         for i, m in enumerate(messages):
             behav = np.asarray(behavioral_vector(
@@ -181,8 +186,8 @@ class MultiTaskEngine:
                 m.get("timestamp"), messages[i - 1]["speaker_id"] if i else None,
                 m["speaker_id"]), dtype=float)
             parts = [cached.transform_one(m["text"])]
+            ctx = cw.context_text(ctx_messages, i)
             if use_context:
-                ctx = cw.context_text(messages, i)
                 parts.append(cached.transform_one(ctx)
                              if ctx else csr_matrix((1, n_out)))
             if use_behavior:
@@ -197,6 +202,7 @@ class MultiTaskEngine:
             emo = self._proba("emotion", X)
             tone = self._proba("tone", X)
             tens = float(np.clip(self.heads["tension"].predict(X)[0], 0, 100))
+            ctx_messages[i]["tension"] = tens
             sarc = self._binary("sarcasm", X)
             iron = self._binary("irony", X)
             pa = self._binary("passive_aggression", X)
@@ -213,7 +219,7 @@ class MultiTaskEngine:
                 "irony": iron,
                 "passive_aggression": pa,
                 "signals": micro_signals(m["text"]),
-                "context_text": cw.context_text(messages, i),
+                "context_text": ctx,
                 "speaker_state_before": mem.state(m["speaker_id"]),
             }
             results.append(res)
