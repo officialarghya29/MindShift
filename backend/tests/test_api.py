@@ -107,6 +107,24 @@ def test_analyze_and_full_flow():
 def test_404_for_unknown_conversation():
     c = _client()
     assert c.get("/conversation/does_not_exist").status_code == 404
+    assert c.get("/conversation/does_not_exist/digest").status_code == 404
+
+
+def test_short_conversation_escalation_schema_and_digest():
+    c = _client()
+    r = c.post("/analyze", files={"file": ("chat.txt", io.BytesIO(b"A: fine.\nB: ok then\n"), "text/plain")})
+    body = r.json()
+    esc = body["escalation"]
+    for k in ("escalation_start_message", "escalation_rate", "peak_tension",
+              "peak_message", "deescalation_point", "phase_means", "confidence"):
+        assert k in esc, f"escalation missing key {k} for short conversation"
+    assert esc["trajectory"] == "stable"
+    conv = body["summary"]["conversation_id"]
+    d = c.get(f"/conversation/{conv}/digest").json()
+    assert d["conversation_id"] == conv and d["n_messages"] == 2
+    assert d["trajectory"]["trajectory"] == "stable"
+    assert d["headline_finding"] is None
+    assert d["speakers"] and d["text"]["overview"]
 
 
 def test_upload_rejects_garbage():

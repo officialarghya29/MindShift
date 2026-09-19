@@ -7,8 +7,27 @@ import numpy as np
 def classify_trajectory(results: list[dict]) -> dict:
     ts = np.array([r["tension"] for r in results], dtype=float)
     n = len(ts)
+    # Degenerate guards: always emit the full schema so report consumers get a
+    # stable key set for ANY conversation length (PS-01 §30). Short chats are
+    # honestly marked "stable" (statistics underpowered) instead of missing keys.
+    if n == 0:
+        return {"trajectory": "stable", "escalation_start_message": None,
+                "escalation_rate": 0.0, "peak_tension": 0.0, "peak_message": None,
+                "deescalation_point": None,
+                "phase_means": {"start": 0.0, "middle": 0.0, "end": 0.0},
+                "confidence": 0.0, "note": "no messages"}
     if n < 4:
-        return {"trajectory": "stable", "note": "conversation too short for phase analysis"}
+        slope = float(np.polyfit(np.arange(n), ts, 1)[0]) if n > 1 else 0.0
+        return {"trajectory": "stable", "escalation_start_message": None,
+                "escalation_rate": round(slope, 3),
+                "peak_tension": round(float(ts.max()), 1),
+                "peak_message": results[int(np.argmax(ts))]["message_id"],
+                "deescalation_point": None,
+                "phase_means": {"start": round(float(ts[0]), 1),
+                                "middle": round(float(np.median(ts)), 1),
+                                "end": round(float(ts[-1]), 1)},
+                "confidence": 0.0,
+                "note": "conversation too short for phase analysis"}
     thirds = (ts[:n//3], ts[n//3: 2*n//3], ts[2*n//3:])
     start_mean, mid_mean, end_mean = (float(t.mean()) for t in thirds)
     slope = float(np.polyfit(np.arange(n), ts, 1)[0])
@@ -43,6 +62,7 @@ def classify_trajectory(results: list[dict]) -> dict:
         "phase_means": {"start": round(start_mean, 1), "middle": round(mid_mean, 1),
                         "end": round(end_mean, 1)},
         "confidence": round(min(0.99, abs(slope) / 2.5 + (ts.max()-ts.min())/200), 3),
+        "note": None,
     }
 
 

@@ -8,6 +8,7 @@ Endpoints:
   GET  /conversation/{id}/timeline        → per-message states
   GET  /conversation/{id}/turning-points  → detected shifts
   GET  /conversation/{id}/speakers        → speaker profiles
+  GET  /conversation/{id}/digest          → executive summary (headline + trajectory)
   GET  /conversation/{id}/report          → full report
   GET  /healthz               → liveness + model status
   GET  /                      → the futuristic dashboard (frontend/index.html)
@@ -187,6 +188,14 @@ async def get_turning_points(conv_id: str):
 async def get_speakers(conv_id: str):
     rep = store_get(conv_id)
     return {"conversation_id": conv_id, "speaker_profiles": rep["speaker_profiles"]}
+
+
+@app.get("/conversation/{conv_id}/digest")
+async def get_digest(conv_id: str):
+    """Executive digest: headline finding + trajectory reading + speaker risk."""
+    rep = store_get(conv_id)
+    from cerebro.explain.explanation_engine import build_digest
+    return build_digest(rep)
 
 
 @app.get("/conversation/{conv_id}/report")
