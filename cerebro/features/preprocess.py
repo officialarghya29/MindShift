@@ -8,6 +8,7 @@ import re
 
 from cerebro.features.lexicons import (
     POS_LEX, NEG_LEX, SARC_MARKERS, IRONY_MARKERS, PA_PHRASES,
+    SARC_SENSE_BLOCKERS, BELIEF_UPDATE_MARKERS,
     EXAG_WORDS, EMOJI_SENTIMENT, EMOJI_SARC_HINT, LAUGHTER_RE, ELLIPSIS, SWEAR_RE,
 )
 
@@ -83,7 +84,10 @@ def micro_signals(text: str) -> dict:
     words = [w.strip(".,!?\"'") for w in low.split()]
     pos_hits = [w for w in words if w in POS_LEX]
     neg_hits = [w for w in words if w in NEG_LEX]
-    sarc_words = [w for w in words if w in SARC_MARKERS]
+    # sense disambiguation: keep only markers used in their ironic sense
+    sarc_words = [w for w in words
+                  if w in SARC_MARKERS
+                  and not any(b in low for b in SARC_SENSE_BLOCKERS.get(w, ()))]
     irony_words = [w for w in words if w in IRONY_MARKERS]
     pa_phrase = next((p for p in PA_PHRASES if low.startswith(p)), None)
     exag = [w for w in words if w in EXAG_WORDS]
@@ -97,6 +101,8 @@ def micro_signals(text: str) -> dict:
     coop = ("thanks", "thank you", "i'll", "let's", "happy to", "will do",
             "sounds good", "no worries", "appreciate", "sorry")
     cooperative = any(c in low for c in coop)
+    # belief revision vs echoic echo (see lexicons.BELIEF_UPDATE_MARKERS)
+    belief_update = any(m in low for m in BELIEF_UPDATE_MARKERS)
     return {
         "n_words": len(words),
         "pos_hits": pos_hits,
@@ -107,6 +113,7 @@ def micro_signals(text: str) -> dict:
         "exaggeration": exag,
         "repeated_words": repeated,
         "cooperative": cooperative,
+        "belief_update": belief_update,
         "interjections": [w for w in ("wow", "oh", "ah") if w in words],
         "praise_minus_neg": praise_minus_context,
         "exclam": text.count("!"),

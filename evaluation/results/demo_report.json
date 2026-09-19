@@ -40,8 +40,8 @@
       "humorous": 2,
       "supportive": 1
     },
-    "sarcasm_level": 0.063,
-    "irony_level": 0.066,
+    "sarcasm_level": 0.048,
+    "irony_level": 0.051,
     "passive_aggression_level": 0.017,
     "mean_tension": 10.1,
     "peak_tension": 17.6,
@@ -119,6 +119,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": false,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -253,6 +254,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": true,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 0,
@@ -387,6 +389,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": true,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -531,6 +534,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": true,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 2,
         "exclam": 1,
@@ -674,6 +678,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": true,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 1,
@@ -814,6 +819,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": false,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -947,6 +953,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": false,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 0,
@@ -1049,7 +1056,9 @@
       "sarcasm": {
         "probability": 0.0064,
         "confidence": 0.9872,
-        "supporting_signals": [],
+        "supporting_signals": [
+          "belief-update wording (argues against an echoic reading)"
+        ],
         "learned_p": 0.0064,
         "contradiction_evidence": 0.0
       },
@@ -1076,6 +1085,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": false,
+        "belief_update": true,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 0,
@@ -1138,6 +1148,7 @@
         "inferred_interpretation": [
           "emotional shift joy → concerned",
           "sentiment shift positive → neutral",
+          "sarcasm evidence: belief-update wording (argues against an echoic reading)",
           "interpreted against the preceding conversation window"
         ],
         "model_confidence": 0.9969,
@@ -1177,24 +1188,21 @@
       },
       "tension": 7.5,
       "sarcasm": {
-        "probability": 0.3559,
-        "confidence": 0.2882,
+        "probability": 0.2816,
+        "confidence": 0.4368,
         "supporting_signals": [
-          "positive wording in negative context",
-          "marker words: great, congrats",
+          "marker words: congrats",
           "exclamation emphasis"
         ],
         "learned_p": 0.0091,
-        "contradiction_evidence": 0.35
+        "contradiction_evidence": 0.275
       },
       "irony": {
-        "probability": 0.3511,
-        "confidence": 0.2978,
-        "supporting_signals": [
-          "literal meaning opposes situational context"
-        ],
+        "probability": 0.2762,
+        "confidence": 0.4475,
+        "supporting_signals": [],
         "learned_p": 0.0017,
-        "mismatch_evidence": 0.35
+        "mismatch_evidence": 0.275
       },
       "passive_aggression": {
         "probability": 0.0019,
@@ -1209,7 +1217,6 @@
         ],
         "neg_hits": [],
         "sarc_words": [
-          "great",
           "congrats"
         ],
         "irony_words": [
@@ -1219,6 +1226,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": false,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 1,
@@ -1273,19 +1281,19 @@
             "label": "Friendly",
             "confidence": 0.9957
           },
-          "sarcasm_probability": 0.3559,
+          "sarcasm_probability": 0.2816,
           "passive_aggression_probability": 0.0019,
           "tension": 7.5
         },
         "detected_evidence": [
           "positive wording: great",
           "intensified punctuation (1× '!')",
-          "irony-prone markers: great, congrats"
+          "irony-prone markers: congrats"
         ],
         "inferred_interpretation": [
           "emotional shift concerned → joy",
           "sentiment shift neutral → positive",
-          "sarcasm evidence: positive wording in negative context; marker words: great, congrats",
+          "sarcasm evidence: marker words: congrats; exclamation emphasis",
           "interpreted against the preceding conversation window"
         ],
         "model_confidence": 0.9953,
@@ -1325,23 +1333,23 @@
       },
       "tension": 17.6,
       "sarcasm": {
-        "probability": 0.2972,
-        "confidence": 0.4055,
+        "probability": 0.1276,
+        "confidence": 0.7448,
         "supporting_signals": [
-          "marker words: sure",
           "repeated wording: was",
+          "belief-update wording (argues against an echoic reading)",
           "exclamation emphasis",
           "tension spike (+10 after this message)"
         ],
         "learned_p": 0.0004,
-        "contradiction_evidence": 0.275
+        "contradiction_evidence": 0.1
       },
       "irony": {
-        "probability": 0.2753,
-        "confidence": 0.4494,
+        "probability": 0.1004,
+        "confidence": 0.7993,
         "supporting_signals": [],
         "learned_p": 0.0004,
-        "mismatch_evidence": 0.275
+        "mismatch_evidence": 0.1
       },
       "passive_aggression": {
         "probability": 0.0058,
@@ -1353,9 +1361,7 @@
         "n_words": 10,
         "pos_hits": [],
         "neg_hits": [],
-        "sarc_words": [
-          "sure"
-        ],
+        "sarc_words": [],
         "irony_words": [],
         "pa_phrase": null,
         "exaggeration": [],
@@ -1363,6 +1369,7 @@
           "was"
         ],
         "cooperative": false,
+        "belief_update": true,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 1,
@@ -1417,18 +1424,17 @@
             "label": "Casual",
             "confidence": 0.9887
           },
-          "sarcasm_probability": 0.2972,
+          "sarcasm_probability": 0.1276,
           "passive_aggression_probability": 0.0058,
           "tension": 17.6
         },
         "detected_evidence": [
-          "intensified punctuation (1× '!')",
-          "irony-prone markers: sure"
+          "intensified punctuation (1× '!')"
         ],
         "inferred_interpretation": [
           "tension rose +10 vs previous turn",
           "emotional shift joy → surprise",
-          "sarcasm evidence: marker words: sure; repeated wording: was",
+          "sarcasm evidence: repeated wording: was; belief-update wording (argues against an echoic reading)",
           "interpreted against the preceding conversation window"
         ],
         "model_confidence": 0.9947,
@@ -1499,6 +1505,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": false,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 1,
@@ -1639,6 +1646,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": true,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -1776,6 +1784,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": true,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -1912,6 +1921,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": true,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -2047,6 +2057,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": false,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 1,
@@ -2154,6 +2165,7 @@
         "probability": 0.0046,
         "confidence": 0.9908,
         "supporting_signals": [
+          "belief-update wording (argues against an echoic reading)",
           "exclamation emphasis"
         ],
         "learned_p": 0.004,
@@ -2182,6 +2194,7 @@
         "exaggeration": [],
         "repeated_words": [],
         "cooperative": false,
+        "belief_update": true,
         "interjections": [],
         "praise_minus_neg": 0,
         "exclam": 1,
@@ -2244,7 +2257,7 @@
           "intensified punctuation (1× '!')"
         ],
         "inferred_interpretation": [
-          "sarcasm evidence: exclamation emphasis",
+          "sarcasm evidence: belief-update wording (argues against an echoic reading); exclamation emphasis",
           "interpreted against the preceding conversation window"
         ],
         "model_confidence": 0.9829,
@@ -2319,6 +2332,7 @@
         ],
         "repeated_words": [],
         "cooperative": false,
+        "belief_update": false,
         "interjections": [],
         "praise_minus_neg": 1,
         "exclam": 0,
@@ -3091,6 +3105,7 @@
       "inferred_interpretation": [
         "emotional shift joy → concerned",
         "sentiment shift positive → neutral",
+        "sarcasm evidence: belief-update wording (argues against an echoic reading)",
         "interpreted against the preceding conversation window"
       ],
       "model_confidence": 0.9969,
@@ -3111,19 +3126,19 @@
           "label": "Friendly",
           "confidence": 0.9957
         },
-        "sarcasm_probability": 0.3559,
+        "sarcasm_probability": 0.2816,
         "passive_aggression_probability": 0.0019,
         "tension": 7.5
       },
       "detected_evidence": [
         "positive wording: great",
         "intensified punctuation (1× '!')",
-        "irony-prone markers: great, congrats"
+        "irony-prone markers: congrats"
       ],
       "inferred_interpretation": [
         "emotional shift concerned → joy",
         "sentiment shift neutral → positive",
-        "sarcasm evidence: positive wording in negative context; marker words: great, congrats",
+        "sarcasm evidence: marker words: congrats; exclamation emphasis",
         "interpreted against the preceding conversation window"
       ],
       "model_confidence": 0.9953,
@@ -3144,18 +3159,17 @@
           "label": "Casual",
           "confidence": 0.9887
         },
-        "sarcasm_probability": 0.2972,
+        "sarcasm_probability": 0.1276,
         "passive_aggression_probability": 0.0058,
         "tension": 17.6
       },
       "detected_evidence": [
-        "intensified punctuation (1× '!')",
-        "irony-prone markers: sure"
+        "intensified punctuation (1× '!')"
       ],
       "inferred_interpretation": [
         "tension rose +10 vs previous turn",
         "emotional shift joy → surprise",
-        "sarcasm evidence: marker words: sure; repeated wording: was",
+        "sarcasm evidence: repeated wording: was; belief-update wording (argues against an echoic reading)",
         "interpreted against the preceding conversation window"
       ],
       "model_confidence": 0.9947,
@@ -3337,7 +3351,7 @@
         "intensified punctuation (1× '!')"
       ],
       "inferred_interpretation": [
-        "sarcasm evidence: exclamation emphasis",
+        "sarcasm evidence: belief-update wording (argues against an echoic reading); exclamation emphasis",
         "interpreted against the preceding conversation window"
       ],
       "model_confidence": 0.9829,

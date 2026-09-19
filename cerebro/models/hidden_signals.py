@@ -36,10 +36,17 @@ def _prior_contradiction(sent, context_text: str, sig: dict,
     ctx_neg = max(ctx_neg, ctx_heat)
     lit_pos = polarity > 0.10
     interjection = 0.15 if sig["interjections"] else 0.0
-    return (0.30 * lit_pos * ctx_neg +
-            0.20 * lit_pos * (1 if sig["exclam"] >= 1 else 0) +
-            0.15 * lit_pos * min(len(sig["sarc_words"]) / 2.0, 1.0) +
-            interjection * lit_pos)
+    evidence = (0.30 * lit_pos * ctx_neg +
+                0.20 * lit_pos * (1 if sig["exclam"] >= 1 else 0) +
+                0.15 * lit_pos * min(len(sig["sarc_words"]) / 2.0, 1.0) +
+                interjection * lit_pos)
+    # Genuine surprise argues AGAINST an echoic reading: sarcasm needs the speaker
+    # to know the negative fact already and praise it anyway, whereas "Wait, you
+    # already finished?" is belief revision. Dampened rather than zeroed — a
+    # belief-update marker can still front a real sarcastic barb.
+    if sig.get("belief_update"):
+        evidence *= 0.5
+    return evidence
 
 
 def sarcasm_score(learned: float, sent: dict, context_text: str, sig: dict,
@@ -67,6 +74,8 @@ def sarcasm_score(learned: float, sent: dict, context_text: str, sig: dict,
         supporting.append(f"repeated wording: {', '.join(sig['repeated_words'][:2])}")
     if sig.get("cooperative"):
         supporting.append("cooperative intent markers present (argues against sarcasm)")
+    if sig.get("belief_update"):
+        supporting.append("belief-update wording (argues against an echoic reading)")
     if sig["emoji_sarc"]:
         supporting.append(f"sarcasm-typical emoji: {', '.join(sig['emoji_sarc'][:2])}")
     if sig["exclam"]:
