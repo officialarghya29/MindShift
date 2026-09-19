@@ -9,9 +9,9 @@ CEREBRO — context-aware temporal conversation-intelligence engine (FastAPI + s
 ## Main commands
 - Train + eval (deterministic, seed 42, ~4 min): `python -m evaluation.run_full fit` then `python -m evaluation.run_full eval`. Notably `fit` only writes `models/saved/eval_state.joblib`; the deployable engine `models/saved/cerebro_engine.joblib` is created by `eval`, which also REWRITES the committed `evaluation/results/*.json`.
 - API + dashboard: `uvicorn backend.app.main:app --reload` → dashboard at `/`, OpenAPI at `/docs`. Backend lazy-loads the persisted engine and returns 503 if `models/saved/cerebro_engine.joblib` is missing.
-- Tests: `python -m pytest tests/ backend/tests/ -q` (39). No trained model needed — `backend/tests` stubs the pipeline.
+- Tests: `python -m pytest tests/ backend/tests/ -q` (47). No trained model needed — `backend/tests` stubs the pipeline.
 - Lint: CI gate is `python -m compileall -q cerebro backend evaluation scripts tests` plus an AST-parse check. The documented pyflakes gate (`python -m pyflakes cerebro/ backend/ evaluation/ tests/ scripts/`) needs pyflakes installed — it is NOT in requirements.
-- Graphs: `PYTHONPATH=. python -m evaluation.make_graphs`. Ships collision validators that refuse overlapping charts; must pass.
+- Graphs: `PYTHONPATH=. python -m evaluation.make_graphs`. Ships 7 per-figure validators (on-canvas, text overlap, on-screen clearance, display-size floor, watermark, legend-vs-data-ink, segment-level line-through-text) that refuse unreadable charts; must pass. Figures are drawn at a single 9.6 in width because GitHub renders README images at ~830 px — see the README's "Figure legibility policy".
 
 ## CI-gated committed artifacts
 `evaluation/results/*.json` and `models/saved/*.joblib` are committed and asserted by CI metric gates (sarcasm ROC-AUC ≥ 0.90, tension MAE ≤ 5.0, fusion weights a valid simplex, scenarios 20/20, real errors ≤ 5, scaling ≥ 100 msg/s, memory ≤ 100 MB @1k). After regenerating results, re-run the CI gate block (`.github/workflows/ci.yml`) before committing changes.
