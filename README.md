@@ -11,8 +11,10 @@ Sentiment · Emotion · Tone · Sarcasm · Irony · Passive-Aggression · Tensio
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.9-B388FF?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-7CFFB2?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/officialarghya29/MindShift/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-47%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-quality-gates--reproducibility)
+[![Tests](https://img.shields.io/badge/tests-64%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-quality-gates--reproducibility)
 [![Lint](https://img.shields.io/badge/pyflakes-0%20issues-7CFFB2?style=flat-square)](#-quality-gates--reproducibility)
+[![Leakage](https://img.shields.io/badge/leakage_audit-0%20split%20overlap-00E5FF?style=flat-square)](#data-quality--leakage-audit-ps-01-38)
+[![Context proof](https://img.shields.io/badge/context_proof-%2B27pp-7CFFB2?style=flat-square)](#-the-controlled-proof--context-is-required-not-merely-helpful)
 [![PS-01](https://img.shields.io/badge/problem_statement-PS--01--Tone%20Intelligence-FF5C8A?style=flat-square)](#-documentation)
 
 **📊 Figure — the two hero panels, stacked.** *Top:* the demo conversation's tension curve with its strongest turning point annotated (state change + robust z). *Bottom:* the five headline test metrics.
@@ -434,18 +436,19 @@ Both sit near the decision boundary, which is what a calibrated model should do 
 **Live API session** (run via [`scripts/demo_api.py`](scripts/demo_api.py) — a fresh 8-message chat, not from the training distribution):
 
 ```
-POST /analyze → 200
-  #1 Aarav | neutral     | tension  12.7 | sarc 0.04 | PA 0.20 | 'Hey! Did you finish the project?'
-  #2 Meera | frustration | tension  37.0 | sarc 0.07 | PA 0.32 | "Yeah I'll do it tonight."
-  #3 Aarav | joy         | tension  13.1 | sarc 0.00 | PA 0.02 | 'Perfect, thanks!'
-  #4 Meera | frustration | tension  55.3 | sarc 0.13 | PA 0.23 | 'You said that yesterday too.'
-  #5 Aarav | frustration | tension  71.6 | sarc 0.07 | PA 0.88 | 'Fine. Do what you want then.'   ← PS-01 §16's hero case
-  #6 Meera | joy         | tension  19.0 | sarc 0.61 | PA 0.01 | 'Wow. Great. Just great.'        ← OOD sarcasm caught via tension-heat + echoic-repetition evidence
-  #7 Aarav | frustration | tension  57.9 | sarc 0.00 | PA 0.20 | "I'm sorry, I really mean it this time."
-  #8 Meera | relief      | tension  29.7 | sarc 0.00 | PA 0.01 | "...okay. Let's just fix it tomorrow."
+POST /analyze → 200 | took 0.1s
+msgs: 8 | trajectory: escalating | mean tension: 40.2
+  #1 Aarav | neutral     | tension  14.6 | sarc 0.14 | PA 0.20 | 'Hey! Did you finish the project?'
+  #2 Meera | frustration | tension  41.5 | sarc 0.00 | PA 0.23 | "Yeah I'll do it tonight."
+  #3 Aarav | joy         | tension  15.0 | sarc 0.00 | PA 0.03 | 'Perfect, thanks!'
+  #4 Meera | frustration | tension  55.3 | sarc 0.12 | PA 0.20 | 'You said that yesterday too.'
+  #5 Aarav | frustration | tension  73.5 | sarc 0.06 | PA 0.87 | 'Fine. Do what you want then.'   ← PS-01 §16's hero case
+  #6 Meera | disgust     | tension  31.9 | sarc 0.68 | PA 0.00 | 'Wow. Great. Just great.'        ← OOD sarcasm caught via tension-heat + echoic-repetition evidence
+  #7 Aarav | frustration | tension  58.0 | sarc 0.00 | PA 0.20 | "I'm sorry, I really mean it this time."
+  #8 Meera | relief      | tension  31.5 | sarc 0.00 | PA 0.00 | "...okay. Let's just fix it tomorrow."
 
-turning points: (2: neutral→frustration, +24.3) · (3: →joy, −23.9) · (5: +16.3 spike) · (6: −52.6 drop) · (8: →relief, −28.2)
-WHAT CHANGED @5: { "tension_delta": 16.3, "emotion_shift": "frustration → frustration" }
+turning points: (2: neutral→frustration, +26.9) · (3: →joy, −26.5) · (5: frustration spike, +18.2) · (6: →disgust, −41.6) · (8: →relief, −26.5)
+WHAT CHANGED @5: { "tension_delta": 18.2, "emotion_shift": "frustration → frustration" }
 ```
 
 ---
@@ -454,17 +457,19 @@ WHAT CHANGED @5: { "tension_delta": 16.3, "emotion_shift": "frustration → frus
 
 <div align="center"><img src="assets/graphs/demo_report.png" width="100%"/></div>
 
-**OOD fix note:** *"Wow. Great. Just great."* was the documented weak spot (0.22 in earlier runs) — literal-positive sarcasm with no recognized failure words in its window. The contradiction evidence now also reads **ambient tension heat** (a heated exchange is a negative situational context even when its words are neutral) and **echoic repetition** (use→mention shift on repeated positive words), while sincerity markers ("thanks", "I'll…") damp the same evidence for cooperative messages. It now scores **0.61** with supporting signals `positive wording in negative context · marker words: great, great · repeated wording: great`; the 2 borderline FPs this gate trades are disclosed in the error table above.
+**OOD fix note:** *"Wow. Great. Just great."* was the documented weak spot (0.22 in early runs) — literal-positive sarcasm with no recognized failure words in its own window. The contradiction evidence now also reads **ambient tension heat** (a heated exchange is a negative situational context even when its words are neutral) and **echoic repetition** (a use→mention shift on repeated positive words), while sincerity markers ("thanks", "I'll…") damp the same evidence for cooperative messages. It now scores **0.68** — up from 0.61 before the lexicon correction below, which *raised* it rather than trading it away.
+
+The tradeoff this gate used to carry is gone. Those same tension-heat and repetition terms were what misfired on sincere messages (*"No way! I was sure the deadline was next month."*); the sense-disambiguation and belief-revision fixes removed those false positives while the echoic case kept improving. Sarcasm and irony now record **zero false positives** on the test split.
 
 **Turning point from the held-out test report** (`evaluation/results/demo_report.json`):
 
 ```json
 {
-  "message_id": 8,
-  "before": { "emotion": "neutral", "tension": 7.7, "tone": "supportive" },
-  "after":  { "emotion": "neutral", "tension": 12.9, "tone": "professional" },
-  "tension_change": 5.2, "robust_z": 1.83,
-  "trigger_text": "Morning! Ready for the call at 10? (we should talk with the lab report)",
+  "message_id": 6,
+  "before": { "emotion": "excitement", "tension": 7.8, "tone": "casual" },
+  "after":  { "emotion": "relief", "tension": 11.2, "tone": "casual" },
+  "tension_change": 3.4, "robust_z": 2.51,
+  "trigger_text": "Yeah I saw it last night, looks solid overall. (with the lab report)",
   "note": "model-estimated turning point, not a causal claim"
 }
 ```
