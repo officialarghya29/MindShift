@@ -76,7 +76,7 @@ class CerebroPipeline:
                             "peak_tension": 0.0, "trajectory": "stable"},
                 "messages": [], "emotional_arc": None, "emotion_transitions": [],
                 "transition_matrix": None, "turning_points": [],
-                "escalation": {"trajectory": "stable"}, "escalation_phases": [],
+                "escalation": classify_trajectory([]), "escalation_phases": [],
                 "speaker_profiles": [], "explanations": [], "topics": None,
                 "disclaimer": ("All outputs are model-estimated with calibrated confidence; "
                                "turning points are associations, not causal claims."),
