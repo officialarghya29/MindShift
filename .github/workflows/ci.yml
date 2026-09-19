@@ -86,8 +86,11 @@ jobs:
           print("training smoke OK")
           EOF
 
-      - name: Graph smoke (full suite + collision validators)
+      - name: Graphs (full suite + 7 legibility validators per figure)
         run: |
           PYTHONPATH=. python -m evaluation.make_graphs
           test -f docs/architecture/architecture.png && echo "architecture OK (validators passed)"
           test -f assets/graphs/efficiency_benchmarks.png && echo "graphs OK (validators passed)"
+
+      - name: Figure audit (independent of the in-process validators)
+        run: python scripts/audit_figures.py
