@@ -180,3 +180,114 @@ def speaker_profiles(results: list[dict]) -> dict:
             "note": "communication-pattern summary, not a psychological profile",
         }
     return out
+
+
+def build_digest(report: dict) -> dict:
+    """Executive conversation digest — aggregates an existing report into the
+    headline finding, trajectory reading, and per-speaker risk summary.
+
+    Deterministic and strictly derived from already-computed model outputs:
+    it adds no new claims, and per-speaker notes keep the 'patterns, not
+    diagnoses' stance of speaker_profiles() (PS-01 §29–30).
+    """
+    summary = report.get("summary") or {}
+    msgs = report.get("messages") or []
+    esc = report.get("escalation") or {}
+    arc = report.get("emotional_arc") or {}
+    tps = report.get("turning_points") or []
+    profiles = report.get("speaker_profiles") or {}
+    n = len(msgs)
+
+    def _from_to(tp: dict) -> str | None:
+        if not tp.get("before") or not tp.get("after"):
+            return None
+        return f"{tp['before']['emotion']} → {tp['after']['emotion']}"
+
+    # --- headline finding: the single most salient event ---
+    headline = None
+    if tps:
+        strongest = max(tps, key=lambda t: abs(float(t.get("tension_change", 0))))
+        if abs(float(strongest.get("tension_change", 0))) >= 5.0:
+            headline = {
+                "kind": "turning_point",
+                "message_id": strongest.get("message_id"),
+                "tension_change": strongest.get("tension_change"),
+                "direction": ("tension spike" if strongest.get("tension_change", 0) > 0
+                              else "tension dip"),
+                "from_to": _from_to(strongest),
+                "trigger": strongest.get("trigger_text"),
+                "speaker": strongest.get("speaker"),
+            }
+    if headline is None and esc.get("trajectory") == "escalating":
+        peak_msg = next((m for m in msgs
+                         if m["message_id"] == esc.get("peak_message")), None)
+        headline = {
+            "kind": "escalation_peak",
+            "message_id": esc.get("peak_message"),
+            "peak_tension": esc.get("peak_tension"),
+            "trigger": peak_msg["text"][:140] if peak_msg else None,
+            "speaker": peak_msg.get("speaker_id") if peak_msg else None,
+        }
+
+    # --- per-speaker risk summary (aggregated, not diagnostic) ---
+    speakers = []
+    for spk, p in sorted(profiles.items()):
+        speakers.append({
+            "speaker_id": spk,
+            "messages": p["messages"],
+            "avg_tension": p["avg_tension"],
+            "max_tension": p["max_tension"],
+            "high_tension_share": p["high_tension_share"],
+            "sarcastic_share": p["sarcastic_share"],
+            "passive_aggressive_share": p["passive_aggressive_share"],
+            "dominant_emotions": p["dominant_emotions"],
+        })
+    flagged = [s for s in speakers
+               if s["high_tension_share"] > 0.5 or s["sarcastic_share"] > 0.25]
+
+    # --- trajectory reading ---
+    trajectory = {
+        "trajectory": esc.get("trajectory"),
+        "escalation_rate": esc.get("escalation_rate"),
+        "start_middle_end": esc.get("phase_means"),
+        "peak_tension": esc.get("peak_tension"),
+        "n_turning_points": len(tps),
+        "recovered": bool(arc.get("recovered") or esc.get("deescalation_point") is not None),
+    }
+
+    # --- templated, deterministic prose ---
+    overview = (f"{n} messages, {len(speakers)} participant(s): trajectory is "
+                f"{trajectory['trajectory']}, peak tension "
+                f"{trajectory['peak_tension']}/100, "
+                f"{trajectory['n_turning_points']} turning point(s) detected.")
+    if trajectory["recovered"]:
+        overview += " The conversation de-escalated after its peak."
+    if flagged:
+        names = ", ".join(s["speaker_id"] for s in flagged)
+        overview += f" Elevated-tension/sarcasm share: {names}."
+    headline_text = overview
+    if headline:
+        headline_text = ("Detected " + headline["direction"] +
+                         (f" after message {headline['message_id']}" if headline.get("message_id")
+                          else ""))
+        if headline.get("from_to"):
+            headline_text += f" ({headline['from_to']})"
+        if headline.get("peak_tension") is not None:
+            headline_text += f" — peak tension {headline['peak_tension']}."
+        else:
+            headline_text += "."
+
+    return {
+        "conversation_id": summary.get("conversation_id"),
+        "n_messages": n,
+        "headline_finding": headline,
+        "trajectory": trajectory,
+        "turning_points": [{"message_id": t.get("message_id"),
+                            "tension_change": t.get("tension_change"),
+                            "from_to": _from_to(t)}
+                           for t in tps[:5]],
+        "speakers": speakers,
+        "text": {"overview": overview, "headline": headline_text},
+        "disclaimer": "Aggregated model estimates — associations, not causation. "
+                      "See per-message explanations for the underlying evidence.",
+    }
