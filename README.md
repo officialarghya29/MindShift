@@ -11,7 +11,7 @@ Sentiment · Emotion · Tone · Sarcasm · Irony · Passive-Aggression · Tensio
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.9-B388FF?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-7CFFB2?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/officialarghya29/MindShift/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-39%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-quality-gates--reproducibility)
+[![Tests](https://img.shields.io/badge/tests-47%20passing-7CFFB2?style=flat-square&logo=pytest&logoColor=white)](#-quality-gates--reproducibility)
 [![Lint](https://img.shields.io/badge/pyflakes-0%20issues-7CFFB2?style=flat-square)](#-quality-gates--reproducibility)
 [![PS-01](https://img.shields.io/badge/problem_statement-PS--01--Tone%20Intelligence-FF5C8A?style=flat-square)](#-documentation)
 
@@ -32,7 +32,7 @@ Sentiment · Emotion · Tone · Sarcasm · Irony · Passive-Aggression · Tensio
 | ⚡ | **≈300 messages/s, flat to 1,000-message chats** · 8.9 MB peak memory · 184 ms API round-trip — measured, not estimated |
 | 🔍 | **Zero crashes across 500 adversarial payloads**, state-leak-proof, all probabilities bounds-checked — validated on every push by CI |
 | 🧠 | **Explainability built-in**: every prediction ships WHY? evidence (detected ≠ inferred), WHAT CHANGED? deltas, and speaker profiles |
-| 📊 | **14 collision-free figures** — each one regenerated from real executed results by code that *refuses to ship overlapping charts* |
+| 📊 | **14 legibility-verified figures** — regenerated from real executed results by code that *refuses to ship clipped titles, colliding labels or lines-through-text* (7 independent checks per figure, run in CI) |
 | 🔬 | **Honest science**: a saturated corpus is called saturated, a transfer gap is quantified, the fallback is disclosed — nothing is spun |
 
 ---
@@ -189,7 +189,7 @@ Protocol: seed 42 · 1,678 features (826 text n-grams + context block + 16 behav
 
 **Reading:** the hidden-signal fusion layer (D→E) delivers the largest single ranking gain (+3.5 points sarcasm AUC over the best head), and behavioral features deliver the largest regression gain (MAE −3.9%). Context+memory help ranking modestly but stabilize the sequence models; their full value shows in the turning-point and escalation analyses, not in per-message accuracy.
 
-**📊 Figure — the same story, two panels.** *Top:* sarcasm AUC climbs with every added component; the arrow marks the **+4.3-point** total lift from A to E. *Bottom:* the MAE drop at D is where behavioral features pay off.
+**📊 Figure — the same story, two panels.** *Top:* sarcasm AUC climbs with every added component; the arrow marks the **+4.25-point** total lift from A to E. *Bottom:* the MAE drop at D is where behavioral features pay off.
 
 <div align="center"><img src="assets/graphs/ablation_study.png" width="100%"/></div>
 
@@ -338,7 +338,7 @@ All 20 PS-01 §41 scenario types (emoji-heavy, slang-heavy, rapid/slow timing, m
 | 18 | irony | ✅ irony/sarcasm highest of all scenarios (sarc 0.35 / irony 0.41) though below threshold |
 | 19–20 | humor · malformed | ✅ executed; null bytes and empty messages survived |
 
-**📊 Figure — all 20 scenarios side by side.** *Top:* mean (bars) and peak (ticks) tension per scenario vs the training-corpus mean; green = scenarios where calm is expected. *Bottom:* hidden-signal probability traces — note the PA separation on scenario 5 and the near-zero false alarms on ambiguous scenario 17.
+**📊 Figure — all 20 scenarios side by side.** *Top:* mean (bars) and peak (white ticks) tension per scenario vs the corpus mean 25.9 (cyan dash); **green = calm expected, orange = conflict expected**, and each scenario's name is tinted with its own bar colour so the chart needs no colour legend. *Bottom:* hidden-signal probability traces (legend below the figure) — note the PA separation on scenario 5 and the near-zero false alarms on ambiguous scenario 17.
 
 <div align="center"><img src="assets/graphs/scenario_robustness.png" width="100%"/></div>
 
@@ -403,6 +403,7 @@ curl -s -X POST http://localhost:8000/analyze -F "file=@chat.txt" \
 | GET | `/conversation/{id}/speakers` | speaker-level profiles |
 | GET | `/why/{id}/{message_id}` | the WHY? panel |
 | GET | `/what-changed/{id}/{message_id}` | the WHAT CHANGED? panel |
+| GET | `/conversation/{id}/digest` | executive digest — headline · trajectory · speaker risk, aggregated from a stored report |
 | GET | `/healthz` | liveness + model status |
 | GET | `/` | the dashboard itself (same-origin, served by this app) |
 | GET | `/demo-report` | persisted report from the held-out demo run |
@@ -457,17 +458,19 @@ Every gate below is executable against this repository right now — no gate is 
 |---|---|---|
 | CI (GitHub Actions) | lint → tests → metric gates → training smoke → graph smoke on every push | ✅ [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 | Static analysis (0 warnings) | `python -m pyflakes cerebro/ backend/ evaluation/ tests/ scripts/` | ✅ 0 issues |
-| Unit + API test suite | `python -m pytest tests/ backend/tests/ -q` | ✅ 39 passed |
+| Unit + API test suite | `python -m pytest tests/ backend/tests/ -q` | ✅ 47 passed |
 | Module import audit | all 29 project modules import cleanly | ✅ |
 | API end-to-end (real engine) | `python scripts/deepscan_api.py` | ✅ 17/17 checks |
 | Adversarial robustness | `python scripts/deepscan_advanced.py` — 500-payload parser fuzz, pipeline fuzz, state-leak, numeric bounds, schema | ✅ all scans |
+| Figure legibility | all 14 figures pass 7 validators each: on-canvas (no clipped text), text-vs-text overlap, on-screen clearance, display-size floor, watermark clearance, legend-vs-data-ink, and exact segment-level line-through-text | ✅ 14/14 |
+| Figure audit (independent) | `python scripts/audit_figures.py` — re-checks the written PNGs from the outside: frame ink, width cap, ink coverage | ✅ 14/14 |
 | Diagram integrity | architecture graph ships with a programmatic box/band/arrow overlap validator | ✅ |
 | Security pattern scan | no `eval`/`exec`/`shell=True`/secret patterns | ✅ clean |
 | Frontend validity | balanced HTML, unique ids, all DOM lookups resolve | ✅ |
 | Docs integrity | image links, cross-references, 10 tables column-aligned | ✅ |
 | Determinism | scenario outputs byte-identical across re-runs (seed 42) | ✅ |
 
-**39 functional tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases), the public-dataset adapters (GoEmotions/SARC/DailyDialog conversion + schema validation), PDF report export, fusion-weight tuning (simplex validity, fallback honesty, determinism), and the full API flow with a stubbed pipeline:
+**47 functional tests** cover parsers (all platforms + malformed exports), features (behavioral vector contract, response-gap computation, segmentation), temporal engines (escalation detection, turning-point statistics, edge cases, schema stability for 0-3-message conversations), the context engine (predicted-tension ranking of older turns), the public-dataset adapters (GoEmotions/SARC/DailyDialog conversion + schema validation), PDF report export, the executive digest, fusion-weight tuning (simplex validity, fallback honesty, determinism), and the full API flow with a stubbed pipeline:
 
 ```bash
 python -m pytest tests/ backend/tests/ -q
@@ -480,6 +483,7 @@ python -m pytest tests/ backend/tests/ -q
 | Full evaluation | `python -m evaluation.run_full eval` | `evaluation/results/*.json` |
 | 20-scenario robustness run | `python -m evaluation.run_scenarios` | `evaluation/results/scenarios.json` |
 | Regenerate all graphs | `python -m evaluation.make_graphs` | `assets/graphs/*.png` |
+| Independent figure audit | `python scripts/audit_figures.py` | pass/fail per figure |
 | Live API demo | `python scripts/demo_api.py` | per-message readout to stdout |
 | Zero-shot transfer (real GoEmotions) | `python evaluation/run_transfer.py` | `transfer_goemotions.json` + graph |
 | Fine-tune on real data (protocol) | `python evaluation/run_finetune.py` | `finetune_summary.json` (before/after) |
@@ -487,6 +491,36 @@ python -m pytest tests/ backend/tests/ -q
 | Social preview (1280×640) | `python scripts/make_social_preview.py` | `docs/social_preview.png` |
 | API deepscan (17 checks) | `python scripts/deepscan_api.py` | pass/fail per endpoint |
 | Adversarial deepscan | `python scripts/deepscan_advanced.py` | scan-by-scan pass/fail |
+
+### 🔍 Figure legibility policy — why these charts stay readable when GitHub shrinks them
+
+GitHub renders every embedded image into a content column of roughly **830 CSS pixels**, whatever the file's own pixel width. One number therefore decides how large a label looks on screen:
+
+```
+on-screen px  ≈  fontsize_pt × 830 / (72 × figure_width_inches)
+```
+
+A 12.5-inch canvas lands at ≈0.44×, so a 13 pt value label reaches the reader at **~12 px** — small enough that neighbouring lines and labels *read* as touching even when the geometry is technically clean. Every figure here is drawn at one canonical **9.6-inch width** (≈0.58× on screen: the same 13 pt label now arrives at **15.6 px**), and every title/subtitle is **auto-fitted** — wrapped and shrunk against its *measured* rendered width — so nothing is silently clipped by the canvas edge.
+
+Each figure must then pass **seven independent checks** before it is written to disk — the same suite CI runs on every push:
+
+| # | Check | What it catches |
+|---|---|---|
+| 1 | On-canvas | text drawn past the PNG edge (seven headers were being clipped before this check existed) |
+| 2 | Text vs text | literal box intersection of any two rendered labels |
+| 3 | On-screen clearance | labels under 3 px apart **after** GitHub's downscale — they would read as one line |
+| 4 | Display-size floor | any text that would reach the reader smaller than ≈13.5 px |
+| 5 | Watermark clearance | the brand mark landing on a data label |
+| 6 | Legend vs data ink | a legend or caption sitting on bars or curves |
+| 7 | Segment-level line-through-text | an *exact* Liang–Barsky clip test of every drawn segment against every label box |
+
+The validators are strict on purpose, and they have already blocked real defects: a benchmark value label sliced by its own curve, a panel title drawn through the header subtitle, a watermark landing on the last bar label, and value labels sitting **0.4 px** from the tick labels they sat beside.
+
+Because those checks run *while* a figure is drawn, a bug in the checkers could in principle hide a defect — so a second, independent audit inspects the **PNGs actually written to disk** instead:
+
+```bash
+python scripts/audit_figures.py     # frame-ink (clipping), width cap, ink coverage
+```
 
 ---
 
@@ -511,7 +545,7 @@ MindShift/
 ├── assets/graphs/              #   logo-branded charts (dark futuristic)
 ├── docs/                       #   dataset card · methodology · architecture
 ├── models/saved/               #   persisted engine (joblib)
-└── tests/                      #   33-test suite (+ public-dataset adapters)
+└── tests/                      #   47-test suite (+ public-dataset adapters)
 ```
 
 ---
