@@ -25,9 +25,17 @@ from collections.abc import Iterable
 # --------------------------------------------------------------------------
 # unified schema
 # --------------------------------------------------------------------------
+# Required for every record (PS-01 §3).
 SCHEMA_FIELDS = ("conversation_id", "message_id", "speaker_id", "timestamp",
                  "text", "sentiment", "emotion", "tone", "sarcasm", "irony",
                  "passive_aggression", "tension")
+
+# Blueprint §6 extends the unified vector with two DERIVED fields. They are not
+# required (an adapter may not know a topic), but when present they are
+# validated and they are always derivable from tension, so every record can be
+# completed to the full 14-field layout with `with_derived_fields`.
+DERIVED_FIELDS = ("escalation", "topic")
+FULL_SCHEMA_FIELDS = SCHEMA_FIELDS + DERIVED_FIELDS
 
 SENTIMENTS = ("positive", "neutral", "negative")
 EMOTIONS = ("joy", "affection", "excitement", "relief", "neutral", "surprise",
@@ -61,6 +69,11 @@ def validate_cerebro_record(rec: dict) -> None:
         raise ValueError(f"tension out of [0,100]: {rec['tension']}")
     if not str(rec["text"]).strip():
         raise ValueError("empty text")
+    # derived fields are optional, but must be well-formed when present
+    if "escalation" in rec and rec["escalation"] not in (0, 1, True, False):
+        raise ValueError(f"escalation must be 0/1, got {rec['escalation']!r}")
+    if "topic" in rec and not str(rec["topic"]).strip():
+        raise ValueError("topic must be a non-empty string when present")
 
 
 def validate_conversation(convs: Iterable[list[dict]]) -> list[list[dict]]:
@@ -79,19 +92,32 @@ def validate_conversation(convs: Iterable[list[dict]]) -> list[list[dict]]:
     return out
 
 
+def with_derived_fields(rec: dict) -> dict:
+    """Complete a record to the full blueprint §6 schema (in place, returned).
+
+    escalation is derived from tension via the shared edge constant; topic
+    defaults to "unknown" when the source has no situational label.
+    """
+    from cerebro.common.labels import ESCALATION_TENSION_THRESHOLD
+    rec.setdefault("topic", "unknown")
+    rec["escalation"] = int(float(rec["tension"]) >= ESCALATION_TENSION_THRESHOLD)
+    return rec
+
+
 def _mk(conv_id: str, mid: int, speaker: str, text: str, emotion: str,
-        tone: str, sarcasm: int, irony: int, pa: int) -> dict:
+        tone: str, sarcasm: int, irony: int, pa: int,
+        topic: str = "unknown") -> dict:
     # sentiment = surface valence of the emotion (PS-01 §11: sentiment ≠
     # sarcasm — the hidden twist lives in the sarcasm/irony labels)
     sentiment, tension = _EMOTION_VALENCE[emotion]
     tension = float(min(tension + sarcasm * 15 + pa * 12, 100))
-    return {
+    return with_derived_fields({
         "conversation_id": conv_id, "message_id": mid, "speaker_id": speaker,
         "timestamp": None, "text": text, "sentiment": sentiment,
         "emotion": emotion, "tone": tone, "sarcasm": int(sarcasm),
         "irony": int(irony), "passive_aggression": int(pa),
-        "tension": tension,
-    }
+        "tension": tension, "topic": topic,
+    })
 
 
 # --------------------------------------------------------------------------
@@ -150,7 +176,7 @@ def goemotions_records(lines: Iterable[str | dict], source_id: str = "goe",
         if not text:
             continue
         convs.append([_mk(f"{source_id}_{i}", 1, "anon", text, emotion,
-                          "casual", 0, 0, 0)])
+                          "casual", 0, 0, 0, topic="reddit_comment")])
     return convs
 
 
@@ -186,7 +212,8 @@ def sarc_records(lines: Iterable[str], source_id: str = "sarc") -> list[list[dic
             convs[key] = []
             order.append(key)
         convs[key].append(_mk(key, len(convs[key]) + 1, author, text, emotion,
-                              tone, int(rec.get("label", 0)), 0, 0))
+                              tone, int(rec.get("label", 0)), 0, 0,
+                              topic="reddit_thread"))
     return [convs[k] for k in order]
 
 
@@ -218,7 +245,7 @@ def dailydialog_conversations(utterance_lines: Iterable[str],
                     "neutral": "casual"}[_EMOTION_VALENCE[emotion][0]]
             conv.append(_mk(f"{source_id}_d{d}", t + 1,
                             "A" if t % 2 == 0 else "B", text, emotion, tone,
-                            0, 0, 0))
+                            0, 0, 0, topic="daily_dialogue"))
         if conv:
             convs.append(conv)
     return convs

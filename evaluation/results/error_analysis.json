@@ -133,7 +133,7 @@
       "text": "Honestly better than I expected, I think I passed.",
       "ground_truth": "1",
       "prediction": "0 (p=0.00)",
-      "confidence": 0.0006,
+      "confidence": 0.0005,
       "error_type": "passive_aggression:false_negative",
       "attributed_to_noise": true,
       "template_design_label": 0,

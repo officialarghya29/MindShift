@@ -93,6 +93,18 @@ def store_get(key: str) -> dict:
     return report
 
 
+def store_delete(key: str) -> bool:
+    """Drop one stored conversation. Returns True if something was removed."""
+    return _STORE.pop(key, None) is not None
+
+
+def store_purge() -> int:
+    """Drop every stored conversation. Returns how many were held."""
+    n = len(_STORE)
+    _STORE.clear()
+    return n
+
+
 def _read_upload(file: UploadFile) -> str:
     raw = file.file.read(MAX_BYTES + 1)
     if len(raw) > MAX_BYTES:
@@ -201,6 +213,28 @@ async def get_digest(conv_id: str):
 @app.get("/conversation/{conv_id}/report")
 async def get_report(conv_id: str):
     return store_get(conv_id)
+
+
+@app.delete("/conversation/{conv_id}")
+async def delete_conversation(conv_id: str):
+    """Deletion control (PS-01 §40/§45): remove a stored conversation now.
+
+    Uploaded chats live only in a bounded in-memory store, but a user still
+    needs to be able to revoke one before its TTL expires.
+    """
+    if not store_delete(conv_id):
+        raise HTTPException(404, f"conversation '{conv_id}' not found")
+    return {"deleted": True, "conversation_id": conv_id,
+            "stored_conversations": len(_STORE),
+            "note": "removed from the in-memory store immediately"}
+
+
+@app.delete("/conversations")
+async def delete_all_conversations():
+    """Delete-everything control: purge the whole in-memory store."""
+    n = store_purge()
+    return {"deleted": n, "stored_conversations": 0,
+            "note": "all stored conversations removed"}
 
 
 @app.get("/conversation/{conv_id}/topics")

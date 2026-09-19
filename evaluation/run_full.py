@@ -19,6 +19,7 @@ from collections import Counter
 import numpy as np
 from scipy.sparse import hstack, csr_matrix, vstack
 
+from cerebro.common.labels import ESCALATION_TENSION_THRESHOLD
 from cerebro.common.metrics import (classification_metrics, regression_metrics,
                                     probability_metrics)
 from cerebro.data.generator import generate_corpus, split_conversations, corpus_stats
@@ -34,7 +35,10 @@ from cerebro.common.io import save_json
 
 RESULTS_DIR = "evaluation/results"
 SEED = 42
-TENSION_EDGE = 60  # escalation threshold for binary escalation F1 (§37)
+# escalation threshold for binary escalation F1 (§37) — shared with the
+# corpus's derived label via cerebro.common.labels, so the target the model is
+# scored against is the same edge the dataset was annotated with
+TENSION_EDGE = ESCALATION_TENSION_THRESHOLD
 
 HEADS_CLASS = ["sentiment", "emotion", "tone"]
 HEADS_BINARY = ["sarcasm", "irony", "passive_aggression"]

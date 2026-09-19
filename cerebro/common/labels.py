@@ -15,6 +15,12 @@ TONE_LABELS = [
     "dismissive", "cold", "frustrated", "aggressive", "passive-aggressive",
 ]
 
+# Escalation is a DERIVED binary signal, not an independent judgement: a message
+# is "escalating" once tension crosses this edge. Single source of truth, used
+# by the corpus's derived label (blueprint §6), the evaluation target (§37) and
+# the dashboard's escalation zone.
+ESCALATION_TENSION_THRESHOLD = 60.0
+
 # How each signal is predicted
 HEADS = {
     "sentiment": {"type": "multiclass", "labels": SENTIMENT_LABELS},
