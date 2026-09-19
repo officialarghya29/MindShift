@@ -22,6 +22,33 @@ NEG_LEX = {
 SARC_MARKERS = {"yeah", "sure", "great", "perfect", "obviously", "totally", "brilliant",
                 "fantastic", "wonderful", "amazing", "right", "exactly", "congrats", "thanks"}
 IRONY_MARKERS = {"wow", "ah", "oh", "great", "perfect", "just", "exactly", "clearly"}
+
+# Several SARC_MARKERS words are ironic in only ONE of their senses. Token-level
+# membership therefore fires on sincere messages: "I was sure the deadline was next
+# month" is plain certainty, not the dismissive "Sure.", and "that's right" is
+# agreement, not the confrontational "Right.". Error analysis surfaced both as
+# false positives at p ~ 0.52-0.58 on sincere messages in heated windows.
+# A marker is suppressed when any of its non-ironic frames appears in the message.
+# (Same idea as PA_PHRASES, which matches positionally rather than by token.)
+SARC_SENSE_BLOCKERS = {
+    "sure": ("i was sure", "i'm sure", "im sure", "make sure", "for sure",
+             "not sure", "wasn't sure", "be sure", "sure that", "sure if",
+             "sure about", "sure to", "sure thing", "sure you"),
+    "right": ("that's right", "that is right", "you're right", "you are right",
+              "all right", "right now", "right away", "right there",
+              "right back", "isn't right", "not right"),
+    "great": ("great to hear", "great news", "that's great", "feel great"),
+    "thanks": ("thanks for", "thanks so much", "thanks a lot", "no thanks"),
+}
+
+# Explicit belief-revision markers: the speaker is updating on new information
+# rather than echoing a prior grievance. Sarcasm requires an echoic gap between
+# literal praise and a known negative fact (PS-01 §14); genuine surprise is the
+# opposite — the speaker did not know the fact yet. Used to dampen contradiction
+# evidence, exactly as the `cooperative` markers do, but more gently.
+BELIEF_UPDATE_MARKERS = ("wait", "no way", "i was sure", "i thought", "really?",
+                         "for real", "you did", "did you", "already",
+                         "wasn't expecting", "didn't expect", "turns out")
 PA_PHRASES = [
     "fine.", "whatever.", "do what you want", "okay then.", "ok then.", "no problem.",
     "as you wish", "i'm not angry", "i'm not mad", "do whatever you want", "suit yourself",

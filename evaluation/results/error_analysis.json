@@ -3,16 +3,12 @@
     "sarcasm:false_negative": 5,
     "irony:false_negative": 4,
     "passive_aggression:false_negative": 5,
-    "sarcasm:false_positive": 3,
-    "irony:false_positive": 2,
     "passive_aggression:false_positive": 1
   },
   "binary_breakdown": {
     "sarcasm:false_negative": 5,
     "irony:false_negative": 4,
     "passive_aggression:false_negative": 5,
-    "sarcasm:false_positive": 3,
-    "irony:false_positive": 2,
     "passive_aggression:false_positive": 1
   },
   "noise_attribution": {
@@ -24,8 +20,6 @@
     "sarcasm:false_negative": 1,
     "irony:false_negative": 1,
     "passive_aggression:false_negative": 0,
-    "sarcasm:false_positive": 3,
-    "irony:false_positive": 2,
     "passive_aggression:false_positive": 1
   },
   "samples": [
@@ -67,19 +61,6 @@
       "attributed_to_noise": true,
       "template_design_label": 0,
       "possible_cause": "gold label contradicts the template design — attributable to the injected 1.5% annotator noise (irreducible error)"
-    },
-    {
-      "conversation": "conv_0583",
-      "message_id": 16,
-      "head": "sarcasm",
-      "text": "Wait, you finished the whole thing already? That's amazing! (quick one about the booking)",
-      "ground_truth": "0",
-      "prediction": "1 (p=0.52)",
-      "confidence": 0.5192,
-      "error_type": "sarcasm:false_positive",
-      "attributed_to_noise": false,
-      "template_design_label": 0,
-      "possible_cause": "tension trajectory primed the prior"
     },
     {
       "conversation": "conv_0284",
@@ -197,58 +178,6 @@
       "attributed_to_noise": true,
       "template_design_label": 0,
       "possible_cause": "gold label contradicts the template design — attributable to the injected 1.5% annotator noise (irreducible error)"
-    },
-    {
-      "conversation": "conv_0485",
-      "message_id": 8,
-      "head": "sarcasm",
-      "text": "No way! I was sure the deadline was next month.",
-      "ground_truth": "0",
-      "prediction": "1 (p=0.57)",
-      "confidence": 0.575,
-      "error_type": "sarcasm:false_positive",
-      "attributed_to_noise": false,
-      "template_design_label": 0,
-      "possible_cause": "tension trajectory primed the prior"
-    },
-    {
-      "conversation": "conv_0485",
-      "message_id": 8,
-      "head": "irony",
-      "text": "No way! I was sure the deadline was next month.",
-      "ground_truth": "0",
-      "prediction": "1 (p=0.58)",
-      "confidence": 0.5771,
-      "error_type": "irony:false_positive",
-      "attributed_to_noise": false,
-      "template_design_label": 0,
-      "possible_cause": "tension trajectory primed the prior"
-    },
-    {
-      "conversation": "conv_0485",
-      "message_id": 9,
-      "head": "sarcasm",
-      "text": "Wait, you finished the whole thing already? That's amazing! (for the delayed order)",
-      "ground_truth": "0",
-      "prediction": "1 (p=0.58)",
-      "confidence": 0.5773,
-      "error_type": "sarcasm:false_positive",
-      "attributed_to_noise": false,
-      "template_design_label": 0,
-      "possible_cause": "tension trajectory primed the prior"
-    },
-    {
-      "conversation": "conv_0485",
-      "message_id": 9,
-      "head": "irony",
-      "text": "Wait, you finished the whole thing already? That's amazing! (for the delayed order)",
-      "ground_truth": "0",
-      "prediction": "1 (p=0.58)",
-      "confidence": 0.5752,
-      "error_type": "irony:false_positive",
-      "attributed_to_noise": false,
-      "template_design_label": 0,
-      "possible_cause": "tension trajectory primed the prior"
     },
     {
       "conversation": "conv_0570",

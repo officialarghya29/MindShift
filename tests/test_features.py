@@ -46,3 +46,38 @@ def test_segmentation_time_gap():
 def test_segmentation_cohesion_short_returns_single():
     msgs = [{"message_id": i + 1, "text": f"msg {i}", "timestamp": None} for i in range(4)]
     assert len(segment_conversation(msgs)) == 1
+
+
+def test_sarcasm_markers_are_sense_disambiguated():
+    """Regression: plain certainty/agreement must not count as irony evidence.
+
+    "sure" is a dismissive marker in "Sure." but ordinary certainty in "I was
+    sure ..."; matching by token alone produced false positives on sincere
+    messages. Found by error analysis, fixed in SARC_SENSE_BLOCKERS.
+    """
+    from cerebro.features.preprocess import micro_signals
+    assert "sure" not in micro_signals("I was sure the deadline was next month.")["sarc_words"]
+    assert "sure" not in micro_signals("Make sure the file is attached.")["sarc_words"]
+    assert "right" not in micro_signals("That's right, well spotted.")["sarc_words"]
+    # the ironic senses must survive the blocker
+    assert "sure" in micro_signals("Sure.")["sarc_words"]
+    assert "right" in micro_signals("Right, and I'm the villain of course.")["sarc_words"]
+
+
+def test_belief_update_markers_damp_contradiction_but_not_true_sarcasm():
+    from cerebro.features.preprocess import micro_signals
+    from cerebro.models.hidden_signals import sarcasm_score
+    sig = micro_signals("Wait, you finished the whole thing already? That's amazing!")
+    assert sig["belief_update"] is True
+    sincere = sarcasm_score(0.05, {"probabilities": {"positive": .9, "negative": .01}},
+                            "it crashed again and we are late", sig, 80.0, 84.0)
+    plain = micro_signals("That's amazing, congratulations on the launch!")
+    no_update = sarcasm_score(0.05, {"probabilities": {"positive": .9, "negative": .01}},
+                              "it crashed again and we are late", plain, 80.0, 84.0)
+    # belief revision lowers the score relative to the same wording without it
+    assert sincere["probability"] < no_update["probability"]
+    # a real echoic barb carries no belief-update marker and stays flagged
+    barb = micro_signals("Oh, we're doing this again tonight? Wonderful.")
+    assert barb["belief_update"] is False
+    assert sarcasm_score(0.05, {"probabilities": {"positive": .9, "negative": .01}},
+                         "it crashed again and we are late", barb, 80.0, 86.0)["probability"] > 0.5
