@@ -63,7 +63,7 @@
       "f1_macro": 0.958,
       "f1_weighted": 0.9811
     },
-    "latency_ms": 4.66
+    "latency_ms": 4.15
   },
   "B2_tfidf_svc": {
     "sentiment": {
@@ -129,7 +129,7 @@
       "f1_macro": 0.958,
       "f1_weighted": 0.9811
     },
-    "latency_ms": 6.46
+    "latency_ms": 6.48
   },
   "B3_tfidf_context": {
     "sentiment": {
@@ -195,6 +195,6 @@
       "f1_macro": 0.9589,
       "f1_weighted": 0.9816
     },
-    "latency_ms": 3.14
+    "latency_ms": 3.15
   }
 }

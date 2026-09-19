@@ -1,0 +1,226 @@
+{
+  "annotation_consistency": {
+    "accepted_band": [
+      0.0037,
+      0.0375
+    ],
+    "flips_per_head": {
+      "irony": 42,
+      "passive_aggression": 60,
+      "sarcasm": 44
+    },
+    "injected_rate": 0.015,
+    "measured_rate": 0.0133,
+    "messages_with_flipped_label": 146,
+    "note": "measured disagreement is the ONLY label inconsistency; the template design is taken as ground truth",
+    "passed": true
+  },
+  "class_imbalance": {
+    "emotion": {
+      "counts": {
+        "affection": 821,
+        "anger": 732,
+        "anxiety": 592,
+        "confusion": 145,
+        "disgust": 136,
+        "excitement": 411,
+        "fear": 68,
+        "frustration": 928,
+        "joy": 1604,
+        "neutral": 2983,
+        "relief": 1535,
+        "sadness": 588,
+        "surprise": 0
+      },
+      "imbalance_ratio": 2983.0,
+      "majority_share": 0.2723,
+      "ok": true
+    },
+    "irony": {
+      "imbalance_ratio": 28.53,
+      "negative": 10585,
+      "note": "binary heads are deliberately minority-positive",
+      "ok": true,
+      "positive": 371,
+      "positive_rate": 0.0339
+    },
+    "passive_aggression": {
+      "imbalance_ratio": 23.62,
+      "negative": 10511,
+      "note": "binary heads are deliberately minority-positive",
+      "ok": true,
+      "positive": 445,
+      "positive_rate": 0.0406
+    },
+    "sarcasm": {
+      "imbalance_ratio": 34.46,
+      "negative": 10647,
+      "note": "binary heads are deliberately minority-positive",
+      "ok": true,
+      "positive": 309,
+      "positive_rate": 0.0282
+    },
+    "sentiment": {
+      "counts": {
+        "negative": 2671,
+        "neutral": 2615,
+        "positive": 5670
+      },
+      "imbalance_ratio": 2.17,
+      "majority_share": 0.5175,
+      "ok": true
+    },
+    "tone": {
+      "counts": {
+        "aggressive": 399,
+        "apologetic": 645,
+        "casual": 2701,
+        "cold": 358,
+        "concerned": 182,
+        "defensive": 503,
+        "dismissive": 207,
+        "friendly": 2858,
+        "frustrated": 307,
+        "humorous": 0,
+        "passive-aggressive": 185,
+        "professional": 1457,
+        "sarcastic": 265,
+        "supportive": 889
+      },
+      "imbalance_ratio": 2858.0,
+      "majority_share": 0.2609,
+      "ok": true
+    }
+  },
+  "conversation_level_separation": {
+    "evidence": "split by whole conversation; hash-ranked, never by message",
+    "id_overlaps": {
+      "train_test": 0,
+      "train_val": 0,
+      "val_test": 0
+    },
+    "passed": true,
+    "split_sizes": {
+      "test": 89,
+      "train": 411,
+      "val": 88
+    }
+  },
+  "duplicate_conversations": {
+    "distinct_signatures": 588,
+    "duplicate_conversations": 0,
+    "passed": true
+  },
+  "duplicate_messages": {
+    "distinct_normalized_texts": 54,
+    "max_repeats_of_one_text": 424,
+    "messages": 10956,
+    "note": "expected for a template corpus; reported so the saturation of the classification heads is never mistaken for a modelling win",
+    "passed": true,
+    "template_reuse_factor": 202.889
+  },
+  "label_leakage_empirical": {
+    "heads": {
+      "emotion": {
+        "chi2_p": 0.1657,
+        "chi2_testable": true,
+        "classes_absent_from_corpus": 1,
+        "max_class_share_deviation": 0.0201,
+        "ok": true
+      },
+      "sentiment": {
+        "chi2_p": 0.0487,
+        "chi2_testable": true,
+        "classes_absent_from_corpus": 0,
+        "max_class_share_deviation": 0.0309,
+        "ok": true
+      },
+      "tone": {
+        "chi2_p": 0.512,
+        "chi2_testable": true,
+        "classes_absent_from_corpus": 1,
+        "max_class_share_deviation": 0.0297,
+        "ok": true
+      }
+    },
+    "passed": true
+  },
+  "label_leakage_static": {
+    "evidence": "AST scan of split_conversations() source",
+    "keys_on_conversation_id": true,
+    "label_fields_referenced": [],
+    "passed": true
+  },
+  "licensing": {
+    "passed": true,
+    "sources": [
+      {
+        "dataset": "GoEmotions (Google Research)",
+        "license": "research / non-commercial (CC BY 4.0 for the release data)",
+        "raw_text_committed": false,
+        "use": "zero-shot transfer eval + head fine-tuning protocol"
+      },
+      {
+        "dataset": "SARC (Self-Annotated Reddit Corpus)",
+        "license": "research use; redistribution restricted",
+        "raw_text_committed": false,
+        "use": "sarcasm adapter \u2014 conversion + schema validation only"
+      },
+      {
+        "dataset": "DailyDialog",
+        "license": "CC BY-NC-SA 4.0 (non-commercial)",
+        "raw_text_committed": false,
+        "use": "dialogue adapter \u2014 conversion + schema validation only"
+      },
+      {
+        "dataset": "CEREBRO generated corpus",
+        "license": "generated in-repo from a seed \u2014 no external data",
+        "raw_text_committed": true,
+        "use": "training, validation, test (conversation-level splits)"
+      }
+    ]
+  },
+  "n_conversations": 588,
+  "n_messages": 10956,
+  "passed": true,
+  "split_balance": {
+    "cohens_d": 0.0696,
+    "criterion": "|Cohen's d| < 0.2 (negligible)",
+    "ks_p_value": 0.0023,
+    "note": "the split is hash-ranked by conversation id, not stratified by arc, so a small tension drift between splits is expected; the effect size above is what matters",
+    "passed": true,
+    "test_mean": 27.21,
+    "test_sd": 26.32,
+    "train_mean": 25.41,
+    "train_sd": 25.81
+  },
+  "synthetic_overrepresentation": {
+    "arcs": 7,
+    "cell_count_max": 588,
+    "cell_count_min": 588,
+    "conversations_per_cell": 14.0,
+    "domains": 6,
+    "note": "corpus is generated from a fixed 6 \u00d7 7 grid, so every cell is exactly balanced by construction",
+    "passed": true,
+    "per_arc": {
+      "?": 588
+    },
+    "per_domain": {
+      "domains": [
+        "work_project",
+        "college_team",
+        "startup_founders",
+        "flatmates",
+        "customer_support",
+        "old_friends"
+      ]
+    }
+  },
+  "test_set_contamination": {
+    "conversation_overlap_train": 0,
+    "conversation_overlap_val": 0,
+    "note": "template phrasings recur across splits by construction; whole conversations never do, so no context is ever shared",
+    "passed": true,
+    "shared_template_texts_train": 54
+  }
+}

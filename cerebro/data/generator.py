@@ -4,9 +4,10 @@ Synthetic-but-annotated conversational corpus: 6 domains × 7 arc patterns,
 weak-supervision labels applied at generation time, conversation-level
 train/val/test splits (no context leakage).
 
-Every message carries the unified schema:
-  conversation_id, message_id, speaker_id, timestamp, text,
-  sentiment, emotion, tone, sarcasm, irony, passive_aggression, tension
+Every message carries the full blueprint §6 unified schema:
+  conversation_id, message_id, speaker_id, timestamp, text, sentiment,
+  emotion, tone, sarcasm, irony, passive_aggression, tension,
+  escalation (derived: tension ≥ ESCALATION_TENSION_THRESHOLD), topic
 
 Run:  python -m cerebro.data.generator
 """
@@ -16,6 +17,7 @@ import hashlib
 import random
 from datetime import datetime, timedelta
 
+from cerebro.common.labels import ESCALATION_TENSION_THRESHOLD
 from cerebro.data.domains import DOMAINS
 
 ARC_PATTERNS = ["calm", "positive", "friction", "escalation", "sarcasm",
@@ -117,6 +119,11 @@ def _make_conversation(dom_name, domain, arc, conv_id, rng, n_turns=None) -> lis
             "platform": "synthetic",
             **labels,
             "tension": round(ten, 1),
+            # blueprint §6 unified schema: escalation is derived from tension
+            # (never an independent judgement), topic is the conversation's
+            # situational domain
+            "escalation": int(round(ten, 1) >= ESCALATION_TENSION_THRESHOLD),
+            "topic": dom_name,
         })
         ts = ts + timedelta(seconds=rng.randint(10, 900))
     return convo

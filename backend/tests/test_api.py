@@ -108,6 +108,35 @@ def test_404_for_unknown_conversation():
     c = _client()
     assert c.get("/conversation/does_not_exist").status_code == 404
     assert c.get("/conversation/does_not_exist/digest").status_code == 404
+    assert c.delete("/conversation/does_not_exist").status_code == 404
+
+
+def test_deletion_controls_privacy_45():
+    """PS-01 §40/§45: a user must be able to revoke a stored conversation."""
+    c = _client()
+    r = c.post("/analyze", files={
+        "file": ("chat.txt", io.BytesIO(b"A: fine.\nB: ok then"), "text/plain")})
+    assert r.status_code == 200
+    conv = r.json()["summary"]["conversation_id"]
+    assert c.get(f"/conversation/{conv}").status_code == 200
+
+    d = c.delete(f"/conversation/{conv}")
+    assert d.status_code == 200 and d.json()["deleted"] is True
+    # gone for real: every read path 404s afterwards
+    assert c.get(f"/conversation/{conv}").status_code == 404
+    assert c.get(f"/conversation/{conv}/timeline").status_code == 404
+    # deleting twice is an honest 404, not a silent success
+    assert c.delete(f"/conversation/{conv}").status_code == 404
+
+
+def test_delete_all_conversations():
+    c = _client()
+    for tok in (b"A: hello\nB: hi", b"A: ok\nB: sure"):
+        c.post("/analyze", files={"file": ("chat.txt", io.BytesIO(tok), "text/plain")})
+    assert c.get("/healthz").json()["stored_conversations"] >= 2
+    body = c.delete("/conversations").json()
+    assert body["stored_conversations"] == 0
+    assert c.get("/healthz").json()["stored_conversations"] == 0
 
 
 def test_short_conversation_escalation_schema_and_digest():
