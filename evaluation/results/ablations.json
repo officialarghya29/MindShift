@@ -22,48 +22,48 @@
       "f1_weighted": 1.0
     },
     "sarcasm": {
-      "accuracy": 0.997,
-      "precision": 0.9984,
-      "recall": 0.9479,
-      "f1_macro": 0.9717,
-      "f1_weighted": 0.9969,
-      "roc_auc": 0.927,
-      "pr_auc": 0.9005,
-      "brier": 0.0037
+      "accuracy": 0.9933,
+      "precision": 0.9966,
+      "recall": 0.9141,
+      "f1_macro": 0.9513,
+      "f1_weighted": 0.993,
+      "roc_auc": 0.9352,
+      "pr_auc": 0.8888,
+      "brier": 0.006
     },
     "irony": {
-      "accuracy": 0.9964,
-      "precision": 0.9981,
-      "recall": 0.9464,
-      "f1_macro": 0.9708,
-      "f1_weighted": 0.9963,
-      "roc_auc": 0.9372,
-      "pr_auc": 0.8997,
-      "brier": 0.0042
+      "accuracy": 0.9933,
+      "precision": 0.9965,
+      "recall": 0.9154,
+      "f1_macro": 0.9521,
+      "f1_weighted": 0.993,
+      "roc_auc": 0.9292,
+      "pr_auc": 0.8507,
+      "brier": 0.0072
     },
     "passive_aggression": {
-      "accuracy": 0.9945,
-      "precision": 0.9972,
-      "recall": 0.9262,
-      "f1_macro": 0.9588,
-      "f1_weighted": 0.9943,
-      "roc_auc": 0.9451,
-      "pr_auc": 0.8831,
-      "brier": 0.0059
+      "accuracy": 0.9939,
+      "precision": 0.9968,
+      "recall": 0.9306,
+      "f1_macro": 0.9611,
+      "f1_weighted": 0.9937,
+      "roc_auc": 0.9398,
+      "pr_auc": 0.8934,
+      "brier": 0.0063
     },
     "tension": {
-      "mae": 3.205,
-      "rmse": 4.215,
-      "r2": 0.9744
+      "mae": 3.359,
+      "rmse": 4.38,
+      "r2": 0.9723
     },
     "escalation": {
-      "accuracy": 0.9812,
-      "precision": 0.9626,
-      "recall": 0.9534,
-      "f1_macro": 0.958,
-      "f1_weighted": 0.9811
+      "accuracy": 0.9788,
+      "precision": 0.9533,
+      "recall": 0.9514,
+      "f1_macro": 0.9523,
+      "f1_weighted": 0.9787
     },
-    "latency_ms": 3.08
+    "latency_ms": 3.09
   },
   "B": {
     "sentiment": {
@@ -88,48 +88,48 @@
       "f1_weighted": 1.0
     },
     "sarcasm": {
-      "accuracy": 0.9964,
-      "precision": 0.9981,
-      "recall": 0.9375,
-      "f1_macro": 0.9657,
-      "f1_weighted": 0.9962,
-      "roc_auc": 0.9328,
-      "pr_auc": 0.8976,
-      "brier": 0.0046
+      "accuracy": 0.9933,
+      "precision": 0.9966,
+      "recall": 0.9141,
+      "f1_macro": 0.9513,
+      "f1_weighted": 0.993,
+      "roc_auc": 0.9465,
+      "pr_auc": 0.8885,
+      "brier": 0.0069
     },
     "irony": {
-      "accuracy": 0.9964,
-      "precision": 0.9981,
-      "recall": 0.9464,
-      "f1_macro": 0.9708,
-      "f1_weighted": 0.9963,
-      "roc_auc": 0.9471,
-      "pr_auc": 0.9006,
-      "brier": 0.0044
+      "accuracy": 0.9921,
+      "precision": 0.9959,
+      "recall": 0.9,
+      "f1_macro": 0.9424,
+      "f1_weighted": 0.9917,
+      "roc_auc": 0.9437,
+      "pr_auc": 0.8556,
+      "brier": 0.0081
     },
     "passive_aggression": {
-      "accuracy": 0.9939,
-      "precision": 0.9969,
-      "recall": 0.918,
-      "f1_macro": 0.9538,
-      "f1_weighted": 0.9937,
-      "roc_auc": 0.9399,
-      "pr_auc": 0.892,
-      "brier": 0.006
+      "accuracy": 0.9927,
+      "precision": 0.9962,
+      "recall": 0.9167,
+      "f1_macro": 0.9526,
+      "f1_weighted": 0.9924,
+      "roc_auc": 0.9429,
+      "pr_auc": 0.9107,
+      "brier": 0.0069
     },
     "tension": {
-      "mae": 3.227,
-      "rmse": 4.25,
-      "r2": 0.9739
+      "mae": 3.405,
+      "rmse": 4.444,
+      "r2": 0.9715
     },
     "escalation": {
-      "accuracy": 0.9818,
-      "precision": 0.9686,
-      "recall": 0.9498,
-      "f1_macro": 0.9589,
-      "f1_weighted": 0.9816
+      "accuracy": 0.9782,
+      "precision": 0.9527,
+      "recall": 0.9491,
+      "f1_macro": 0.9509,
+      "f1_weighted": 0.9781
     },
-    "latency_ms": 3.2
+    "latency_ms": 3.21
   },
   "C": {
     "sentiment": {
@@ -154,48 +154,48 @@
       "f1_weighted": 1.0
     },
     "sarcasm": {
-      "accuracy": 0.9958,
-      "precision": 0.9978,
-      "recall": 0.9271,
-      "f1_macro": 0.9596,
-      "f1_weighted": 0.9956,
-      "roc_auc": 0.9344,
-      "pr_auc": 0.8981,
-      "brier": 0.0048
+      "accuracy": 0.9933,
+      "precision": 0.9966,
+      "recall": 0.9141,
+      "f1_macro": 0.9513,
+      "f1_weighted": 0.993,
+      "roc_auc": 0.946,
+      "pr_auc": 0.8883,
+      "brier": 0.0068
     },
     "irony": {
-      "accuracy": 0.9964,
-      "precision": 0.9981,
-      "recall": 0.9464,
-      "f1_macro": 0.9708,
-      "f1_weighted": 0.9963,
-      "roc_auc": 0.9467,
-      "pr_auc": 0.9005,
-      "brier": 0.0044
+      "accuracy": 0.9921,
+      "precision": 0.9959,
+      "recall": 0.9,
+      "f1_macro": 0.9424,
+      "f1_weighted": 0.9917,
+      "roc_auc": 0.9415,
+      "pr_auc": 0.8547,
+      "brier": 0.0082
     },
     "passive_aggression": {
       "accuracy": 0.9939,
-      "precision": 0.9969,
-      "recall": 0.918,
-      "f1_macro": 0.9538,
+      "precision": 0.9968,
+      "recall": 0.9306,
+      "f1_macro": 0.9611,
       "f1_weighted": 0.9937,
-      "roc_auc": 0.9412,
-      "pr_auc": 0.8889,
-      "brier": 0.0061
+      "roc_auc": 0.9442,
+      "pr_auc": 0.9048,
+      "brier": 0.0069
     },
     "tension": {
-      "mae": 3.226,
-      "rmse": 4.248,
-      "r2": 0.974
+      "mae": 3.404,
+      "rmse": 4.446,
+      "r2": 0.9715
     },
     "escalation": {
-      "accuracy": 0.9818,
-      "precision": 0.9686,
-      "recall": 0.9498,
-      "f1_macro": 0.9589,
-      "f1_weighted": 0.9816
+      "accuracy": 0.9782,
+      "precision": 0.9544,
+      "recall": 0.947,
+      "f1_macro": 0.9507,
+      "f1_weighted": 0.9781
     },
-    "latency_ms": 3.23
+    "latency_ms": 3.32
   },
   "D": {
     "sentiment": {
@@ -220,47 +220,47 @@
       "f1_weighted": 1.0
     },
     "sarcasm": {
-      "accuracy": 0.9964,
-      "precision": 0.9981,
-      "recall": 0.9375,
-      "f1_macro": 0.9657,
-      "f1_weighted": 0.9962,
-      "roc_auc": 0.9342,
-      "pr_auc": 0.8981,
-      "brier": 0.0047
-    },
-    "irony": {
-      "accuracy": 0.9964,
-      "precision": 0.9981,
-      "recall": 0.9464,
-      "f1_macro": 0.9708,
-      "f1_weighted": 0.9963,
-      "roc_auc": 0.945,
-      "pr_auc": 0.9002,
-      "brier": 0.0043
-    },
-    "passive_aggression": {
       "accuracy": 0.9939,
       "precision": 0.9969,
-      "recall": 0.918,
-      "f1_macro": 0.9538,
+      "recall": 0.9219,
+      "f1_macro": 0.9561,
       "f1_weighted": 0.9937,
-      "roc_auc": 0.9367,
-      "pr_auc": 0.8867,
-      "brier": 0.0062
+      "roc_auc": 0.9451,
+      "pr_auc": 0.8889,
+      "brier": 0.0068
+    },
+    "irony": {
+      "accuracy": 0.9921,
+      "precision": 0.9959,
+      "recall": 0.9,
+      "f1_macro": 0.9424,
+      "f1_weighted": 0.9917,
+      "roc_auc": 0.9328,
+      "pr_auc": 0.8511,
+      "brier": 0.0083
+    },
+    "passive_aggression": {
+      "accuracy": 0.9933,
+      "precision": 0.9889,
+      "recall": 0.9302,
+      "f1_macro": 0.9575,
+      "f1_weighted": 0.9931,
+      "roc_auc": 0.9448,
+      "pr_auc": 0.9021,
+      "brier": 0.007
     },
     "tension": {
-      "mae": 3.079,
-      "rmse": 3.959,
-      "r2": 0.9774
+      "mae": 3.205,
+      "rmse": 4.139,
+      "r2": 0.9753
     },
     "escalation": {
-      "accuracy": 0.9812,
-      "precision": 0.9626,
-      "recall": 0.9534,
-      "f1_macro": 0.958,
-      "f1_weighted": 0.9811
+      "accuracy": 0.9794,
+      "precision": 0.9555,
+      "recall": 0.9518,
+      "f1_macro": 0.9536,
+      "f1_weighted": 0.9793
     },
-    "latency_ms": 3.31
+    "latency_ms": 3.36
   }
 }

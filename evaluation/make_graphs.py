@@ -798,6 +798,7 @@ def graph_confusion(head_key, labels, title, fname, color):
 def graph_calibration():
     from sklearn.calibration import calibration_curve
     proba = _test_predictions_proba()
+    cal = load("summary.json")["full_metrics"].get("calibration", {})
     fig, ax = plt.subplots(figsize=(FIG_W, 8.8))
     for name, color in [("sarcasm", PINK), ("irony", PURPLE),
                         ("passive_aggression", GREEN)]:
@@ -805,8 +806,10 @@ def graph_calibration():
         p = np.array([p[1] for p in proba[name]])
         frac, mean_p = calibration_curve(y, p, n_bins=8, strategy="quantile")
         brier = float(np.mean((p - y) ** 2))
-        ax.plot(mean_p, frac, "-o", color=color, lw=3.0, ms=10,
-                label=f"{name}  (Brier {brier:.3f})")
+        ece = cal.get(name, {}).get("ece")
+        label = (f"{name}  (ECE {ece:.3f})" if ece is not None
+                 else f"{name}  (Brier {brier:.3f})")
+        ax.plot(mean_p, frac, "-o", color=color, lw=3.0, ms=10, label=label)
     ax.plot([0, 1], [0, 1], "--", color="#6B7280", lw=1.6,
             label="perfectly calibrated")
     ax.set_xlabel("predicted probability")
@@ -818,15 +821,149 @@ def graph_calibration():
     ax.set_title("Curves hugging the diagonal = trustworthy confidences",
                  loc="left", pad=12)
     style_ax(ax)
-    band = header(fig, "Probability calibration — hidden-signal heads",
-                  "reliability curves on 45 test conversations · Brier score in legend "
-                  "(lower = better)")
+    mc = [cal.get(h, {}).get("ece") for h in ("sentiment", "emotion", "tone")]
+    extra = (f" · top-1 ECE: sentiment {mc[0]:.3f}, emotion {mc[1]:.3f}, "
+             f"tone {mc[2]:.3f}" if all(v is not None for v in mc) else "")
+    band = header(fig, "Probability calibration — every head, not just the binary ones",
+                  "reliability curves on 45 test conversations · expected calibration "
+                  "error in legend (lower = better)" + extra)
     fig.subplots_adjust(top=top_for(fig, band), bottom=0.215, left=0.135,
                         right=0.975)
     save(fig, "calibration_curves.png")
 
 
-# ================================================================ 7 · DATASET
+# ================================================ 7 · CONTEXT PROOF (§3, §36)
+def graph_context_proof():
+    """The headline experiment: text-only is bounded by the lexical ceiling."""
+    proof = load("context_proof.json")
+    tx = load("transformer_baselines.json")
+    reg = proof["regimes"][proof["primary_regime"]]
+    ceiling = reg["text_only_lexical_ceiling"]["sentiment"]["accuracy"]
+    variants = ["A", "B", "C", "D", "E"]
+    vlabels = ["A text only", "B +context", "C +memory", "D +behavior",
+               "E +fusion"]
+    heads = [("sentiment", "Sentiment", CYAN), ("emotion", "Emotion", PURPLE),
+             ("tone", "Tone", PINK)]
+
+    # one panel per head: each value label then owns its own slot, so no two
+    # numbers can ever land on the same baseline (the three heads share values)
+    fig, axes = plt.subplots(4, 1, figsize=(FIG_W, 16.6),
+                             gridspec_kw={"height_ratios": [1, 1, 1, 1.30]})
+    x = np.arange(len(variants))
+    for ax, (key, lbl, _c) in zip(axes[:3], heads):
+        vals = [reg["variants"][v][key]["accuracy"] for v in variants]
+        bars = ax.bar(x, vals, 0.55, color=[BLUE] * 4 + [GREEN], edgecolor=BG, lw=.6)
+        for b, v in zip(bars, vals):
+            ax.text(b.get_x() + b.get_width() / 2, v + .032, f"{v:.3f}",
+                    ha="center", fontsize=FS_VALUE, color="white",
+                    fontweight="bold" if v == max(vals) else "normal")
+        ax.axhline(ceiling, color=ORANGE, ls="--", lw=1.8)
+        ax.set_ylim(0, 1.20)
+        ax.set_yticks(np.arange(0, 1.01, .25))
+        ax.set_ylabel(f"{lbl}\naccuracy", fontsize=FS_TICK - 1)
+        ax.set_title(f"{lbl} — dashed line = text-only lexical ceiling "
+                     f"{ceiling:.3f}", loc="left", pad=10)
+        ax.tick_params(labelbottom=False)
+        style_ax(ax)
+    axes[2].set_xticks(x, vlabels, fontsize=FS_TICK - 0.5)
+    axes[2].tick_params(labelbottom=True)
+    ax2 = axes[3]
+
+    # -- panel 4: every context-free reader sits ON the ceiling
+    probe = tx["probe_experiment"]["test"]
+    rows = [("MiniLM (B2)\nno context",
+             probe["B2_transformer_text_only"]["sentiment"]["accuracy"], PINK),
+            ("TF-IDF (A)\nno context",
+             reg["variants"]["A"]["sentiment"]["accuracy"], BLUE),
+            ("MiniLM (B3)\n+ context",
+             probe["B3_transformer_plus_context"]["sentiment"]["accuracy"], PURPLE),
+            ("CEREBRO full (E)", reg["variants"]["E"]["sentiment"]["accuracy"], GREEN)]
+    y = np.arange(len(rows))[::-1]
+    ax2.barh(y, [v for _, v, _ in rows], 0.55, color=[c for _, _, c in rows],
+             edgecolor=BG, lw=.6)
+    for yi, (_, v, _) in zip(y, rows):
+        # value printed INSIDE the bar, so nothing sits near the ceiling line
+        ax2.text(v - .025, yi, f"{v:.3f}", va="center", ha="right",
+                 fontsize=FS_VALUE, color="white", fontweight="bold")
+    ax2.axvline(ceiling, color=ORANGE, ls="--", lw=1.8)
+    ax2.set_yticks(y, [n for n, _, _ in rows], fontsize=FS_TICK)
+    ax2.set_xlim(0, 1.06)
+    ax2.set_xticks(np.arange(0, 1.01, .2))
+    ax2.set_xlabel("sentiment accuracy on probe turns (held-out history wording)")
+    ax2.set_title("No amount of language understanding substitutes for context",
+                  loc="left", pad=12)
+    style_ax(ax2)
+
+    band = header(fig, "Controlled proof — context is required, not merely helpful",
+                  f"{reg['n_probe_turns']} probe turns · identical wording under benign vs "
+                  f"tense histories · balanced so I(text;label)=0")
+    fig.subplots_adjust(top=top_for(fig, band), bottom=0.075, left=0.20,
+                        right=0.975, hspace=0.52)
+    save(fig, "context_proof.png")
+
+
+# ============================================= 8 · TRANSFORMER BASELINES (§9)
+def graph_transformer_baselines():
+    tx = load("transformer_baselines.json")
+    probe = tx["probe_experiment"]["test"]
+    main = tx["main_corpus_experiment"]
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(FIG_W, 13.2))
+
+    heads = [("sentiment", "Sentiment", CYAN), ("emotion", "Emotion", PURPLE),
+             ("tone", "Tone", PINK)]
+    x = np.arange(len(heads))
+    w = 0.36
+    for i, (key, name) in enumerate([("B2_transformer_text_only", "B2 transformer, no context"),
+                                     ("B3_transformer_plus_context", "B3 transformer + context")]):
+        vals = [probe[key][h]["accuracy"] for h, _, _ in heads]
+        cols = [c for _, _, c in heads] if i == 0 else ["#94A3B8"] * 3
+        bars = ax1.bar(x + (i - .5) * w, vals, w * .92, color=cols, label=name,
+                       edgecolor=BG, lw=.6, alpha=1.0 if i == 0 else .55)
+        for b, v in zip(bars, vals):
+            # printed inside the bar — B2's three heads are all exactly 0.636
+            ax1.text(b.get_x() + b.get_width() / 2, v - .055, f"{v:.3f}",
+                     ha="center", fontsize=FS_VALUE, color="white",
+                     fontweight="bold")
+    ax1.set_xticks(x, [n for _, n, _ in heads], fontsize=FS_TICK)
+    ax1.set_ylim(0, 1.20)
+    ax1.set_yticks(np.arange(0, 1.01, .2))
+    ax1.set_ylabel("accuracy on probe turns")
+    ax1.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncols=2,
+               framealpha=0, borderaxespad=0)
+    ax1.set_title("A pretrained encoder still needs the conversation around it",
+                  loc="left", pad=12)
+    style_ax(ax1)
+
+    rows = [("Tone", "tone"), ("Emotion", "emotion"), ("Sentiment", "sentiment")]
+    y = np.arange(len(rows))[::-1]
+    h = 0.34
+    for i, (name, key) in enumerate([("B2 no context", "B2_transformer_text_only"),
+                                     ("B3 + context", "B3_transformer_plus_context")]):
+        vals = [main[key][k]["accuracy"] for _, k in rows]
+        ax2.barh(y + (i - .5) * h, vals, h * .92,
+                 color=[CYAN, PURPLE][i], label=name, edgecolor=BG, lw=.6,
+                 alpha=1.0 if i == 0 else .55)
+        for yi, v in zip(y + (i - .5) * h, vals):
+            ax2.text(v - .012, yi, f"{v:.3f}", va="center", ha="right",
+                     fontsize=FS_VALUE, color="white")
+    ax2.set_yticks(y, [n for n, _ in rows], fontsize=FS_TICK)
+    ax2.set_xlim(0.90, 1.035)
+    ax2.set_xlabel("accuracy on the main-corpus test split (axis starts at 0.90)")
+    ax2.legend(loc="upper center", bbox_to_anchor=(0.5, -0.17), ncols=2,
+               framealpha=0, borderaxespad=0)
+    ax2.set_title("The template corpus saturates every model family alike",
+                  loc="left", pad=12)
+    style_ax(ax2)
+
+    band = header(fig, "Pretrained-transformer baselines B2 and B3",
+                  "frozen sentence-transformers/all-MiniLM-L6-v2 (ONNX, CPU) + the same "
+                  "heads — no fine-tuning, so the comparison isolates context")
+    fig.subplots_adjust(top=top_for(fig, band), bottom=0.155, left=0.13,
+                        right=0.975, hspace=0.42)
+    save(fig, "transformer_baselines.png")
+
+
+# ================================================================ 9 · DATASET
 def graph_dataset():
     from cerebro.data.generator import generate_corpus
     corpus = generate_corpus(convs_per_cell=14)
@@ -1299,6 +1436,8 @@ if __name__ == "__main__":
     graph_demo_report()
     graph_scenarios()
     graph_transfer()
+    graph_context_proof()
+    graph_transformer_baselines()
     graph_benchmarks()
     graph_architecture()
     graph_confusion("sent", SENTIMENT_LABELS, "sentiment (3-way)",

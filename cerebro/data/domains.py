@@ -27,6 +27,12 @@ CALM = [
     ("No worries, happy to help.", "positive", "affection", "supportive", 0, 0, 0, 6),
     ("Morning! Ready for the call at 10?", "neutral", "neutral", "professional", 0, 0, 0, 12),
     ("Yep, joined five minutes early.", "positive", "neutral", "professional", 0, 0, 0, 10),
+    # surprise + humorous coverage (blueprint §4): without these the two classes
+    # have zero support and the heads can never emit them
+    ("Wait, you finished the whole thing already? That's amazing!", "positive", "surprise", "friendly", 0, 0, 0, 16),
+    ("No way! I was sure the deadline was next month.", "positive", "surprise", "casual", 0, 0, 0, 18),
+    ("Okay that diagram is genuinely too funny.", "positive", "joy", "humorous", 0, 0, 0, 8),
+    ("Ha! You should put that line on a slide.", "positive", "joy", "humorous", 0, 0, 0, 8),
 ]
 
 STRAINED = [
@@ -48,6 +54,8 @@ STRAINED = [
     ("And I meant it. Today things just slipped.", "negative", "anxiety", "apologetic", 0, 0, 0, 46),
     ("The Wifi died mid-call, of all days.", "negative", "frustration", "casual", 0, 0, 0, 42),
     ("Of course it did. This week, huh.", "neutral", "neutral", "casual", 0, 0, 0, 40),
+    ("Huh. So the file was never attached at all? That explains it.", "neutral", "surprise", "concerned", 0, 0, 0, 44),
+    ("Honestly, the way this broke is almost funny.", "neutral", "frustration", "humorous", 0, 0, 0, 42),
 ]
 
 HOT = [
@@ -69,6 +77,8 @@ HOT = [
     ("...I didn't mean to blow up like that. I'm sorry.", "negative", "sadness", "apologetic", 0, 0, 0, 48),
     ("Me neither. This week just broke me a bit.", "negative", "sadness", "apologetic", 0, 0, 0, 40),
     ("Alright. Deep breath. Let's just fix the file.", "neutral", "relief", "supportive", 0, 0, 0, 28),
+    ("Oh, we're doing this again tonight? Wonderful.", "positive", "surprise", "sarcastic", 1, 0, 0, 85),
+    ("Great, so now we're laughing about the deadline. Incredible.", "positive", "disgust", "humorous", 1, 1, 0, 84),
 ]
 
 DOMAINS = {

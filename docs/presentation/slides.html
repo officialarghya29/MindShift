@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEREBRO — PS-01 Tone Intelligence in Conversations</title>
+<style>
+  :root { --bg:#080B13; --panel:#111827; --text:#E5E7EB; --muted:#9CA3AF;
+           --cyan:#00E5FF; --purple:#B388FF; --pink:#FF5C8A; --green:#7CFFB2; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+          font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+          -webkit-font-smoothing:antialiased; }
+  .deck { display:flex; flex-direction:column; align-items:center; gap:38px; padding:38px 0 96px; }
+  .slide { width:min(1180px,94vw); background:var(--panel); border:1px solid #1F2937;
+            border-radius:18px; padding:46px 54px 40px; position:relative;
+            box-shadow:0 22px 60px rgba(0,0,0,.45); }
+  .kicker { font-size:13.5px; letter-spacing:.20em; text-transform:uppercase;
+             color:var(--cyan); font-weight:700; margin-bottom:12px; }
+  h2 { font-size:38px; line-height:1.15; margin:0 0 20px; letter-spacing:-.02em; }
+  h3 { font-size:19px; margin:0 0 10px; color:var(--cyan); }
+  p { font-size:17.5px; line-height:1.62; margin:0 0 14px; }
+  p.lead { font-size:20.5px; color:#F3F4F6; }
+  .muted { color:var(--muted); font-size:15.5px; line-height:1.6; }
+  .quote { font-size:34px; font-weight:700; color:var(--pink); margin:22px 0 6px; }
+  .stats { display:flex; gap:16px; flex-wrap:wrap; margin:24px 0 6px; }
+  .stat { flex:1 1 190px; background:#0C1322; border:1px solid #1F2937; border-radius:13px;
+           padding:18px 20px; }
+  .stat .v { font-size:31px; font-weight:800; letter-spacing:-.02em; }
+  .stat .l { font-size:14px; color:var(--muted); margin-top:7px; line-height:1.42; }
+  figure { margin:20px 0 0; }
+  figure img { border-radius:12px; border:1px solid #1F2937; display:block; }
+  figcaption { font-size:14.5px; color:var(--muted); margin-top:12px; line-height:1.55; }
+  table { width:100%; border-collapse:collapse; margin:8px 0 16px; font-size:16.5px; }
+  th { text-align:left; padding:11px 12px; border-bottom:2px solid #374151;
+        color:var(--cyan); font-size:14px; letter-spacing:.06em; text-transform:uppercase; }
+  td { padding:10px 12px; border-bottom:1px solid #1F2937; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; font-weight:700; color:var(--green); }
+  .cols { display:flex; gap:34px; margin:10px 0 18px; }
+  .cols > div { flex:1; }
+  ul { margin:0; padding-left:20px; } li { font-size:17px; line-height:1.75; }
+  .tagline { font-size:25px; font-weight:800; color:var(--purple); margin:14px 0 18px; }
+  .footer { position:absolute; right:30px; bottom:18px; font-size:12.5px;
+             color:#4B5563; letter-spacing:.09em; }
+  @media print { body { background:#fff; } .deck { gap:0; padding:0; }
+    .slide { width:100%; border-radius:0; box-shadow:none; page-break-after:always; } }
+</style></head>
+<body><div class="deck">
+
+    <section class="slide">
+      <div class="kicker">1 · Problem</div>
+      <h2>Text carries more than words</h2>
+      <p class="lead">A single message is ambiguous by construction. The same
+        string can mean opposite things, and only the conversation tells you which.</p>
+        <div class="quote">&ldquo;Fine.&rdquo;</div>
+        <p class="muted">relieved · neutral · cold · passive-aggressive</p>
+        <div class="stats">
+          <div class="stat"><div class="v" style="color:#FF5C8A">73%</div><div class="l">of probe utterances flip sentiment with history</div></div>
+          <div class="stat"><div class="v" style="color:#00E5FF">10,956</div><div class="l">messages analysed in the published corpus</div></div>
+          <div class="stat"><div class="v" style="color:#00E5FF">4</div><div class="l">platforms parsed natively</div></div>
+        </div>
+      <div class="footer">PS-01 §1</div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">2 · Why the obvious approach fails</div>
+      <h2>Message-level analysis misses the conversation</h2>
+      <p class="lead">We measured it rather than asserting it. On a controlled probe
+        set where the wording is identical and only the history differs, every
+        context-free reader collapses to the same score — the majority-class rate.</p>
+        <div class="stats">
+          <div class="stat"><div class="v" style="color:#FF9E64">0.636</div><div class="l">text-only ceiling (analytic)</div></div>
+          <div class="stat"><div class="v" style="color:#FF9E64">0.636</div><div class="l">TF-IDF text-only</div></div>
+          <div class="stat"><div class="v" style="color:#FF9E64">0.636</div><div class="l">frozen MiniLM transformer, no context</div></div>
+        </div>
+        <p class="muted">The design balances every utterance across its gold labels, so
+        the mutual information between the words and the label is zero. A pretrained
+        encoder buys nothing here: it is bounded by the same ceiling.</p>
+      <div class="footer">PS-01 §3</div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">3 · Our solution</div>
+      <h2>CEREBRO</h2>
+      <p class="lead">A context-aware, temporal conversation-intelligence engine.
+        It does not ask <em>what is the sentiment of this message</em>. It asks
+        <em>what is happening to the emotional state of this conversation, where did it
+        change, and what accompanied the change</em>.</p>
+        <div class="stats">
+          <div class="stat"><div class="v" style="color:#7CFFB2">0.909</div><div class="l">probe accuracy with context</div></div>
+          <div class="stat"><div class="v" style="color:#7CFFB2">+27.3 pp</div><div class="l">over the text-only ceiling</div></div>
+          <div class="stat"><div class="v" style="color:#00E5FF">p = 0e+00</div><div class="l">exact McNemar vs text-only</div></div>
+        </div>
+        <p class="muted">95% bootstrap CI on the paired gain:
+        [0.210, 0.347] accuracy.</p>
+      <div class="footer">PS-01 §2, §47</div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">4 · System</div>
+      <h2>Architecture</h2>
+      <figure><img src="../architecture/architecture.png" style="width:100%" alt="End-to-end pipeline: parse → features → contextual multi-task heads → hidden signals → temporal engines → fusion → explainability → API + dashboard."><figcaption>End-to-end pipeline: parse → features → contextual multi-task heads → hidden signals → temporal engines → fusion → explainability → API + dashboard.</figcaption></figure>
+      <div class="footer">PS-01 §5, §54</div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">5 · Core innovation</div>
+      <h2>Context, memory, behaviour — and a proof they are used</h2>
+      <figure><img src="../../assets/graphs/context_proof.png" style="width:100%" alt="The component ladder on held-out history wording. Text-only sits exactly on the lexical ceiling; the full stack reaches 0.909 sentiment / 0.932 emotion / 0.955 tone."><figcaption>The component ladder on held-out history wording. Text-only sits exactly on the lexical ceiling; the full stack reaches 0.909 sentiment / 0.932 emotion / 0.955 tone.</figcaption></figure>
+      <div class="footer">PS-01 §11, §12, §36</div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">6 · Evaluation design</div>
+      <h2>Baselines: lexical, and a real pretrained transformer</h2>
+      <figure><img src="../../assets/graphs/transformer_baselines.png" style="width:100%" alt="B2 is a frozen sentence-transformers MiniLM encoder — a strong, general-purpose language model with no fine-tuning, exactly as §9 asks. Bottom: the template corpus saturates every model family alike, which is why the probe experiment is the informative one."><figcaption>B2 is a frozen sentence-transformers MiniLM encoder — a strong, general-purpose language model with no fine-tuning, exactly as §9 asks. Bottom: the template corpus saturates every model family alike, which is why the probe experiment is the informative one.</figcaption></figure>
+      <div class="footer">PS-01 §9, §36</div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">7 · Results</div>
+      <h2>Every number measured, every claim bounded</h2>
+      <table>
+          <tr><th>Head</th><th>Metric</th><th>Value</th></tr>
+          <tr><td>Sentiment</td><td>probe accuracy (unseen wording)</td>
+              <td class="num">0.909</td></tr>
+          <tr><td>Emotion</td><td>probe accuracy (unseen wording)</td>
+              <td class="num">0.932</td></tr>
+          <tr><td>Tone</td><td>probe accuracy (unseen wording)</td>
+              <td class="num">0.955</td></tr>
+          <tr><td>Sarcasm</td><td>ROC-AUC (held-out test)</td>
+              <td class="num">0.9485</td></tr>
+          <tr><td>Irony</td><td>ROC-AUC</td><td class="num">0.9267</td></tr>
+          <tr><td>Passive aggression</td><td>ROC-AUC</td>
+              <td class="num">0.9386</td></tr>
+          <tr><td>Tension</td><td>MAE / R²</td>
+              <td class="num">3.205 / 0.975</td></tr>
+          <tr><td>Calibration</td><td>top-1 ECE (sentiment / emotion / tone)</td>
+              <td class="num">0.006 / 0.017 / 0.019</td></tr>
+        </table>
+        <p class="muted">In-corpus scores saturate because the corpus is template-generated
+        (62 distinct phrasings over 10,956 messages). We
+        publish that rather than headlining it, and report real-text transfer separately.</p>
+      <div class="footer">PS-01 §33, §34, §38</div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">8 · Transfer</div>
+      <h2>Real human text is the honest test</h2>
+      <figure><img src="../../assets/graphs/transfer_goemotions.png" style="width:100%" alt="Zero-shot on GoEmotions, then the same heads fine-tuned on real Reddit text — emotion exact 0.136 → 0.446, top-3 → 0.753."><figcaption>Zero-shot on GoEmotions, then the same heads fine-tuned on real Reddit text — emotion exact 0.136 → 0.446, top-3 → 0.753.</figcaption></figure>
+      <div class="footer">PS-01 §35 — measured on google-research-datasets/go_emotions (simplified), research license (research licence)</div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">9 · Engineering</div>
+      <h2>Explainable, robust, fast</h2>
+      <div class="stats">
+          <div class="stat"><div class="v" style="color:#00E5FF">176</div><div class="l">probe turns in the controlled experiment</div></div>
+          <div class="stat"><div class="v" style="color:#00E5FF">88</div><div class="l">messages / second, single CPU core</div></div>
+          <div class="stat"><div class="v" style="color:#00E5FF">8.9 MB</div><div class="l">peak memory, 1,000-message chat</div></div>
+          <div class="stat"><div class="v" style="color:#00E5FF">184 ms</div><div class="l">API round-trip, 50 messages</div></div>
+          <div class="stat"><div class="v" style="color:#00E5FF">0.92</div><div class="l">min annotator κ across heads</div></div>
+          <div class="stat"><div class="v" style="color:#00E5FF">20/20</div><div class="l">robustness scenarios passed</div></div>
+        </div>
+        <p class="muted">Data-leakage audit: 0 conversation
+        overlap across splits, 0 label-leakage findings; the
+        62 recurring templates are disclosed, not hidden.
+        Every prediction ships with confidence and a human-readable explanation that
+        separates detected evidence from inferred interpretation.</p>
+      <div class="footer">PS-01 §28, §29, §30, §39, §46</div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">10 · Applications &amp; future</div>
+      <h2>Where this goes</h2>
+      <div class="cols">
+          <div><h3>Applications</h3><ul>
+            <li>Customer-support escalation early-warning</li>
+            <li>Team-communication and workplace analytics</li>
+            <li>Community moderation triage</li>
+            <li>Conversation research at scale</li>
+          </ul></div>
+          <div><h3>Next</h3><ul>
+            <li>Multilingual parsing and lexicons</li>
+            <li>Multi-turn real conversation corpora</li>
+            <li>Streaming / real-time analysis</li>
+            <li>Human multi-annotator agreement study</li>
+          </ul></div>
+        </div>
+        <div class="tagline">&ldquo;Decode the shift. Understand the conversation.&rdquo;</div>
+        <p class="muted">CEREBRO reports <em>model-detected emotional and tone signals</em>,
+        not a person's true feelings. Turning points are statistical associations, not
+        causal claims.</p>
+      <div class="footer">MIND SHIFT · PS-01</div>
+    </section>
+</div></body></html>

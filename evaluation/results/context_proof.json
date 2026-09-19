@@ -1,0 +1,824 @@
+{
+  "seed": 42,
+  "design": "controlled context-dependence probe: identical surface text under benign vs tense histories; utterance-level label balance pins I(text;label)=0, so any context-free model is bounded by the lexical ceiling reported alongside every number",
+  "corpus": {
+    "conversations": 528,
+    "probe_turns": 528,
+    "history_turns": 2640,
+    "history_scripts_per_condition": 3,
+    "context_dependent_probes": 16,
+    "control_probes": 6,
+    "utterance_labels_balanced": true,
+    "label_count_distribution": {
+      "12": 32
+    }
+  },
+  "split_sizes": {
+    "train": 176,
+    "val": 88,
+    "test": 176,
+    "test_seen": 88
+  },
+  "flip_rates": {
+    "sentiment": 0.7273,
+    "emotion": 0.7273,
+    "tone": 0.7273,
+    "sarcasm": 0.2273,
+    "irony": 0.0455,
+    "passive_aggression": 0.4091,
+    "n_utterances": 22,
+    "context_dependent_utterances": 16,
+    "control_utterances": 6
+  },
+  "regimes": {
+    "unseen_history_wording": {
+      "n_probe_turns": 176,
+      "text_only_lexical_ceiling": {
+        "sentiment": {
+          "accuracy": 0.6364,
+          "precision": 0.7292,
+          "recall": 0.7333,
+          "f1_macro": 0.6075,
+          "f1_weighted": 0.561
+        },
+        "emotion": {
+          "accuracy": 0.6364,
+          "precision": 0.5316,
+          "recall": 0.6212,
+          "f1_macro": 0.5258,
+          "f1_weighted": 0.5422
+        },
+        "tone": {
+          "accuracy": 0.6364,
+          "precision": 0.3764,
+          "recall": 0.5385,
+          "f1_macro": 0.4375,
+          "f1_weighted": 0.5021
+        },
+        "sarcasm": {
+          "accuracy": 0.8864,
+          "precision": 0.4432,
+          "recall": 0.5,
+          "f1_macro": 0.4699,
+          "f1_weighted": 0.833
+        },
+        "irony": {
+          "accuracy": 0.9773,
+          "precision": 0.4886,
+          "recall": 0.5,
+          "f1_macro": 0.4943,
+          "f1_weighted": 0.966
+        },
+        "passive_aggression": {
+          "accuracy": 0.7955,
+          "precision": 0.3977,
+          "recall": 0.5,
+          "f1_macro": 0.443,
+          "f1_weighted": 0.7048
+        },
+        "tension": {
+          "note": "continuous target — lexical ceiling not applicable"
+        }
+      },
+      "variants": {
+        "A": {
+          "sentiment": {
+            "accuracy": 0.6364,
+            "precision": 0.7292,
+            "recall": 0.7333,
+            "f1_macro": 0.6075,
+            "f1_weighted": 0.561
+          },
+          "emotion": {
+            "accuracy": 0.6364,
+            "precision": 0.5436,
+            "recall": 0.6591,
+            "f1_macro": 0.5766,
+            "f1_weighted": 0.5695
+          },
+          "tone": {
+            "accuracy": 0.6364,
+            "precision": 0.5385,
+            "recall": 0.7009,
+            "f1_macro": 0.5741,
+            "f1_weighted": 0.5549
+          },
+          "sarcasm": {
+            "accuracy": 0.8864,
+            "precision": 0.4432,
+            "recall": 0.5,
+            "f1_macro": 0.4699,
+            "f1_weighted": 0.833
+          },
+          "irony": {
+            "accuracy": 0.9773,
+            "precision": 0.75,
+            "recall": 0.9884,
+            "f1_macro": 0.8275,
+            "f1_weighted": 0.9809
+          },
+          "passive_aggression": {
+            "accuracy": 0.7955,
+            "precision": 0.6912,
+            "recall": 0.7063,
+            "f1_macro": 0.6979,
+            "f1_weighted": 0.7994
+          },
+          "tension": {
+            "mae": 18.591,
+            "rmse": 21.193
+          },
+          "latency_ms": 3.05
+        },
+        "B": {
+          "sentiment": {
+            "accuracy": 0.6591,
+            "precision": 0.7362,
+            "recall": 0.7,
+            "f1_macro": 0.6575,
+            "f1_weighted": 0.6442
+          },
+          "emotion": {
+            "accuracy": 0.7045,
+            "precision": 0.6818,
+            "recall": 0.7537,
+            "f1_macro": 0.6711,
+            "f1_weighted": 0.6911
+          },
+          "tone": {
+            "accuracy": 0.6364,
+            "precision": 0.5962,
+            "recall": 0.7521,
+            "f1_macro": 0.621,
+            "f1_weighted": 0.5661
+          },
+          "sarcasm": {
+            "accuracy": 0.9318,
+            "precision": 0.9643,
+            "recall": 0.7,
+            "f1_macro": 0.7672,
+            "f1_weighted": 0.9185
+          },
+          "irony": {
+            "accuracy": 0.9773,
+            "precision": 0.4886,
+            "recall": 0.5,
+            "f1_macro": 0.4943,
+            "f1_weighted": 0.966
+          },
+          "passive_aggression": {
+            "accuracy": 0.9318,
+            "precision": 0.9605,
+            "recall": 0.8333,
+            "f1_macro": 0.8795,
+            "f1_weighted": 0.9264
+          },
+          "tension": {
+            "mae": 17.849,
+            "rmse": 20.207
+          },
+          "latency_ms": 3.137
+        },
+        "C": {
+          "sentiment": {
+            "accuracy": 0.6364,
+            "precision": 0.8519,
+            "recall": 0.5407,
+            "f1_macro": 0.5498,
+            "f1_weighted": 0.5939
+          },
+          "emotion": {
+            "accuracy": 0.8182,
+            "precision": 0.8152,
+            "recall": 0.8045,
+            "f1_macro": 0.7841,
+            "f1_weighted": 0.8042
+          },
+          "tone": {
+            "accuracy": 0.7955,
+            "precision": 0.793,
+            "recall": 0.8718,
+            "f1_macro": 0.8089,
+            "f1_weighted": 0.7374
+          },
+          "sarcasm": {
+            "accuracy": 0.9318,
+            "precision": 0.9643,
+            "recall": 0.7,
+            "f1_macro": 0.7672,
+            "f1_weighted": 0.9185
+          },
+          "irony": {
+            "accuracy": 0.9773,
+            "precision": 0.4886,
+            "recall": 0.5,
+            "f1_macro": 0.4943,
+            "f1_weighted": 0.966
+          },
+          "passive_aggression": {
+            "accuracy": 0.9545,
+            "precision": 0.973,
+            "recall": 0.8889,
+            "f1_macro": 0.9236,
+            "f1_weighted": 0.9523
+          },
+          "tension": {
+            "mae": 18.77,
+            "rmse": 22.242
+          },
+          "latency_ms": 3.189
+        },
+        "D": {
+          "sentiment": {
+            "accuracy": 0.9091,
+            "precision": 0.9298,
+            "recall": 0.9333,
+            "f1_macro": 0.9237,
+            "f1_weighted": 0.9094
+          },
+          "emotion": {
+            "accuracy": 0.9318,
+            "precision": 0.8554,
+            "recall": 0.8636,
+            "f1_macro": 0.8442,
+            "f1_weighted": 0.921
+          },
+          "tone": {
+            "accuracy": 0.9545,
+            "precision": 0.8846,
+            "recall": 0.9231,
+            "f1_macro": 0.8974,
+            "f1_weighted": 0.9394
+          },
+          "sarcasm": {
+            "accuracy": 0.8864,
+            "precision": 0.4432,
+            "recall": 0.5,
+            "f1_macro": 0.4699,
+            "f1_weighted": 0.833
+          },
+          "irony": {
+            "accuracy": 0.9773,
+            "precision": 0.4886,
+            "recall": 0.5,
+            "f1_macro": 0.4943,
+            "f1_weighted": 0.966
+          },
+          "passive_aggression": {
+            "accuracy": 0.7955,
+            "precision": 0.3977,
+            "recall": 0.5,
+            "f1_macro": 0.443,
+            "f1_weighted": 0.7048
+          },
+          "tension": {
+            "mae": 13.859,
+            "rmse": 18.078
+          },
+          "latency_ms": 3.256
+        },
+        "E": {
+          "sentiment": {
+            "accuracy": 0.9091,
+            "precision": 0.9298,
+            "recall": 0.9333,
+            "f1_macro": 0.9237,
+            "f1_weighted": 0.9094
+          },
+          "emotion": {
+            "accuracy": 0.9318,
+            "precision": 0.8554,
+            "recall": 0.8636,
+            "f1_macro": 0.8442,
+            "f1_weighted": 0.921
+          },
+          "tone": {
+            "accuracy": 0.9545,
+            "precision": 0.8846,
+            "recall": 0.9231,
+            "f1_macro": 0.8974,
+            "f1_weighted": 0.9394
+          },
+          "sarcasm": {
+            "accuracy": 0.9318,
+            "precision": 0.85,
+            "recall": 0.7872,
+            "f1_macro": 0.8143,
+            "f1_weighted": 0.9285
+          },
+          "irony": {
+            "accuracy": 0.9773,
+            "precision": 0.75,
+            "recall": 0.9884,
+            "f1_macro": 0.8275,
+            "f1_weighted": 0.9809
+          },
+          "passive_aggression": {
+            "accuracy": 0.8409,
+            "precision": 0.7604,
+            "recall": 0.8175,
+            "f1_macro": 0.7811,
+            "f1_weighted": 0.8487
+          },
+          "tension": {
+            "mae": 13.857,
+            "rmse": 18.078
+          }
+        }
+      },
+      "significance": {
+        "sentiment": {
+          "A_to_B": {
+            "a_wrong_b_right": 40,
+            "a_right_b_wrong": 36,
+            "discordant": 76,
+            "p_value": 1.0,
+            "delta": 0.0227,
+            "ci95": [
+              -0.0739,
+              0.125
+            ],
+            "n_boot": 2000
+          },
+          "A_to_E": {
+            "a_wrong_b_right": 48,
+            "a_right_b_wrong": 0,
+            "discordant": 48,
+            "p_value": 0.0,
+            "delta": 0.2727,
+            "ci95": [
+              0.2102,
+              0.3466
+            ],
+            "n_boot": 2000
+          }
+        },
+        "emotion": {
+          "A_to_B": {
+            "a_wrong_b_right": 40,
+            "a_right_b_wrong": 28,
+            "discordant": 68,
+            "p_value": 0.36362,
+            "delta": 0.0682,
+            "ci95": [
+              -0.0227,
+              0.1648
+            ],
+            "n_boot": 2000
+          },
+          "A_to_E": {
+            "a_wrong_b_right": 60,
+            "a_right_b_wrong": 8,
+            "discordant": 68,
+            "p_value": 0.0,
+            "delta": 0.2955,
+            "ci95": [
+              0.2159,
+              0.3807
+            ],
+            "n_boot": 2000
+          }
+        },
+        "tone": {
+          "A_to_B": {
+            "a_wrong_b_right": 4,
+            "a_right_b_wrong": 4,
+            "discordant": 8,
+            "p_value": 1.0,
+            "delta": 0.0,
+            "ci95": [
+              -0.0341,
+              0.0286
+            ],
+            "n_boot": 2000
+          },
+          "A_to_E": {
+            "a_wrong_b_right": 64,
+            "a_right_b_wrong": 8,
+            "discordant": 72,
+            "p_value": 0.0,
+            "delta": 0.3182,
+            "ci95": [
+              0.233,
+              0.3977
+            ],
+            "n_boot": 2000
+          }
+        }
+      },
+      "headline_gain_pp": {
+        "sentiment": {
+          "text_only": 0.6364,
+          "full_cerebro": 0.9091,
+          "gain_pp": 27.3
+        },
+        "emotion": {
+          "text_only": 0.6364,
+          "full_cerebro": 0.9318,
+          "gain_pp": 29.5
+        },
+        "tone": {
+          "text_only": 0.6364,
+          "full_cerebro": 0.9545,
+          "gain_pp": 31.8
+        }
+      }
+    },
+    "seen_history_wording": {
+      "n_probe_turns": 88,
+      "text_only_lexical_ceiling": {
+        "sentiment": {
+          "accuracy": 0.6364,
+          "precision": 0.7292,
+          "recall": 0.7333,
+          "f1_macro": 0.6075,
+          "f1_weighted": 0.561
+        },
+        "emotion": {
+          "accuracy": 0.6364,
+          "precision": 0.5316,
+          "recall": 0.6212,
+          "f1_macro": 0.5258,
+          "f1_weighted": 0.5422
+        },
+        "tone": {
+          "accuracy": 0.6364,
+          "precision": 0.3764,
+          "recall": 0.5385,
+          "f1_macro": 0.4375,
+          "f1_weighted": 0.5021
+        },
+        "sarcasm": {
+          "accuracy": 0.8864,
+          "precision": 0.4432,
+          "recall": 0.5,
+          "f1_macro": 0.4699,
+          "f1_weighted": 0.833
+        },
+        "irony": {
+          "accuracy": 0.9773,
+          "precision": 0.4886,
+          "recall": 0.5,
+          "f1_macro": 0.4943,
+          "f1_weighted": 0.966
+        },
+        "passive_aggression": {
+          "accuracy": 0.7955,
+          "precision": 0.3977,
+          "recall": 0.5,
+          "f1_macro": 0.443,
+          "f1_weighted": 0.7048
+        },
+        "tension": {
+          "note": "continuous target — lexical ceiling not applicable"
+        }
+      },
+      "variants": {
+        "A": {
+          "sentiment": {
+            "accuracy": 0.6364,
+            "precision": 0.7292,
+            "recall": 0.7333,
+            "f1_macro": 0.6075,
+            "f1_weighted": 0.561
+          },
+          "emotion": {
+            "accuracy": 0.6364,
+            "precision": 0.5436,
+            "recall": 0.6591,
+            "f1_macro": 0.5766,
+            "f1_weighted": 0.5695
+          },
+          "tone": {
+            "accuracy": 0.6364,
+            "precision": 0.5385,
+            "recall": 0.7009,
+            "f1_macro": 0.5741,
+            "f1_weighted": 0.5549
+          },
+          "sarcasm": {
+            "accuracy": 0.8864,
+            "precision": 0.4432,
+            "recall": 0.5,
+            "f1_macro": 0.4699,
+            "f1_weighted": 0.833
+          },
+          "irony": {
+            "accuracy": 0.9773,
+            "precision": 0.75,
+            "recall": 0.9884,
+            "f1_macro": 0.8275,
+            "f1_weighted": 0.9809
+          },
+          "passive_aggression": {
+            "accuracy": 0.7955,
+            "precision": 0.6912,
+            "recall": 0.7063,
+            "f1_macro": 0.6979,
+            "f1_weighted": 0.7994
+          },
+          "tension": {
+            "mae": 18.591,
+            "rmse": 21.193
+          },
+          "latency_ms": 3.089
+        },
+        "B": {
+          "sentiment": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "emotion": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "tone": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "sarcasm": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "irony": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "passive_aggression": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "tension": {
+            "mae": 9.613,
+            "rmse": 11.204
+          },
+          "latency_ms": 3.195
+        },
+        "C": {
+          "sentiment": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "emotion": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "tone": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "sarcasm": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "irony": {
+            "accuracy": 0.9886,
+            "precision": 0.9943,
+            "recall": 0.75,
+            "f1_macro": 0.8304,
+            "f1_weighted": 0.9868
+          },
+          "passive_aggression": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "tension": {
+            "mae": 7.201,
+            "rmse": 9.177
+          },
+          "latency_ms": 3.297
+        },
+        "D": {
+          "sentiment": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "emotion": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "tone": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "sarcasm": {
+            "accuracy": 0.9773,
+            "precision": 0.9875,
+            "recall": 0.9,
+            "f1_macro": 0.9381,
+            "f1_weighted": 0.9762
+          },
+          "irony": {
+            "accuracy": 0.9773,
+            "precision": 0.4886,
+            "recall": 0.5,
+            "f1_macro": 0.4943,
+            "f1_weighted": 0.966
+          },
+          "passive_aggression": {
+            "accuracy": 0.9773,
+            "precision": 0.95,
+            "recall": 0.9857,
+            "f1_macro": 0.9664,
+            "f1_weighted": 0.9777
+          },
+          "tension": {
+            "mae": 7.016,
+            "rmse": 8.962
+          },
+          "latency_ms": 3.302
+        },
+        "E": {
+          "sentiment": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "emotion": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "tone": {
+            "accuracy": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1_macro": 1.0,
+            "f1_weighted": 1.0
+          },
+          "sarcasm": {
+            "accuracy": 0.9545,
+            "precision": 0.9756,
+            "recall": 0.8,
+            "f1_macro": 0.8625,
+            "f1_weighted": 0.9494
+          },
+          "irony": {
+            "accuracy": 0.9773,
+            "precision": 0.4886,
+            "recall": 0.5,
+            "f1_macro": 0.4943,
+            "f1_weighted": 0.966
+          },
+          "passive_aggression": {
+            "accuracy": 0.8409,
+            "precision": 0.7812,
+            "recall": 0.9,
+            "f1_macro": 0.8044,
+            "f1_weighted": 0.8543
+          },
+          "tension": {
+            "mae": 7.016,
+            "rmse": 8.961
+          }
+        }
+      },
+      "significance": {
+        "sentiment": {
+          "A_to_B": {
+            "a_wrong_b_right": 32,
+            "a_right_b_wrong": 0,
+            "discordant": 32,
+            "p_value": 0.0,
+            "delta": 0.3636,
+            "ci95": [
+              0.2614,
+              0.4659
+            ],
+            "n_boot": 2000
+          },
+          "A_to_E": {
+            "a_wrong_b_right": 32,
+            "a_right_b_wrong": 0,
+            "discordant": 32,
+            "p_value": 0.0,
+            "delta": 0.3636,
+            "ci95": [
+              0.2614,
+              0.4659
+            ],
+            "n_boot": 2000
+          }
+        },
+        "emotion": {
+          "A_to_B": {
+            "a_wrong_b_right": 32,
+            "a_right_b_wrong": 0,
+            "discordant": 32,
+            "p_value": 0.0,
+            "delta": 0.3636,
+            "ci95": [
+              0.2614,
+              0.4659
+            ],
+            "n_boot": 2000
+          },
+          "A_to_E": {
+            "a_wrong_b_right": 32,
+            "a_right_b_wrong": 0,
+            "discordant": 32,
+            "p_value": 0.0,
+            "delta": 0.3636,
+            "ci95": [
+              0.2614,
+              0.4659
+            ],
+            "n_boot": 2000
+          }
+        },
+        "tone": {
+          "A_to_B": {
+            "a_wrong_b_right": 32,
+            "a_right_b_wrong": 0,
+            "discordant": 32,
+            "p_value": 0.0,
+            "delta": 0.3636,
+            "ci95": [
+              0.2614,
+              0.4659
+            ],
+            "n_boot": 2000
+          },
+          "A_to_E": {
+            "a_wrong_b_right": 32,
+            "a_right_b_wrong": 0,
+            "discordant": 32,
+            "p_value": 0.0,
+            "delta": 0.3636,
+            "ci95": [
+              0.2614,
+              0.4659
+            ],
+            "n_boot": 2000
+          }
+        }
+      },
+      "headline_gain_pp": {
+        "sentiment": {
+          "text_only": 0.6364,
+          "full_cerebro": 1.0,
+          "gain_pp": 36.4
+        },
+        "emotion": {
+          "text_only": 0.6364,
+          "full_cerebro": 1.0,
+          "gain_pp": 36.4
+        },
+        "tone": {
+          "text_only": 0.6364,
+          "full_cerebro": 1.0,
+          "gain_pp": 36.4
+        }
+      }
+    }
+  },
+  "primary_regime": "unseen_history_wording",
+  "wall_time_seconds": 32.2,
+  "note": "The probe corpus is constructed, not sampled — blueprint §12 names these exact ambiguous forms. It measures whether context and speaker memory ARE USED when they are the only available evidence. It is not a natural-distribution benchmark; see the transfer evaluation for that."
+}

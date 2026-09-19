@@ -165,45 +165,76 @@ def check_split_balance(train, test) -> dict:
 
 
 # ---------------------------------------------------------------- 8 · noise
-def check_annotation_consistency(splits) -> dict:
-    """Compare measured label/design disagreement with the injected noise rate.
+DESIGN_HEAD_ORDER = ["sentiment", "emotion", "tone", "sarcasm", "irony",
+                     "passive_aggression"]
 
-    The corpus is weak-supervision generated: each message inherits its
-    template's design labels, then a small controlled fraction is flipped to
-    emulate annotator disagreement. If the measured disagreement had drifted
-    away from the injected rate, the README's error-attribution would be stale.
+
+def check_annotation_consistency(splits) -> dict:
+    """Annotator agreement + drift of the measured noise rate (blueprint §7).
+
+    The corpus is weak-supervision generated: each message inherits its template's
+    design labels, and a small controlled fraction is then flipped to emulate
+    annotator disagreement. That gives two annotators over every label:
+
+      A1  the template design (the schema author's intent)
+      A2  the released label (A1 plus the injected disagreements)
+
+    We report Cohen's κ and Krippendorff's nominal α between them. This is an
+    agreement measurement over a *simulated* second annotator, so the numbers
+    describe the effect of the injected disagreement rate — they are not a
+    substitute for a human multi-annotator study, and are labelled as such.
     """
+    from cerebro.common.metrics import cohen_kappa, krippendorff_alpha_nominal
     from cerebro.data.domains import DOMAINS
 
+    # design lookup for every head (the template tuple carries all of them)
     design = {}
     for dom in DOMAINS.values():
         for band in dom["bands"]:
             for tpl in band:
-                text, _, _, _, sarc, iron, pa, _ = tpl
-                design[_WS.sub(" ", text.lower().strip())] = (int(sarc), int(iron), int(pa))
+                text, sent, emo, tone, sarc, iron, pa, _ = tpl
+                design[_WS.sub(" ", text.lower().strip())] = {
+                    "sentiment": sent, "emotion": emo, "tone": tone,
+                    "sarcasm": int(sarc), "irony": int(iron),
+                    "passive_aggression": int(pa)}
 
     msgs = [m for split in splits.values() for conv in split for m in conv]
     flipped_msgs = 0
     per_head = Counter()
+    a1 = {h: [] for h in DESIGN_HEAD_ORDER}
+    a2 = {h: [] for h in DESIGN_HEAD_ORDER}
     for m in msgs:
         d = design.get(_norm(m["text"]))
         if d is None:
             continue
-        if any(int(m[h]) != d[i] for i, h in enumerate(BINARY_HEADS)):
+        for h in DESIGN_HEAD_ORDER:
+            a1[h].append(str(d[h]))
+            a2[h].append(str(m[h] if h not in BINARY_HEADS else int(m[h])))
+        if any(int(m[h]) != d[h] for h in BINARY_HEADS):
             flipped_msgs += 1
-            for i, h in enumerate(BINARY_HEADS):
-                if int(m[h]) != d[i]:
+            for h in BINARY_HEADS:
+                if int(m[h]) != d[h]:
                     per_head[h] += 1
+
     measured = flipped_msgs / max(len(msgs), 1)
     lo, hi = (LABEL_NOISE_RATE * NOISE_BAND[0], LABEL_NOISE_RATE * NOISE_BAND[1])
+    agreement = {}
+    for h in DESIGN_HEAD_ORDER:
+        if not a1[h]:
+            continue
+        agreement[h] = {**cohen_kappa(a1[h], a2[h]),
+                        **krippendorff_alpha_nominal(a1[h], a2[h])}
     return {"passed": bool(lo <= measured <= hi),
             "injected_rate": LABEL_NOISE_RATE,
             "measured_rate": round(measured, 4),
             "accepted_band": [round(lo, 4), round(hi, 4)],
             "messages_with_flipped_label": flipped_msgs,
             "flips_per_head": dict(per_head),
-            "note": ("measured disagreement is the ONLY label inconsistency; "
-                     "the template design is taken as ground truth")}
+            "annotator_agreement": agreement,
+            "min_kappa": round(min(v["kappa"] for v in agreement.values()), 4),
+            "note": ("annotator B is simulated (design + injected disagreement), so κ/α "
+                     "quantify the injected noise, not human rater variance; a human "
+                     "multi-annotator study remains future work")}
 
 
 # ------------------------------------------------------------------ licensing

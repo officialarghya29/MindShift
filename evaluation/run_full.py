@@ -20,8 +20,8 @@ import numpy as np
 from scipy.sparse import hstack, csr_matrix, vstack
 
 from cerebro.common.labels import ESCALATION_TENSION_THRESHOLD
-from cerebro.common.metrics import (classification_metrics, regression_metrics,
-                                    probability_metrics)
+from cerebro.common.metrics import (calibration_metrics, classification_metrics,
+                                    regression_metrics, probability_metrics)
 from cerebro.data.generator import generate_corpus, split_conversations, corpus_stats
 from cerebro.features.featurizer import build_vectorizer
 from cerebro.features.preprocess import process_text, behavioral_vector
@@ -222,6 +222,7 @@ def eval_full_cerebro(engine: MultiTaskEngine, convs):
     y_true = {h: [] for h in HEADS_CLASS + HEADS_BINARY + ["tension", "escalation"]}
     y_pred = {h: [] for h in y_true}
     p_proba = {h: [] for h in HEADS_BINARY}
+    conf = {h: [] for h in HEADS_CLASS}     # top-1 confidence, for calibration
     latencies = []
 
     from cerebro.models.pipeline import _add_behavior_flags
@@ -241,6 +242,7 @@ def eval_full_cerebro(engine: MultiTaskEngine, convs):
             y_pred["escalation"].append(int(r["tension"] >= TENSION_EDGE))
             for head in HEADS_CLASS:
                 y_pred[head].append(r[head]["label"])
+                conf[head].append(float(r[head]["confidence"]))
             for head in HEADS_BINARY:
                 y_true[head].append(int(m[head]))
                 y_pred[head].append(int(r[head]["probability"] >= .5))
@@ -257,6 +259,13 @@ def eval_full_cerebro(engine: MultiTaskEngine, convs):
                               "brier": pm["brier"]})
     metrics["tension"] = regression_metrics(y_true["tension"], y_pred["tension"])
     metrics["escalation"] = classification_metrics(y_true["escalation"], y_pred["escalation"])
+    # calibration of the shipped system's own confidence (§28, §34)
+    metrics["calibration"] = {
+        **{h: calibration_metrics([int(t == p) for t, p in
+                                   zip(y_true[h], y_pred[h])], conf[h])
+           for h in HEADS_CLASS},
+        **{h: calibration_metrics(y_true[h], p_proba[h]) for h in HEADS_BINARY},
+    }
     metrics["latency_ms"] = round(float(np.mean(latencies)) * 1000, 2)
     return metrics
 
