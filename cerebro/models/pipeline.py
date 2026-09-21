@@ -11,12 +11,26 @@ from cerebro.common.labels import SCHEMA_VERSION
 from cerebro.models.engines import MultiTaskEngine
 from cerebro.models.hidden_signals import apply_hidden_signals
 from cerebro.fusion.fusion import fuse_conversation, _DEFAULT_W
+from cerebro.features.segmentation import segment_conversation
 from cerebro.temporal.arc import build_arc
 from cerebro.temporal.transitions import track_transitions, transition_matrix
 from cerebro.temporal.turning_points import detect_turning_points
 from cerebro.temporal.escalation import classify_trajectory, escalation_flags
 from cerebro.explain.explanation_engine import (
     explain_message, what_changed, speaker_profiles, behavior_flags)
+
+
+def _topics(messages: list[dict]) -> list[dict]:
+    """Topic segments (PS-01 §23) for the report. Always a list so every
+    report shape carries the same key (was None + caller-side segmentation)."""
+    segs = segment_conversation(
+        [{"message_id": m.get("message_id", i + 1),
+          "text": str(m.get("text", "")),
+          "timestamp": m.get("timestamp")}
+         for i, m in enumerate(messages)])
+    return [{"segment_id": s["segment_id"], "start": s["start"], "end": s["end"],
+             "method": s["method"], "messages_analyzed": len(s["messages"])}
+            for s in segs]
 
 
 def _add_behavior_flags(results):
@@ -84,7 +98,7 @@ class CerebroPipeline:
                 "transition_matrix": None, "turning_points": [],
                 "escalation": classify_trajectory([]), "escalation_phases": [],
                 "speaker_profiles": [], "speakers": [],
-                "explanations": [], "topics": None,
+                "explanations": [], "topics": [],
                 "disclaimer": ("All outputs are model-estimated with calibrated confidence; "
                                "turning points are associations, not causal claims."),
             }
@@ -160,7 +174,7 @@ class CerebroPipeline:
             "speaker_profiles": profiles,
             "speakers": profiles,          # blueprint §33 name for the same data
             "explanations": explanations,
-            "topics": None,  # filled by caller via segmentation if desired
+            "topics": _topics(messages),
             "disclaimer": ("All outputs are model-estimated with calibrated confidence; "
                            "turning points are associations, not causal claims."),
         }

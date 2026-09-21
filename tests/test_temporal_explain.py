@@ -125,6 +125,7 @@ def test_analyze_empty_report_full_escalation_schema():
     assert "escalation_rate" in rep["escalation"]
     assert _ESC_KEYS <= set(rep["escalation"])
     assert rep["escalation"]["trajectory"] == "stable"
+    assert rep["topics"] == []
 
 
 def _report(msgs):
