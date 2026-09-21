@@ -59,8 +59,8 @@
       "recall": 0.9077,
       "f1_macro": 0.9473,
       "f1_weighted": 0.9924,
-      "roc_auc": 0.9289,
-      "pr_auc": 0.8442,
+      "roc_auc": 0.9288,
+      "pr_auc": 0.8443,
       "brier": 0.014
     },
     "passive_aggression": {
@@ -70,12 +70,12 @@
       "f1_macro": 0.9617,
       "f1_weighted": 0.9938,
       "roc_auc": 0.9386,
-      "pr_auc": 0.8985,
+      "pr_auc": 0.8986,
       "brier": 0.0198
     },
     "tension": {
-      "mae": 3.205,
-      "rmse": 4.143,
+      "mae": 3.204,
+      "rmse": 4.142,
       "r2": 0.9753
     },
     "escalation": {
@@ -87,32 +87,32 @@
     },
     "calibration": {
       "sentiment": {
-        "ece": 0.0064,
-        "mce": 0.0339,
-        "mean_confidence": 0.9936,
+        "ece": 0.0066,
+        "mce": 0.0357,
+        "mean_confidence": 0.9934,
         "accuracy": 1.0,
         "n_bins_used": 10,
         "n": 1648
       },
       "emotion": {
-        "ece": 0.0171,
-        "mce": 0.0691,
-        "mean_confidence": 0.9829,
+        "ece": 0.0173,
+        "mce": 0.0699,
+        "mean_confidence": 0.9827,
         "accuracy": 1.0,
         "n_bins_used": 10,
         "n": 1648
       },
       "tone": {
-        "ece": 0.0189,
-        "mce": 0.0761,
-        "mean_confidence": 0.9811,
+        "ece": 0.0194,
+        "mce": 0.0782,
+        "mean_confidence": 0.9806,
         "accuracy": 1.0,
         "n_bins_used": 10,
         "n": 1648
       },
       "sarcasm": {
         "ece": 0.0524,
-        "mce": 0.152,
+        "mce": 0.1519,
         "mean_confidence": 0.0901,
         "accuracy": 0.0388,
         "n_bins_used": 8,
@@ -120,7 +120,7 @@
       },
       "irony": {
         "ece": 0.0356,
-        "mce": 0.1314,
+        "mce": 0.1313,
         "mean_confidence": 0.0715,
         "accuracy": 0.0394,
         "n_bins_used": 10,
@@ -135,7 +135,7 @@
         "n": 1648
       }
     },
-    "latency_ms": 3.51
+    "latency_ms": 7.38
   },
   "fusion_weights": {
     "text": 0.3,
@@ -172,5 +172,5 @@
     },
     "n_samples": 15
   },
-  "wall_time_seconds": 53.1
+  "wall_time_seconds": 111.7
 }

@@ -23,6 +23,7 @@ jobs:
       - name: Lint (syntax + undefined names)
         run: |
           python -m compileall -q cerebro backend evaluation scripts tests
+          python -m pyflakes cerebro/ backend/ evaluation/ scripts/ tests/
           python - <<'EOF'
           import ast, pathlib, sys
           bad = []
