@@ -38,7 +38,7 @@ class _StubPipeline:
                 "context_text": "", "speaker_state_before": {},
             }
             results.append(r)
-        from cerebro.models.pipeline import _add_behavior_flags
+        from cerebro.models.pipeline import _add_behavior_flags, _topics
         _add_behavior_flags(results)
         from cerebro.fusion.fusion import fuse_conversation
         results = fuse_conversation(results)
@@ -68,7 +68,7 @@ class _StubPipeline:
             "escalation_phases": escalation_flags(results),
             "speaker_profiles": speaker_profiles(results),
             "explanations": explanations,
-            "topics": None,
+            "topics": _topics(messages),
             "disclaimer": "stub",
         }
 
@@ -160,6 +160,20 @@ def test_upload_rejects_garbage():
     c = _client()
     r = c.post("/upload", files={"file": ("x.txt", io.BytesIO(b""), "text/plain")})
     assert r.status_code == 422
+
+
+def test_topics_endpoint_returns_segment_list():
+    c = _client()
+    r = c.post("/analyze", files={
+        "file": ("t.txt", io.BytesIO(b"A: fine.\nB: ok then\nC: why would you say that\nA: whatever\n"), "text/plain")})
+    conv = r.json()["summary"]["conversation_id"]
+    t = c.get(f"/conversation/{conv}/topics")
+    assert t.status_code == 200
+    assert isinstance(t.json()["topics"], list)
+    for seg in t.json()["topics"]:
+        for k in ("segment_id", "start", "end", "method", "messages_analyzed"):
+            assert k in seg
+    assert t.json()["topics"][0]["method"] in ("time-gap", "cohesion")
 
 
 def test_pdf_report_endpoint():
