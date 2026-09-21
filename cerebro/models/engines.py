@@ -219,6 +219,7 @@ class MultiTaskEngine:
                 "irony": iron,
                 "passive_aggression": pa,
                 "signals": micro_signals(m["text"]),
+                "behavior_vector": [float(v) for v in behav],
                 "context_text": ctx,
                 "speaker_state_before": mem.state(m["speaker_id"]),
             }

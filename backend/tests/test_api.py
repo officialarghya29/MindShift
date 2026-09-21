@@ -14,6 +14,14 @@ class _StubPipeline:
     def analyze(self, messages, conversation_id="conv_stub"):
         from cerebro.explain.explanation_engine import explain_message
         results = []
+        sig = {
+            "n_words": 3, "pos_hits": [], "neg_hits": [],
+            "sarc_words": [], "irony_words": [], "pa_phrase": None,
+            "exaggeration": [], "interjections": [], "praise_minus_neg": 0,
+            "exclam": 0, "ellipsis": 0, "emoji_sarc": [],
+            "emoji_polarity": 0.0, "laugh": False, "swear": 0,
+            "quoted_echo": False, "is_short": False,
+        }
         for i, m in enumerate(messages):
             r = {
                 "message_id": m["message_id"], "speaker_id": m["speaker_id"],
@@ -29,12 +37,16 @@ class _StubPipeline:
                 "irony": {"probability": .1, "confidence": .2, "supporting_signals": []},
                 "passive_aggression": {"probability": .2, "confidence": .2,
                                        "supporting_signals": []},
-                "signals": {"n_words": 3, "pos_hits": [], "neg_hits": [],
-                            "sarc_words": [], "irony_words": [], "pa_phrase": None,
-                            "exaggeration": [], "interjections": [], "praise_minus_neg": 0,
-                            "exclam": 0, "ellipsis": 0, "emoji_sarc": [],
-                            "emoji_polarity": 0.0, "laugh": False, "swear": 0,
-                            "quoted_echo": False, "is_short": False},
+                # production results carry the canonical 16-dim vector from
+                # predict_conversation; the stub fabricates one from its signals.
+                "signals": sig,
+                "behavior_vector": [
+                    sig["n_words"], float(len(m["text"])), sig["exclam"], 0, 0, 0,
+                    len(sig["pos_hits"]), len(sig["neg_hits"]),
+                    len(sig["exaggeration"]), sig["emoji_polarity"],
+                    len(sig["emoji_sarc"]), int(sig["laugh"]), sig["ellipsis"],
+                    int(sig["quoted_echo"]) + int(sig["swear"]),
+                    int(sig["is_short"]), 0.0],
                 "context_text": "", "speaker_state_before": {},
             }
             results.append(r)

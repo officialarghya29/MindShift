@@ -63,7 +63,7 @@
       "f1_macro": 0.9523,
       "f1_weighted": 0.9787
     },
-    "latency_ms": 3.14
+    "latency_ms": 6.59
   },
   "B": {
     "sentiment": {
@@ -129,7 +129,7 @@
       "f1_macro": 0.9509,
       "f1_weighted": 0.9781
     },
-    "latency_ms": 3.25
+    "latency_ms": 7.01
   },
   "C": {
     "sentiment": {
@@ -195,7 +195,7 @@
       "f1_macro": 0.9507,
       "f1_weighted": 0.9781
     },
-    "latency_ms": 3.32
+    "latency_ms": 7.01
   },
   "D": {
     "sentiment": {
@@ -226,7 +226,7 @@
       "f1_macro": 0.9561,
       "f1_weighted": 0.9937,
       "roc_auc": 0.9451,
-      "pr_auc": 0.8889,
+      "pr_auc": 0.8887,
       "brier": 0.0068
     },
     "irony": {
@@ -235,8 +235,8 @@
       "recall": 0.9,
       "f1_macro": 0.9424,
       "f1_weighted": 0.9917,
-      "roc_auc": 0.9328,
-      "pr_auc": 0.8511,
+      "roc_auc": 0.9329,
+      "pr_auc": 0.8514,
       "brier": 0.0083
     },
     "passive_aggression": {
@@ -245,13 +245,13 @@
       "recall": 0.9302,
       "f1_macro": 0.9575,
       "f1_weighted": 0.9931,
-      "roc_auc": 0.9448,
-      "pr_auc": 0.9021,
-      "brier": 0.007
+      "roc_auc": 0.9447,
+      "pr_auc": 0.902,
+      "brier": 0.0069
     },
     "tension": {
       "mae": 3.205,
-      "rmse": 4.139,
+      "rmse": 4.138,
       "r2": 0.9753
     },
     "escalation": {
@@ -261,6 +261,6 @@
       "f1_macro": 0.9536,
       "f1_weighted": 0.9793
     },
-    "latency_ms": 3.35
+    "latency_ms": 7.07
   }
 }
