@@ -34,7 +34,6 @@ from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from cerebro.parsers import auto_parse
-from cerebro.features.segmentation import segment_conversation
 from cerebro.models.pipeline import CerebroPipeline
 from cerebro.models.engines import MultiTaskEngine
 
@@ -240,13 +239,7 @@ async def delete_all_conversations():
 @app.get("/conversation/{conv_id}/topics")
 async def get_topics(conv_id: str):
     rep = store_get(conv_id)
-    msgs = [{"message_id": m["message_id"], "text": m["text"],
-             "timestamp": None} for m in rep["messages"]]
-    segs = segment_conversation(msgs)
-    return {"conversation_id": conv_id, "topics": [
-        {"segment_id": s["segment_id"], "start": s["start"], "end": s["end"],
-         "method": s["method"],
-         "messages_analyzed": len(s["messages"])} for s in segs]}
+    return {"conversation_id": conv_id, "topics": rep.get("topics") or []}
 
 
 @app.get("/why/{conv_id}/{message_id}")

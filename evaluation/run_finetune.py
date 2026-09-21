@@ -3,8 +3,12 @@
 Protocol:
   1. pull N real Reddit comments (HF datasets-server, research license)
   2. adapter → unified schema (sentiment/tension derived from native labels)
-  3. 60/20/20 split BY SOURCE CONVERSATION (Reddit link_id), stratified
-  4. fit a fresh text-only MultiTaskEngine on the train split
+  3. 70/15/15 row-level split (deduplicated, stratified by emotion band) —
+     the HF `simplified` API exposes no thread ids, so conversation-level
+     splits are impossible here; exact-dup removal mitigates the dominant
+     leakage mode (disclosed in the summary artifact)
+  4. fit a fresh text-only MultiTaskEngine on the train split; the held-out
+     VAL split selects the behavior-vector modality for the final engine
   5. evaluate on the held-out real test split:
        before = the in-corpus engine (zero-shot)
        after  = the real-data engine
@@ -46,7 +50,7 @@ SEED = 42
 
 def _get(url: str, tries: int = 8) -> dict:
     """GET with exponential backoff — the datasets-server rate-limits (429)
-    with a cool-down window longer than naive 2^n seconds."""
+    and throws transient 5xx gateway errors; both are retried."""
     import time
     last = None
     for t in range(tries):
@@ -54,9 +58,9 @@ def _get(url: str, tries: int = 8) -> dict:
             with urllib.request.urlopen(url, timeout=30) as r:
                 return json.loads(r.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
-            if e.code == 429:
+            if e.code in (429, 502, 503, 504):
                 wait = 15 * (2 ** t)      # 15s, 30s, 60s, ...
-                print(f"  429 rate-limited, backing off {wait}s...")
+                print(f"  HTTP {e.code} — server busy, backing off {wait}s...")
                 time.sleep(wait)
                 last = e
             else:
@@ -182,11 +186,23 @@ def main() -> None:
     print(f"row-level split (dedup, stratified): "
           f"train={len(train)} val={len(val)} test={len(test)}")
 
-    # ---- fit real-data engine (text-only variant) ----
-    print("fitting real-data engine (text-only)...")
+    # ---- fit on train; select the behavior-vector modality via the HOLD-OUT
+    # val split (the val split was previously computed but unused) ----
+    candidates = {}
+    for use_behavior in (False, True):
+        cand = MultiTaskEngine(seed=SEED)
+        cand.fit([[m] for m in train], use_context=False,
+                 use_memory=False, use_behavior=use_behavior)
+        score = eval_msgs(CerebroPipeline.from_trained(cand), val)
+        candidates[use_behavior] = score
+        print(f"  use_behavior={use_behavior}: {score}")
+
+    use_behavior = candidates[True]["emotion_exact"] >= candidates[False]["emotion_exact"]
+    print(f"selecting use_behavior={use_behavior} by val emotion_exact")
+
     real_eng = MultiTaskEngine(seed=SEED)
     info = real_eng.fit([[m] for m in train], use_context=False,
-                        use_memory=False, use_behavior=False)
+                        use_memory=False, use_behavior=use_behavior)
     print(f"  {info}")
 
     real_pipe = CerebroPipeline.from_trained(real_eng)
@@ -230,7 +246,10 @@ def main() -> None:
                   "limitation": ("HF simplified config exposes no Reddit thread ids; "
                                  "thread-level split impossible via this API. Exact-dup "
                                  "removal mitigates the dominant leakage mode.")},
-        "engine_variant": "text-only MultiTaskEngine (same heads as CEREBRO)",
+        "engine_variant": ("text-only MultiTaskEngine (same heads as CEREBRO), "
+                           "behavior-vector modality selected on the hold-out val split"),
+        "val_model_selection": {str(k): v for k, v in candidates.items()},
+        "selected_use_behavior": use_behavior,
         "before_zero_shot": before,
         "after_finetune": after,
         "delta": {k: (round(after[k] - before[k], 4)
