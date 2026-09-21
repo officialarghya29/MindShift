@@ -9,40 +9,57 @@
   "test": 453,
   "limitation": "HF simplified config exposes no Reddit thread ids; thread-level split impossible via this API. Exact-dup removal mitigates the dominant leakage mode."
  },
- "engine_variant": "text-only MultiTaskEngine (same heads as CEREBRO)",
+ "engine_variant": "text-only MultiTaskEngine (same heads as CEREBRO), behavior-vector modality selected on the hold-out val split",
+ "val_model_selection": {
+  "False": {
+   "n": 447,
+   "emotion_exact": 0.4676,
+   "emotion_top3": 0.7942,
+   "sentiment_exact": 0.6219,
+   "tension_valence_auc": 0.8212
+  },
+  "True": {
+   "n": 447,
+   "emotion_exact": 0.4944,
+   "emotion_top3": 0.8031,
+   "sentiment_exact": 0.6555,
+   "tension_valence_auc": 0.853
+  }
+ },
+ "selected_use_behavior": true,
  "before_zero_shot": {
   "n": 453,
-  "emotion_exact": 0.117,
-  "emotion_top3": 0.3709,
-  "sentiment_exact": 0.3797,
-  "tension_valence_auc": 0.6377
+  "emotion_exact": 0.128,
+  "emotion_top3": 0.3664,
+  "sentiment_exact": 0.426,
+  "tension_valence_auc": 0.6737
  },
  "after_finetune": {
   "n": 453,
-  "emotion_exact": 0.4459,
-  "emotion_top3": 0.7528,
-  "sentiment_exact": 0.6071,
-  "tension_valence_auc": 0.8276
+  "emotion_exact": 0.479,
+  "emotion_top3": 0.7638,
+  "sentiment_exact": 0.6115,
+  "tension_valence_auc": 0.829
  },
  "delta": {
-  "emotion_exact": 0.3289,
-  "emotion_top3": 0.3819,
-  "sentiment_exact": 0.2274,
-  "tension_valence_auc": 0.1899
+  "emotion_exact": 0.351,
+  "emotion_top3": 0.3974,
+  "sentiment_exact": 0.1855,
+  "tension_valence_auc": 0.1553
  },
  "retention_incorpus_reference": {
   "n": 1500,
   "emotion_exact": 1.0,
   "emotion_top3": 1.0,
   "sentiment_exact": 1.0,
-  "tension_valence_auc": 0.9566
+  "tension_valence_auc": 0.9507
  },
  "retention_incorpus_after_realdata_training": {
   "n": 1500,
-  "emotion_exact": 0.2593,
-  "emotion_top3": 0.558,
-  "sentiment_exact": 0.5247,
-  "tension_valence_auc": 0.8813
+  "emotion_exact": 0.2353,
+  "emotion_top3": 0.5093,
+  "sentiment_exact": 0.6167,
+  "tension_valence_auc": 0.8807
  },
  "note": "Text-only fine-tune on real data closes part of the transfer gap; full CEREBRO context/temporal stack needs multi-turn real conversations (roadmap: DailyDialog transfer)."
 }
