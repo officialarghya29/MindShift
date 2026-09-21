@@ -10,7 +10,7 @@ CEREBRO — context-aware temporal conversation-intelligence engine (FastAPI + s
 - Train + eval (deterministic, seed 42, ~4 min): `python -m evaluation.run_full fit` then `python -m evaluation.run_full eval`. Notably `fit` only writes `models/saved/eval_state.joblib`; the deployable engine `models/saved/cerebro_engine.joblib` is created by `eval`, which also REWRITES the committed `evaluation/results/*.json`.
 - API + dashboard: `uvicorn backend.app.main:app --reload` → dashboard at `/`, OpenAPI at `/docs`. Backend lazy-loads the persisted engine and returns 503 if `models/saved/cerebro_engine.joblib` is missing.
 - Tests: `python -m pytest tests/ backend/tests/ -q` (67). No trained model needed — `backend/tests` stubs the pipeline.
-- Lint: CI gate is `python -m compileall -q cerebro backend evaluation scripts tests` plus an AST-parse check. The documented pyflakes gate (`python -m pyflakes cerebro/ backend/ evaluation/ tests/ scripts/`) needs pyflakes installed — it is NOT in requirements.
+- Lint: CI gate is `python -m compileall -q cerebro backend evaluation scripts tests`, `python -m pyflakes cerebro/ backend/ evaluation/ scripts/ tests/` (in requirements.txt), plus an AST-parse check.
 - Graphs: `PYTHONPATH=. python -m evaluation.make_graphs`. Ships 7 per-figure validators (on-canvas, text overlap, on-screen clearance, display-size floor, watermark, legend-vs-data-ink, segment-level line-through-text) that refuse unreadable charts; must pass. Figures are drawn at a single 9.6 in width because GitHub renders README images at ~830 px — see the README's "Figure legibility policy".
 
 ## CI-gated committed artifacts

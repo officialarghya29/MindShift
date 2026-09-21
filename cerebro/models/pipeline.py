@@ -35,17 +35,21 @@ def _topics(messages: list[dict]) -> list[dict]:
 
 def _add_behavior_flags(results):
     for r in results:
-        r["behavior_flags"] = behavior_flags(np.array(_vec_from_signals(r), dtype=float))
+        r["behavior_flags"] = behavior_flags(np.array(_vec_from_result(r), dtype=float))
     return results
 
 
-def _vec_from_signals(r) -> list[float]:
-    """Reconstruct the behavioral vector fields needed by behavior_flags."""
-    s = r["signals"]
-    return [s["n_words"], len(r["text"]), s["exclam"], 0, 0, 0,
-            len(s["pos_hits"]), len(s["neg_hits"]), len(s["exaggeration"]),
-            s["emoji_polarity"], len(s["emoji_sarc"]), int(s["laugh"]),
-            s["ellipsis"], s["quoted_echo"] + s["swear"], int(s["is_short"]), 0]
+def _vec_from_result(r) -> list[float]:
+    """Canonical 16-dim behavioral vector (PS-01 §17), carried on each result
+    by predict_conversation. Previously reconstructed positionally from the
+    signal dict — that duplicated the authoritative feature and silently zeroed
+    the question/repeated-punct/caps-ratio/gap dims while index 13 substituted
+    `'"' in text` + swear for the true unbalanced-quote count."""
+    vec = r.get("behavior_vector")
+    if vec is None:
+        raise KeyError("predict_conversation attaches behavior_vector; "
+                       "manually-built stubs must too")
+    return [float(v) for v in vec]
 
 
 class CerebroPipeline:

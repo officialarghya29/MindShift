@@ -24,7 +24,6 @@ def _mk_texts():
 
 
 def _train():
-    texts = sum(_mk_texts(), [])
     convs = []
     for group in _mk_texts():
         convs.append([
@@ -67,3 +66,24 @@ def test_pipeline_transition_matrix_and_digest():
     assert isinstance(d["turning_points"], list)
     for s in d["speakers"]:
         assert "avg_tension" in s and "high_tension_share" in s
+
+
+def test_behavior_flags_from_canonical_vector():
+    """C8 regression: flags read the authoritative 16-dim vector carried on
+    each result, not a lossy positional reconstruction of the signals dict."""
+    pipe = CerebroPipeline.from_trained(_train())
+    msgs = [
+        {"text": "WHY AGAIN!!!", "speaker_id": "A"},
+        {"text": "whatever", "speaker_id": "B"},
+    ]
+    rep = pipe.analyze(msgs)
+    shout = rep["messages"][0]
+    assert len(shout["behavior_vector"]) == 16
+    assert shout["behavior_vector"][3] == 0     # no "?" in "WHY AGAIN!!!"
+    assert shout["behavior_vector"][4] > 0      # repeated punctuation ("!!!")
+    bf = shout["behavior_flags"]
+    assert bf["negative_lexicon"] == shout["behavior_vector"][7]
+    assert bf["caps_ratio"] > 0
+    assert bf["intensity"] > 0
+    for r in rep["messages"]:
+        assert "behavior_flags" in r and "behavior_vector" in r
